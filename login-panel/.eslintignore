@@ -1,0 +1,5 @@
+node_modules
+.webpack
+.husky
+src/Plugins
+public

@@ -1,0 +1,62 @@
+.course-details {
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+.course-title {
+    color: #2c3e50;
+    border-bottom: 2px solid #3498db;
+    padding-bottom: 10px;
+}
+
+.instructor-name {
+    color: #34495e;
+    font-style: italic;
+}
+
+.rating {
+    font-size: 1.2em;
+    color: #f39c12;
+}
+
+.description {
+    line-height: 1.6;
+    color: #555;
+}
+
+.comment {
+    transition: all 0.3s ease;
+}
+
+.comment:hover {
+    transform: translateX(5px);
+    background-color: #f0f0f0;
+}
+
+.like-button, .dislike-button {
+    transition: all 0.2s ease;
+}
+
+.like-button:hover, .dislike-button:hover {
+    transform: scale(1.1);
+}
+
+.comment-form textarea {
+    transition: border-color 0.3s ease;
+}
+
+.comment-form textarea:focus {
+    border-color: #3498db;
+}
+
+.submit-button {
+    transition: background-color 0.3s ease;
+}
+
+.submit-button:hover {
+    background-color: #2980b9;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}

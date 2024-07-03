@@ -1,0 +1,119 @@
+body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    margin: 0;
+    padding: 0;
+}
+
+.header {
+    background: linear-gradient(90deg, #4b6cb7 0%, #182848 100%);
+    color: white;
+    padding: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.site-title {
+    font-size: 2rem;
+    margin: 0;
+}
+
+.search-container {
+    display: flex;
+    align-items: center;
+}
+
+.search-input {
+    padding: 0.5rem;
+    border: none;
+    border-radius: 4px;
+    margin-right: 0.5rem;
+}
+
+.auth-button {
+    background-color: white;
+    color: #4b6cb7;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.course-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 2rem;
+    padding: 2rem;
+}
+
+.course-card {
+    background-color: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease-in-out;
+}
+
+.course-card:hover {
+    transform: translateY(-5px);
+}
+
+.course-content {
+    padding: 1rem;
+}
+
+.course-title {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.course-instructor {
+    color: #666;
+    margin-bottom: 1rem;
+}
+
+.course-rating {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.star {
+    color: #f6ad55;
+    margin-right: 0.25rem;
+}
+
+.details-button {
+    background-color: #4b6cb7;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease-in-out;
+}
+
+.details-button:hover {
+    background-color: #3c5aa6;
+}
+
+.admin-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 2rem;
+    padding: 0 2rem 2rem;
+}
+
+.admin-button {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease-in-out;
+}
+
+.admin-button:hover {
+    opacity: 0.9;
+}

@@ -1,0 +1,10 @@
+{
+  "jdbcUrl":  "jdbc:postgresql://localhost:5432/db",
+  "username": "db",
+  "password": "root",
+  "prepStmtCacheSize": 250,
+  "prepStmtCacheSqlLimit":  2048,
+  "maximumPoolSize": 40,
+  "connectionLiveMinutes": 10,
+  "maximumServerConnection": 20000
+}

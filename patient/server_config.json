@@ -1,0 +1,6 @@
+{
+  "serverIP": "127.0.0.1",
+  "serverPort": 10003,
+  "maximumServerConnection": 10000,
+  "maximumClientConnection": 10000
+}
