@@ -1,0 +1,8 @@
+**/.DS_Store
+*.bat
+*.cmd
+*.out
+*.o
+**/.vscode
+**/.main.dSYM
+*.dSYM
