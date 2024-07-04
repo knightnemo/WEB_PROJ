@@ -16,19 +16,19 @@ object Routes:
     messageType match {
       case "AddPatientMessage" =>
         IO(decode[AddPatientMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for AddPatientMessage")))
-          .flatMap{m=>
-            m.fullPlan.map(_.asJson.toString)
-          }
+          .flatMap(_.fullPlan.map(_.asJson.toString))
       case "LoginMessage" =>
         IO(decode[LoginMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for LoginMessage")))
-          .flatMap{m=>
-            m.fullPlan.map(_.asJson.toString)
-          }
+          .flatMap(_.fullPlan.map(_.asJson.toString))
       case "RegisterMessage" =>
         IO(decode[RegisterMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for RegisterMessage")))
-          .flatMap{m=>
-            m.fullPlan.map(_.asJson.toString)
-          }
+          .flatMap(_.fullPlan.map(_.asJson.toString))
+      case "UserQueryMessage" =>
+        IO(decode[UserQueryMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for UserQueryMessage")))
+          .flatMap(_.fullPlan.map(_.asJson.toString))
+      case "UserDeleteMessage" =>
+        IO(decode[UserDeleteMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for UserDeleteMessage")))
+          .flatMap(_.fullPlan.map(_.asJson.toString))
       case _ =>
         IO.raiseError(new Exception(s"Unknown type: $messageType"))
     }

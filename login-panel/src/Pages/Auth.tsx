@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import axios, { isAxiosError } from 'axios';
 import { useHistory } from 'react-router-dom';
 import { API } from 'Plugins/CommonUtils/API';
@@ -6,6 +6,7 @@ import { LoginMessage } from 'Plugins/DoctorAPI/LoginMessage';
 import { RegisterMessage } from 'Plugins/DoctorAPI/RegisterMessage';
 import { PatientLoginMessage } from 'Plugins/PatientAPI/PatientLoginMessage';
 import { PatientRegisterMessage } from 'Plugins/PatientAPI/PatientRegisterMessage';
+import { UserDeleteMessage } from 'Plugins/DoctorAPI/UserDeleteMessage';
 import './Auth.css';
 
 export function Auth() {
@@ -15,22 +16,22 @@ export function Auth() {
     const [isAdmin, setIsAdmin] = useState(false);
     const [isRegistering, setIsRegistering] = useState(false);
     const [isLoggedIn, setIsLoggedIn] = useState(false);
-    const [users, setUsers] = useState<string[]>([]);
+    const [userToDelete, setUserToDelete] = useState('');
+
+    const resetState = useCallback(() => {
+        setUsername('');
+        setPassword('');
+        setIsAdmin(false);
+        setIsRegistering(false);
+        setIsLoggedIn(false);
+        setUserToDelete('');
+    }, []);
 
     useEffect(() => {
-        if (isAdmin && isLoggedIn) {
-            fetchUsers();
-        }
-    }, [isAdmin, isLoggedIn]);
-
-    const fetchUsers = async () => {
-        try {
-            const response = await axios.post('/api/UserQueryMessage', {});
-            setUsers(response.data);
-        } catch (error) {
-            console.error('Error fetching users:', error);
-        }
-    };
+        return () => {
+            resetState();
+        };
+    }, [resetState]);
 
     const sendPostRequest = async (message: API) => {
         try {
@@ -41,9 +42,6 @@ export function Auth() {
             console.log('Response body:', response.data);
             alert('操作成功');
             setIsLoggedIn(true);
-            if (isAdmin) {
-                fetchUsers();
-            }
         } catch (error) {
             if (isAxiosError(error)) {
                 if (error.response && error.response.data) {
@@ -77,21 +75,22 @@ export function Auth() {
         }
     };
 
-    const handleDeleteUser = async (userName: string) => {
+    const handleDeleteUser = async () => {
+        if (!userToDelete) {
+            alert('请输入要删除的用户名');
+            return;
+        }
         try {
-            await axios.post('/api/UserDeleteMessage', { userName });
-            alert(`用户 ${userName} 已删除`);
-            fetchUsers();
+            await sendPostRequest(new UserDeleteMessage(userToDelete));
+            alert(`用户 ${userToDelete} 已删除`);
+            setUserToDelete('');
         } catch (error) {
             alert('删除用户失败');
         }
     };
 
     const handleLogout = () => {
-        setIsLoggedIn(false);
-        setUsername('');
-        setPassword('');
-        setUsers([]);
+        resetState();
     };
 
     return (
@@ -148,21 +147,19 @@ export function Auth() {
                             欢迎, {username}!
                         </h2>
                         {isAdmin && (
-                            <div className="user-list">
-                                <h3>用户列表</h3>
-                                <ul>
-                                    {users.map((user) => (
-                                        <li key={user}>
-                                            <span>{user}</span>
-                                            <button
-                                                onClick={() => handleDeleteUser(user)}
-                                                className="delete-button"
-                                            >
-                                                删除
-                                            </button>
-                                        </li>
-                                    ))}
-                                </ul>
+                            <div className="user-management">
+                                <h3>删除用户</h3>
+                                <div className="form-group">
+                                    <input
+                                        type="text"
+                                        value={userToDelete}
+                                        onChange={(e) => setUserToDelete(e.target.value)}
+                                        placeholder="输入要删除的用户名"
+                                    />
+                                    <button onClick={handleDeleteUser} className="delete-button">
+                                        删除用户
+                                    </button>
+                                </div>
                             </div>
                         )}
                         <button
