@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ScalaCompilerConfiguration">
+    <profile name="sbt 1" modules="patient_6329" />
+    <profile name="sbt 2" modules="Patient">
+      <option name="implicitConversions" value="true" />
+      <option name="featureWarnings" value="true" />
+    </profile>
+  </component>
+</project>

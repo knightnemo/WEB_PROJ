@@ -1,0 +1,51 @@
+"use client";
+
+import * as React from 'react';
+import classNames from 'classnames';
+import useLayoutEffect from "rc-util/es/hooks/useLayoutEffect";
+export default function Progress(_ref) {
+  let {
+    percent,
+    prefixCls
+  } = _ref;
+  const dotClassName = `${prefixCls}-dot`;
+  const holderClassName = `${dotClassName}-holder`;
+  const hideClassName = `${holderClassName}-hidden`;
+  const [render, setRender] = React.useState(false);
+  // ==================== Visible =====================
+  useLayoutEffect(() => {
+    if (percent !== 0) {
+      setRender(true);
+    }
+  }, [percent !== 0]);
+  // ==================== Progress ====================
+  const safePtg = Math.max(Math.min(percent, 100), 0);
+  const viewSize = 100;
+  const borderWidth = viewSize / 5;
+  const radius = viewSize / 2 - borderWidth / 2;
+  const circumference = radius * 2 * Math.PI;
+  const renderCircle = (circleClassName, style) => ( /*#__PURE__*/React.createElement("circle", {
+    className: classNames(circleClassName, `${dotClassName}-circle`),
+    r: radius,
+    cx: "50",
+    cy: "50",
+    strokeWidth: borderWidth,
+    style: style
+  }));
+  // ===================== Render =====================
+  if (!render) {
+    return null;
+  }
+  return /*#__PURE__*/React.createElement("span", {
+    className: classNames(holderClassName, `${dotClassName}-progress`, safePtg <= 0 && hideClassName)
+  }, /*#__PURE__*/React.createElement("svg", {
+    viewBox: `0 0 ${viewSize} ${viewSize}`,
+    role: "progressbar",
+    "aria-valuemin": 0,
+    "aria-valuemax": 100,
+    "aria-valuenow": safePtg
+  }, renderCircle(`${dotClassName}-circle-bg`), renderCircle('', {
+    strokeDasharray: `${circumference * safePtg / 100} ${circumference * (100 - safePtg) / 100}`,
+    strokeDashoffset: `${circumference / 4}`
+  })));
+}

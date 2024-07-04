@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="sbt: ch.qos.logback:logback-classic:1.2.10:jar" external-system-id="SBT">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/ch/qos/logback/logback-classic/1.2.10/logback-classic-1.2.10.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/ch/qos/logback/logback-classic/1.2.10/logback-classic-1.2.10-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useHistory, Link } from 'react-router-dom';
 import './Main.css';
+import axios from 'axios';
 
 interface Course {
     id: number;
@@ -35,8 +36,13 @@ export function Main() {
     const history = useHistory();
     const [courses, setCourses] = useState<Course[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
+    const [username, setUsername] = useState('');
 
     useEffect(() => {
+        const storedUsername = localStorage.getItem('username');
+        if (storedUsername) {
+            setUsername(storedUsername);
+        }
         const fetchCourses = async () => {
             const mockCourses: Course[] = [
                 { id: 1, title: "Web开发入门", instructor: "张三", rating: 4.5, reviews: 120 },
@@ -48,6 +54,7 @@ export function Main() {
             ];
             setCourses(mockCourses);
         };
+
         fetchCourses();
     }, []);
 
@@ -74,6 +81,17 @@ export function Main() {
                         >
                             注册 / 登录
                         </button>
+                        {username && (
+                            <div className="username-display">
+                                <span>欢迎, {username}</span>
+                                <button
+                                    onClick={() => history.push('/change-password')}
+                                    className="change-password-button"
+                                >
+                                    修改密码
+                                </button>
+                            </div>
+                        )}
                     </div>
                 </div>
             </header>

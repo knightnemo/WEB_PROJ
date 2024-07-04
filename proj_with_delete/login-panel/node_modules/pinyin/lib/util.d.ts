@@ -1,0 +1,10 @@
+import type { IPinyinAllOptions, IPinyinOptions, IPinyinStyle, IPinyinMode } from "./declare";
+import { ENUM_PINYIN_STYLE, ENUM_PINYIN_MODE } from "./constant";
+export declare function hasKey(obj: any, key: string): boolean;
+export declare function convertPinyinStyle(style?: IPinyinStyle): ENUM_PINYIN_STYLE;
+export declare function convertPinyinMode(mode?: IPinyinMode): ENUM_PINYIN_MODE;
+export declare function convertUserOptions(options?: IPinyinOptions): IPinyinAllOptions;
+export declare function combo2array(a1: string[], a2: string[]): string[];
+export declare function combo(arr: string[][]): string[];
+export declare function compact2array(a1: string[] | string[][], a2: string[]): string[][];
+export declare function compact(arr: string[][]): string[][];

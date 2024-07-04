@@ -1,0 +1,21 @@
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.callbackify = callbackify;
+// wrapper an async function that support callback style API.
+// It will preserve 'this'.
+function callbackify(fn) {
+  return function () {
+    const args = [...arguments];
+    const callback = args.pop();
+
+    // If the last argument is a function, assume it's the callback.
+    if (typeof callback === 'function') {
+      return fn.apply(this, args).then(result => callback(null, result), err => callback(err));
+    }
+    return fn.apply(this, arguments);
+  };
+}
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJuYW1lcyI6WyJjYWxsYmFja2lmeSIsImZuIiwiYXJncyIsImFyZ3VtZW50cyIsImNhbGxiYWNrIiwicG9wIiwiYXBwbHkiLCJ0aGVuIiwicmVzdWx0IiwiZXJyIl0sInNvdXJjZXMiOlsiY2FsbGJhY2tpZnkuanMiXSwic291cmNlc0NvbnRlbnQiOlsiLy8gd3JhcHBlciBhbiBhc3luYyBmdW5jdGlvbiB0aGF0IHN1cHBvcnQgY2FsbGJhY2sgc3R5bGUgQVBJLlxuLy8gSXQgd2lsbCBwcmVzZXJ2ZSAndGhpcycuXG5leHBvcnQgZnVuY3Rpb24gY2FsbGJhY2tpZnkoZm4pIHtcbiAgcmV0dXJuIGZ1bmN0aW9uICgpIHtcbiAgICBjb25zdCBhcmdzID0gWy4uLmFyZ3VtZW50c11cbiAgICBjb25zdCBjYWxsYmFjayA9IGFyZ3MucG9wKClcblxuICAgIC8vIElmIHRoZSBsYXN0IGFyZ3VtZW50IGlzIGEgZnVuY3Rpb24sIGFzc3VtZSBpdCdzIHRoZSBjYWxsYmFjay5cbiAgICBpZiAodHlwZW9mIGNhbGxiYWNrID09PSAnZnVuY3Rpb24nKSB7XG4gICAgICByZXR1cm4gZm4uYXBwbHkodGhpcywgYXJncykudGhlbihcbiAgICAgICAgKHJlc3VsdCkgPT4gY2FsbGJhY2sobnVsbCwgcmVzdWx0KSxcbiAgICAgICAgKGVycikgPT4gY2FsbGJhY2soZXJyKSxcbiAgICAgIClcbiAgICB9XG5cbiAgICByZXR1cm4gZm4uYXBwbHkodGhpcywgYXJndW1lbnRzKVxuICB9XG59XG4iXSwibWFwcGluZ3MiOiI7Ozs7OztBQUFBO0FBQ0E7QUFDTyxTQUFTQSxXQUFXQSxDQUFDQyxFQUFFLEVBQUU7RUFDOUIsT0FBTyxZQUFZO0lBQ2pCLE1BQU1DLElBQUksR0FBRyxDQUFDLEdBQUdDLFNBQVMsQ0FBQztJQUMzQixNQUFNQyxRQUFRLEdBQUdGLElBQUksQ0FBQ0csR0FBRyxDQUFDLENBQUM7O0lBRTNCO0lBQ0EsSUFBSSxPQUFPRCxRQUFRLEtBQUssVUFBVSxFQUFFO01BQ2xDLE9BQU9ILEVBQUUsQ0FBQ0ssS0FBSyxDQUFDLElBQUksRUFBRUosSUFBSSxDQUFDLENBQUNLLElBQUksQ0FDN0JDLE1BQU0sSUFBS0osUUFBUSxDQUFDLElBQUksRUFBRUksTUFBTSxDQUFDLEVBQ2pDQyxHQUFHLElBQUtMLFFBQVEsQ0FBQ0ssR0FBRyxDQUN2QixDQUFDO0lBQ0g7SUFFQSxPQUFPUixFQUFFLENBQUNLLEtBQUssQ0FBQyxJQUFJLEVBQUVILFNBQVMsQ0FBQztFQUNsQyxDQUFDO0FBQ0gifQ==

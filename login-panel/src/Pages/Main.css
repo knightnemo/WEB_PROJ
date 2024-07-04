@@ -138,3 +138,23 @@
 .details-button:hover {
     background-color: #2563eb;
 }
+
+.username-display {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.change-password-button {
+    background-color: #3b82f6;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 0.25rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.change-password-button:hover {
+    background-color: #2563eb;
+}

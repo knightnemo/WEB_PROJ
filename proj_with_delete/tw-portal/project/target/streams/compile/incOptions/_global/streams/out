@@ -1,0 +1,5 @@
+[debug] Created transactional ClassFileManager with tempDir = /Users/knightnemo/Desktop/web/WEB_PROJ/proj_with_delete/tw-portal/project/target/scala-2.12/sbt-1.0/classes.bak
+[debug] About to delete class files:
+[debug] We backup class files:
+[debug] Created transactional ClassFileManager with tempDir = /Users/knightnemo/Desktop/web/WEB_PROJ/proj_with_delete/tw-portal/project/target/scala-2.12/sbt-1.0/classes.bak
+[debug] Removing the temporary directory used for backing up class files: /Users/knightnemo/Desktop/web/WEB_PROJ/proj_with_delete/tw-portal/project/target/scala-2.12/sbt-1.0/classes.bak
