@@ -12,5 +12,5 @@ case class UserDeleteMessagePlanner(userName: String, override val planContext: 
     writeDB(
       s"DELETE FROM ${schemaName}.user_name WHERE user_name = ?",
       List(SqlParameter("String", userName))
-    ).map(_ => s"User $userName deleted successfully")
+    ).map(_ => s"User deletion operation completed for $userName")
   }
