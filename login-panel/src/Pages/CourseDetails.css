@@ -1,62 +1,155 @@
 .course-details {
-    animation: fadeIn 0.5s ease-in-out;
+    min-height: 25vh;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    padding: 2rem 0;
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+}
+
+.back-button {
+    background-color: #3b82f6;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-bottom: 1rem;
+    transition: background-color 0.3s;
+}
+
+.back-button:hover {
+    background-color: #2563eb;
 }
 
 .course-title {
-    color: #2c3e50;
-    border-bottom: 2px solid #3498db;
-    padding-bottom: 10px;
+    font-size: 2rem;
+    font-weight: bold;
+    color: #1f2937;
+    margin-bottom: 0.5rem;
 }
 
 .instructor-name {
-    color: #34495e;
-    font-style: italic;
+    font-size: 1.2rem;
+    color: #4b5563;
+    margin-bottom: 1rem;
 }
 
 .rating {
-    font-size: 1.2em;
-    color: #f39c12;
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.star {
+    color: #fbbf24;
+    margin-right: 0.25rem;
+}
+
+.rating-value {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #1f2937;
+}
+
+.review-count {
+    color: #6b7280;
+    margin-left: 0.5rem;
 }
 
 .description {
+    color: #4b5563;
     line-height: 1.6;
-    color: #555;
+    margin-bottom: 2rem;
+}
+
+.comments-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #1f2937;
+    margin-bottom: 1rem;
 }
 
 .comment {
-    transition: all 0.3s ease;
+    background-color: #f3f4f6;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
 }
 
-.comment:hover {
-    transform: translateX(5px);
-    background-color: #f0f0f0;
+.comment-user {
+    font-weight: bold;
+    color: #1f2937;
+    margin-bottom: 0.5rem;
 }
 
-.like-button, .dislike-button {
-    transition: all 0.2s ease;
+.comment-content {
+    color: #4b5563;
+    margin-bottom: 0.5rem;
 }
 
-.like-button:hover, .dislike-button:hover {
-    transform: scale(1.1);
+.comment-actions {
+    display: flex;
+    gap: 1rem;
+}
+
+.like-button,
+.dislike-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    color: #6b7280;
+}
+
+.like-button:hover {
+    color: #10b981;
+}
+
+.dislike-button:hover {
+    color: #ef4444;
+}
+
+.comment-form {
+    margin-top: 2rem;
 }
 
 .comment-form textarea {
-    transition: border-color 0.3s ease;
-}
-
-.comment-form textarea:focus {
-    border-color: #3498db;
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    resize: vertical;
+    min-height: 100px;
+    margin-bottom: 1rem;
 }
 
 .submit-button {
-    transition: background-color 0.3s ease;
+    background-color: #3b82f6;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
 }
 
 .submit-button:hover {
-    background-color: #2980b9;
+    background-color: #2563eb;
 }
 
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+.loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    font-size: 1.5rem;
+    color: #4b5563;
 }
