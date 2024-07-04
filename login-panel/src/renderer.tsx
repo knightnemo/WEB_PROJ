@@ -20,16 +20,16 @@ import React from 'react'
 import { render } from 'react-dom'
 import { HashRouter, Route, Switch } from 'react-router-dom'
 import { Main } from 'Pages/Main'
-import { AnotherPage } from 'Pages/AnotherPage'
 import { CourseDetails } from 'Pages/CourseDetails'
+import { Auth } from 'Pages/Auth';
 
 const Layout = () => {
     return (
         <HashRouter>
             <Switch>
                 <Route path="/" exact component={Main} />
-                <Route path="/another" exact component={AnotherPage} />
                 <Route path="/course/:id" exact component={CourseDetails} />
+                <Route path="/auth" exact component={Auth} />
             </Switch>
         </HashRouter>
     )
