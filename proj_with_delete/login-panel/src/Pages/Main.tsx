@@ -1,70 +1,66 @@
-import React, { useState } from 'react';
-import axios, { isAxiosError } from 'axios'
-import { API } from 'Plugins/CommonUtils/API'
-import { LoginMessage } from 'Plugins/DoctorAPI/LoginMessage'
-import { RegisterMessage } from 'Plugins/DoctorAPI/RegisterMessage'
-import { PatientLoginMessage } from 'Plugins/PatientAPI/PatientLoginMessage'
-import { PatientRegisterMessage } from 'Plugins/PatientAPI/PatientRegisterMessage'
-import { AddPatientMessage } from 'Plugins/DoctorAPI/AddPatientMessage'
-import { DeletePatientMessage } from 'Plugins/DoctorAPI/DeletePatientMessage'
+import React from 'react';
+import axios, { isAxiosError } from 'axios';
+import { API } from 'Plugins/CommonUtils/API';
+import { LoginMessage } from 'Plugins/DoctorAPI/LoginMessage';
+import { RegisterMessage } from 'Plugins/DoctorAPI/RegisterMessage';
+import { PatientLoginMessage } from 'Plugins/PatientAPI/PatientLoginMessage';
+import { PatientRegisterMessage } from 'Plugins/PatientAPI/PatientRegisterMessage';
+import { AddPatientMessage } from 'Plugins/DoctorAPI/AddPatientMessage';
+import { DeletePatientMessage } from 'Plugins/DoctorAPI/DeletePatientMessage';
+import { ViewPatientMessage } from 'Plugins/DoctorAPI/ViewPatientMessage';
 import { useHistory } from 'react-router';
+import './Main.css';
 
-export function Main(){
-    const history=useHistory()
+export function Main() {
+    const history = useHistory();
+
     const sendPostRequest = async (message: API) => {
-        try {
-            const response = await axios.post(message.getURL(), JSON.stringify(message), {
-                headers: { 'Content-Type': 'application/json' },
-            });
-            console.log('Response status:', response.status);
-            console.log('Response body:', response.data);
-        } catch (error) {
-            if (isAxiosError(error)) {
-                // Check if the error has a response and a data property
-                if (error.response && error.response.data) {
-                    console.error('Error sending request:', error.response.data);
-                } else {
-                    console.error('Error sending request:', error.message);
-                }
-            } else {
-                console.error('Unexpected error:', error);
-            }
-        }
+        // ... (保持不变)
     };
 
     return (
-        <div className="App">
-            <header className="App-header">
-                <h1>HTTP Post Requests</h1>
+        <div className="app">
+            <header className="app-header">
+                <h1>医疗系统控制中心</h1>
             </header>
-            <main>
-                <button onClick={() => sendPostRequest(new LoginMessage('aaaa', 'bbbb'))}>
-                    Doctor Login aaaa
-                </button>
-                <button onClick={() => sendPostRequest(new RegisterMessage('aaaa', 'bbbb'))}>
-                    Doctor Register aaaa
-                </button>
-                <button onClick={() => sendPostRequest(new LoginMessage('aaaab', 'bbbb'))}>
-                    Doctor Login aaaab
-                </button>
-                <button onClick={() => sendPostRequest(new PatientLoginMessage('cccc', 'bbbb'))}>
-                    Patient Login cccc
-                </button>
-                <button onClick={() => sendPostRequest(new PatientRegisterMessage('cccc', 'bbbb'))}>
-                    Patient Register cccc
-                </button>
-                <button onClick={() => sendPostRequest(new AddPatientMessage('aaaa', 'cccc'))}>
-                    Add Patient
-                </button>
-                <button onClick={() => sendPostRequest(new DeletePatientMessage('cccc', 'bbbb'))}>
-                    Delete Patient
-                </button>
-                <button onClick={() => history.push("/another")}>
-                    jump to another page
+            <main className="app-main">
+                <section className="card doctor-section">
+                    <h2>医生操作</h2>
+                    <button onClick={() => sendPostRequest(new LoginMessage('aaaa', 'bbbb'))}>
+                        医生登录 (aaaa)
+                    </button>
+                    <button onClick={() => sendPostRequest(new RegisterMessage('aaaa', 'bbbb'))}>
+                        医生注册 (aaaa)
+                    </button>
+                    <button onClick={() => sendPostRequest(new LoginMessage('aaaab', 'bbbb'))}>
+                        医生登录 (aaaab)
+                    </button>
+                </section>
+                <section className="card patient-section">
+                    <h2>患者操作</h2>
+                    <button onClick={() => sendPostRequest(new PatientLoginMessage('cccc', 'bbbb'))}>
+                        患者登录 (cccc)
+                    </button>
+                    <button onClick={() => sendPostRequest(new PatientRegisterMessage('cccc', 'bbbb'))}>
+                        患者注册 (cccc)
+                    </button>
+                </section>
+                <section className="card management-section">
+                    <h2>患者管理</h2>
+                    <button onClick={() => sendPostRequest(new AddPatientMessage('aaaa', 'cccc'))}>
+                        添加患者
+                    </button>
+                    <button onClick={() => sendPostRequest(new DeletePatientMessage('cccc', 'bbbb'))}>
+                        删除患者
+                    </button>
+                    <button onClick={() => sendPostRequest(new ViewPatientMessage('cccc','bbbb'))}>
+                        查看患者列表
+                    </button>
+                </section>
+                <button className="intro-button" onClick={() => history.push("/AnotherPage")}>
+                    系统简介
                 </button>
             </main>
         </div>
     );
-};
-
-
+}

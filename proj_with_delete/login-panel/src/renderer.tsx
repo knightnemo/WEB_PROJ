@@ -9,7 +9,7 @@ const Layout = () => {
         <HashRouter>
             <Switch>
                 <Route path="/" exact component={Main} />
-                <Route path="/another" exact component={AnotherPage} />
+                <Route path="/AnotherPage" exact component={AnotherPage} /> ///请注意是在这里搞Route的路径
             </Switch>
         </HashRouter>
     )
