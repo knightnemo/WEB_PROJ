@@ -14,7 +14,7 @@ const PlaceholderImage: React.FC<{ text: string }> = ({ text }) => (
     <svg
         xmlns="http://www.w3.org/2000/svg"
         width="100%"
-        height="150" // 调整高度以匹配 CSS 中的设置
+        height="150"
         viewBox="0 0 200 120"
         style={{ backgroundColor: '#f0f0f0' }}
     >
@@ -35,6 +35,8 @@ export function Main() {
     const history = useHistory();
     const [courses, setCourses] = useState<Course[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [username, setUsername] = useState('');
 
     useEffect(() => {
         const fetchCourses = async () => {
@@ -49,7 +51,20 @@ export function Main() {
             setCourses(mockCourses);
         };
         fetchCourses();
+
+        // 检查登录状态
+        const loggedInUser = localStorage.getItem('username');
+        if (loggedInUser) {
+            setIsLoggedIn(true);
+            setUsername(loggedInUser);
+        }
     }, []);
+
+    const handleLogout = () => {
+        localStorage.removeItem('username');
+        setIsLoggedIn(false);
+        setUsername('');
+    };
 
     const filteredCourses = courses.filter(course =>
         course.title.toLowerCase().includes(searchTerm.toLowerCase())
@@ -68,12 +83,21 @@ export function Main() {
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
-                        <button
-                            onClick={() => history.push('/auth')}
-                            className="auth-button"
-                        >
-                            注册 / 登录
-                        </button>
+                        {isLoggedIn ? (
+                            <div className="user-info">
+                                <span className="username">{username}</span>
+                                <button onClick={handleLogout} className="logout-button">
+                                    登出
+                                </button>
+                            </div>
+                        ) : (
+                            <button
+                                onClick={() => history.push('/auth')}
+                                className="auth-button"
+                            >
+                                注册 / 登录
+                            </button>
+                        )}
                     </div>
                 </div>
             </header>
