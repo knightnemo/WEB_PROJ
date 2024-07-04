@@ -225,6 +225,11 @@ export function Auth() {
             console.log('Response status:', response.status);
             console.log('Response body:', response.data);
 
+            // 检查响应体是否包含 "invalid user"
+            if (typeof response.data === 'string' && response.data.toLowerCase().includes('invalid user')) {
+                throw new Error('Invalid user');
+            }
+
             if (response.status >= 200 && response.status < 300) {
                 await handleSuccessResponse(message, response.data);
             } else {
@@ -243,18 +248,56 @@ export function Auth() {
             alert('注册成功');
             setIsRegistering(false);
         } else if (message instanceof LoginMessage || message instanceof PatientLoginMessage) {
-            console.log('Login successful');
-            alert('登录成功');
-            setIsLoggedIn(true);
-        } else if (message instanceof UserDeleteMessage) {
-            console.log(`User deletion operation completed for: ${(message as UserDeleteMessage).userName}`);
-            // 尝试登录刚刚"删除"的用户来验证删除是否成功
-            const verificationResult = await verifyUserDeletion((message as UserDeleteMessage).userName);
-            if (verificationResult) {
-                alert(`用户 ${(message as UserDeleteMessage).userName} 已成功删除`);
+            // 检查登录响应是否表示成功（包含 "Valid user"）
+            if (typeof data === 'string' && data.toLowerCase().includes('valid user')) {
+                console.log('Login successful');
+                alert('登录成功');
+                setIsLoggedIn(true);
             } else {
-                alert(`删除操作可能未成功，用户 ${(message as UserDeleteMessage).userName} 仍然可以登录`);
+                console.log('Login failed');
+                alert('登录失败：用户名或密码错误');
             }
+        } else if (message instanceof UserDeleteMessage) {
+            if (data.success) {
+                alert(`用户 ${message.userName} 已成功删除`);
+                setUserToDelete('');
+            } else {
+                alert(`删除用户 ${message.userName} 失败：${data.message}`);
+            }
+        }
+    };
+
+    const handleErrorResponse = (error: any) => {
+        console.error('Operation failed:', error);
+
+        if (isAxiosError(error)) {
+            if (error.response) {
+                const statusCode = error.response.status;
+                const errorMessage = error.response.data?.message || error.message || '未知错误';
+
+                switch (statusCode) {
+                    case 400:
+                        alert(`请求错误: ${errorMessage}`);
+                        break;
+                    case 401:
+                        alert('权限不足，无法执行此操作。');
+                        break;
+                    case 404:
+                        alert('用户不存在，请检查用户名。');
+                        break;
+                    case 500:
+                        alert(`服务器错误: ${errorMessage}`);
+                        break;
+                    default:
+                        alert(`操作失败: ${errorMessage}`);
+                }
+            } else if (error.request) {
+                alert('无法连接到服务器，请检查您的网络连接。');
+            } else {
+                alert(`操作失败: ${error.message}`);
+            }
+        } else {
+            alert('操作失败: 发生未知错误');
         }
     };
 
@@ -283,45 +326,6 @@ export function Auth() {
         return true; // 如果发生任何其他情况，我们假设删除成功
     };
 
-    const handleErrorResponse = (error: any) => {
-        console.error('Operation failed:', error);
-
-        if (isAxiosError(error)) {
-            if (error.response) {
-                const statusCode = error.response.status;
-                const errorMessage = error.response.data?.message || error.message || '未知错误';
-
-                switch (statusCode) {
-                    case 400:
-                        alert(`请求错误: ${errorMessage}`);
-                        break;
-                    case 401:
-                        alert('用户名或密码错误，请重试。');
-                        break;
-                    case 404:
-                        alert('用户不存在，请检查用户名。');
-                        break;
-                    case 409:
-                        alert('用户名已存在，请选择其他用户名。');
-                        break;
-                    case 500:
-                        alert(`服务器错误: ${errorMessage}`);
-                        break;
-                    default:
-                        alert(`操作失败: ${errorMessage}`);
-                }
-            } else if (error.request) {
-                alert('无法连接到服务器，请检查您的网络连接。');
-            } else {
-                alert(`操作失败: ${error.message}`);
-            }
-        } else if (error.message === 'Invalid user') {
-            alert('用户名或密码错误，请重试。');
-        } else {
-            alert('操作失败: 发生未知错误');
-        }
-    };
-
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (isAdmin) {
@@ -346,7 +350,13 @@ export function Auth() {
         }
         try {
             await sendPostRequest(new UserDeleteMessage(userToDelete));
-            setUserToDelete('');
+            const isDeleted = await verifyUserDeletion(userToDelete);
+            if (isDeleted) {
+                alert(`用户 ${userToDelete} 已成功删除`);
+                setUserToDelete('');
+            } else {
+                alert(`无法确认用户 ${userToDelete} 是否已被删除，请检查系统`);
+            }
         } catch (error) {
             console.error('Error deleting user:', error);
             alert('删除用户失败');
