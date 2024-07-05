@@ -146,3 +146,28 @@
 .home-button:hover {
     background-color: #6b7280;
 }
+
+.user-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+.user-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.delete-button {
+    background-color: #ff4d4d;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+.delete-button:hover {
+    background-color: #ff0000;
+}
