@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
+import { useUser } from './UserContext';
 import './Main.css';
 
 interface Course {
@@ -33,6 +34,7 @@ const PlaceholderImage: React.FC<{ text: string }> = ({ text }) => (
 
 export function Main() {
     const history = useHistory();
+    const { username, isAdmin } = useUser();
     const [courses, setCourses] = useState<Course[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
 
@@ -55,6 +57,10 @@ export function Main() {
         course.title.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
+    const handleUserClick = () => {
+        history.push('/auth');
+    };
+
     return (
         <div className="app-container">
             <header className="app-header">
@@ -68,12 +74,18 @@ export function Main() {
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
-                        <button
-                            onClick={() => history.push('/auth')}
-                            className="auth-button"
-                        >
-                            注册 / 登录
-                        </button>
+                        {username ? (
+                            <button onClick={handleUserClick} className="user-button">
+                                {username}
+                            </button>
+                        ) : (
+                            <button
+                                onClick={() => history.push('/auth')}
+                                className="auth-button"
+                            >
+                                注册 / 登录
+                            </button>
+                        )}
                     </div>
                 </div>
             </header>

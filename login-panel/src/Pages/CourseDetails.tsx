@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useHistory } from 'react-router-dom';
+import { useParams, useHistory, Link } from 'react-router-dom';
+import { useUser } from './UserContext';
 import './CourseDetails.css';
 
 interface CourseDetails {
@@ -19,41 +20,48 @@ interface Comment {
     dislikes: number;
 }
 
+const mockCourseDetails: CourseDetails = {
+    id: 2,
+    title: "数据科学与机器学习",
+    instructor: "李四",
+    description: "本课程将带你深入了解数据科学和机器学习的核心概念和实践应用。",
+    rating: 4.8,
+    reviews: 200,
+};
+
+const mockComments: Comment[] = [
+    { id: 1, user: "张三", content: "非常棒的课程！讲解深入浅出。", likes: 15, dislikes: 2 },
+    { id: 2, user: "李明", content: "老师讲得很好，但是作业有点难。", likes: 10, dislikes: 1 },
+];
+
 export function CourseDetails() {
     const { id } = useParams<{ id: string }>();
     const history = useHistory();
+    const { username } = useUser();
     const [course, setCourse] = useState<CourseDetails | null>(null);
     const [comments, setComments] = useState<Comment[]>([]);
     const [newComment, setNewComment] = useState('');
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        // 模拟从API获取课程详情
-        const fetchCourseDetails = async () => {
-            const mockCourse: CourseDetails = {
-                id: parseInt(id),
-                title: "Web开发入门",
-                instructor: "张三",
-                description: "这门课程将带你深入了解Web开发的基础知识，包括HTML, CSS和JavaScript。",
-                rating: 4.5,
-                reviews: 120,
-            };
-            setCourse(mockCourse);
-
-            const mockComments: Comment[] = [
-                { id: 1, user: "用户A", content: "非常棒的课程！", likes: 10, dislikes: 1 },
-                { id: 2, user: "用户B", content: "讲解清晰，收获很多。", likes: 8, dislikes: 0 },
-            ];
+        // 模拟API请求延迟
+        setTimeout(() => {
+            setCourse(mockCourseDetails);
             setComments(mockComments);
-        };
-        fetchCourseDetails();
+            setIsLoading(false);
+        }, 1000);
     }, [id]);
 
     const handleCommentSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+        if (!username) {
+            alert("请先登录后再评论");
+            return;
+        }
         if (newComment.trim()) {
             const newCommentObj: Comment = {
                 id: comments.length + 1,
-                user: "当前用户",
+                user: username,
                 content: newComment,
                 likes: 0,
                 dislikes: 0,
@@ -75,8 +83,12 @@ export function CourseDetails() {
         ));
     };
 
-    if (!course) {
+    if (isLoading) {
         return <div className="loading">加载中...</div>;
+    }
+
+    if (!course) {
+        return <div className="error">未找到课程信息</div>;
     }
 
     return (
@@ -114,16 +126,22 @@ export function CourseDetails() {
                     ))}
                 </div>
 
-                <form onSubmit={handleCommentSubmit} className="comment-form">
-                    <textarea
-                        value={newComment}
-                        onChange={(e) => setNewComment(e.target.value)}
-                        placeholder="写下你的评论..."
-                    ></textarea>
-                    <button type="submit" className="submit-button">
-                        提交评论
-                    </button>
-                </form>
+                {username ? (
+                    <form onSubmit={handleCommentSubmit} className="comment-form">
+                        <textarea
+                            value={newComment}
+                            onChange={(e) => setNewComment(e.target.value)}
+                            placeholder="写下你的评论..."
+                        ></textarea>
+                        <button type="submit" className="submit-button">
+                            提交评论
+                        </button>
+                    </form>
+                ) : (
+                    <p className="login-prompt">
+                        请<Link to="/auth">登录</Link>后评论
+                    </p>
+                )}
             </div>
         </div>
     );
