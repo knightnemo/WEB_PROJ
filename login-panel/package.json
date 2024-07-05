@@ -80,7 +80,7 @@
                         },
                         "devContentSecurityPolicy": "style-src 'self' 'unsafe-inline'; connect-src * data: blob: 'unsafe-inline'; img-src * 'self' data: blob: 'unsafe-inline';",
                         "port": 3000,
-                        "loggerPort": 9000
+                        "loggerPort": 8080
                     }
                 }
             ]
