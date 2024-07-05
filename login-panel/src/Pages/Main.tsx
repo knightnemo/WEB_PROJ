@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 import { useUser } from './UserContext';
 import './Main.css';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faUser, faStar, faCodeBranch } from '@fortawesome/free-solid-svg-icons';
 
 interface Course {
     id: number;
@@ -75,8 +77,13 @@ export function Main() {
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
                         {username ? (
-                            <button onClick={handleUserClick} className="user-button">
-                                {username}
+                            <button onClick={handleUserClick} className="user-info">
+                                <FontAwesomeIcon icon={faUser} className="user-icon" />
+                                <span className="user-name">{username}</span>
+                                <FontAwesomeIcon icon={faStar} className="icon" />
+                                <span className="star-count">52.3k</span>
+                                <FontAwesomeIcon icon={faCodeBranch} className="icon" />
+                                <span className="fork-count">6.4k</span>
                             </button>
                         ) : (
                             <button
