@@ -79,8 +79,8 @@
                             }
                         },
                         "devContentSecurityPolicy": "style-src 'self' 'unsafe-inline'; connect-src * data: blob: 'unsafe-inline'; img-src * 'self' data: blob: 'unsafe-inline';",
-                        "port": 3000,
-                        "loggerPort": 8080
+                        "port": 8080,
+                        "loggerPort": 9000
                     }
                 }
             ]
@@ -126,11 +126,15 @@
         "style-loader": "^3.0.0",
         "ts-loader": "^9.2.2",
         "typescript": "^4.0.2",
+        "webpack-cli": "^5.1.4",
         "xlsx": "^0.17.0"
     },
     "dependencies": {
         "@emotion/react": "^11.4.1",
         "@emotion/styled": "^11.3.0",
+        "@fortawesome/fontawesome-svg-core": "^6.5.2",
+        "@fortawesome/free-solid-svg-icons": "^6.5.2",
+        "@fortawesome/react-fontawesome": "^0.2.2",
         "@mui/icons-material": "^5.0.5",
         "@mui/lab": "^5.0.0-alpha.53",
         "@mui/material": "^5.2.1",

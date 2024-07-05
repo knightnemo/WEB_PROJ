@@ -1,188 +1,5 @@
-// import React, { useState, useEffect, useCallback } from 'react';
-// import axios, { isAxiosError } from 'axios';
-// import { useHistory } from 'react-router-dom';
-// import { API } from 'Plugins/CommonUtils/API';
-// import { LoginMessage } from 'Plugins/DoctorAPI/LoginMessage';
-// import { RegisterMessage } from 'Plugins/DoctorAPI/RegisterMessage';
-// import { PatientLoginMessage } from 'Plugins/PatientAPI/PatientLoginMessage';
-// import { PatientRegisterMessage } from 'Plugins/PatientAPI/PatientRegisterMessage';
-// import { UserDeleteMessage } from 'Plugins/DoctorAPI/UserDeleteMessage';
-// import './Auth.css';
-//
-// export function Auth() {
-//     const history = useHistory();
-//     const [username, setUsername] = useState('');
-//     const [password, setPassword] = useState('');
-//     const [isAdmin, setIsAdmin] = useState(false);
-//     const [isRegistering, setIsRegistering] = useState(false);
-//     const [isLoggedIn, setIsLoggedIn] = useState(false);
-//     const [userToDelete, setUserToDelete] = useState('');
-//
-//     const resetState = useCallback(() => {
-//         setUsername('');
-//         setPassword('');
-//         setIsAdmin(false);
-//         setIsRegistering(false);
-//         setUserToDelete('');
-//     }, []);
-//
-//     useEffect(() => {
-//         return () => {
-//             resetState();
-//         };
-//     }, [resetState]);
-//
-//     const sendPostRequest = async (message: API) => {
-//         try {
-//             const response = await axios.post(message.getURL(), JSON.stringify(message), {
-//                 headers: { 'Content-Type': 'application/json' },
-//             });
-//             console.log('Response status:', response.status);
-//             console.log('Response body:', response.data);
-//             alert('操作成功');
-//             setIsLoggedIn(true);
-//         } catch (error) {
-//             if (isAxiosError(error)) {
-//                 if (error.response && error.response.data) {
-//                     console.error('Error sending request:', error.response.data);
-//                     alert(`操作失败: ${error.response.data}`);
-//                 } else {
-//                     console.error('Error sending request:', error.message);
-//                     alert(`操作失败: ${error.message}`);
-//                 }
-//             } else {
-//                 console.error('Unexpected error:', error);
-//                 alert('操作失败: 未知错误');
-//             }
-//         }
-//     };
-//
-//     const handleSubmit = (e: React.FormEvent) => {
-//         e.preventDefault();
-//         if (isAdmin) {
-//             if (isRegistering) {
-//                 sendPostRequest(new RegisterMessage(username, password));
-//             } else {
-//                 sendPostRequest(new LoginMessage(username, password));
-//             }
-//         } else {
-//             if (isRegistering) {
-//                 sendPostRequest(new PatientRegisterMessage(username, password));
-//             } else {
-//                 sendPostRequest(new PatientLoginMessage(username, password));
-//             }
-//         }
-//     };
-//
-//     const handleDeleteUser = async () => {
-//         if (!userToDelete) {
-//             alert('请输入要删除的用户名');
-//             return;
-//         }
-//         try {
-//             await sendPostRequest(new UserDeleteMessage(userToDelete));
-//             alert(`用户 ${userToDelete} 已删除`);
-//             setUserToDelete('');
-//         } catch (error) {
-//             alert('删除用户失败');
-//         }
-//     };
-//
-//     const handleLogout = () => {
-//         setIsLoggedIn(false);
-//         resetState();
-//     };
-//
-//     return (
-//         <div className="auth-container">
-//             <div className="auth-card">
-//                 {!isLoggedIn ? (
-//                     <>
-//                         <h2 className="auth-title">
-//                             {isRegistering ? '注册' : '登录'}
-//                         </h2>
-//                         <form onSubmit={handleSubmit} className="auth-form">
-//                             <div className="form-group">
-//                                 <label htmlFor="username">用户名</label>
-//                                 <input
-//                                     id="username"
-//                                     type="text"
-//                                     value={username}
-//                                     onChange={(e) => setUsername(e.target.value)}
-//                                     required
-//                                 />
-//                             </div>
-//                             <div className="form-group">
-//                                 <label htmlFor="password">密码</label>
-//                                 <input
-//                                     id="password"
-//                                     type="password"
-//                                     value={password}
-//                                     onChange={(e) => setPassword(e.target.value)}
-//                                     required
-//                                 />
-//                             </div>
-//                             <div className="checkbox-group">
-//                                 <input
-//                                     id="isAdmin"
-//                                     type="checkbox"
-//                                     checked={isAdmin}
-//                                     onChange={(e) => setIsAdmin(e.target.checked)}
-//                                 />
-//                                 <label htmlFor="isAdmin">管理员账户</label>
-//                             </div>
-//                             <button type="submit" className="submit-button">
-//                                 {isRegistering ? '注册' : '登录'}
-//                             </button>
-//                         </form>
-//                         <div className="toggle-auth-mode">
-//                             <button onClick={() => setIsRegistering(!isRegistering)}>
-//                                 {isRegistering ? '已有账户？立即登录' : '没有账户？立即注册'}
-//                             </button>
-//                         </div>
-//                     </>
-//                 ) : (
-//                     <>
-//                         <h2 className="auth-title">
-//                             欢迎, {username}!
-//                         </h2>
-//                         {isAdmin && (
-//                             <div className="user-management">
-//                                 <h3>删除用户</h3>
-//                                 <div className="form-group">
-//                                     <input
-//                                         type="text"
-//                                         value={userToDelete}
-//                                         onChange={(e) => setUserToDelete(e.target.value)}
-//                                         placeholder="输入要删除的用户名"
-//                                     />
-//                                     <button onClick={handleDeleteUser} className="delete-button">
-//                                         删除用户
-//                                     </button>
-//                                 </div>
-//                             </div>
-//                         )}
-//                         <button
-//                             onClick={handleLogout}
-//                             className="logout-button"
-//                         >
-//                             登出
-//                         </button>
-//                     </>
-//                 )}
-//                 <button
-//                     onClick={() => history.push("/")}
-//                     className="home-button"
-//                 >
-//                     返回主页
-//                 </button>
-//             </div>
-//         </div>
-//     );
-// }
-
 import React, { useState, useEffect, useCallback } from 'react';
-import axios, { isAxiosError } from 'axios';
+import axios from 'axios';
 import { useHistory } from 'react-router-dom';
 import { API } from 'Plugins/CommonUtils/API';
 import { LoginMessage } from 'Plugins/DoctorAPI/LoginMessage';
@@ -190,26 +7,28 @@ import { RegisterMessage } from 'Plugins/DoctorAPI/RegisterMessage';
 import { PatientLoginMessage } from 'Plugins/PatientAPI/PatientLoginMessage';
 import { PatientRegisterMessage } from 'Plugins/PatientAPI/PatientRegisterMessage';
 import { UserDeleteMessage } from 'Plugins/PatientAPI/UserDeleteMessage';
+import { AllUsersQueryMessage } from 'Plugins/PatientAPI/AllUsersQueryMessage';
 import { useUser } from './UserContext';
 import './Auth.css';
 
 export function Auth() {
     const history = useHistory();
     const { username: contextUsername, isAdmin: contextIsAdmin, setUser, clearUser } = useUser();
-    const [username, setUsername] = useState(contextUsername);
+    const [username, setUsername] = useState(contextUsername || '');
     const [password, setPassword] = useState('');
     const [isAdmin, setIsAdmin] = useState(contextIsAdmin);
     const [isRegistering, setIsRegistering] = useState(false);
     const [isLoggedIn, setIsLoggedIn] = useState(!!contextUsername);
-    const [userToDelete, setUserToDelete] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [users, setUsers] = useState<string[]>([]);
+    const [message, setMessage] = useState('');
 
     const resetState = useCallback(() => {
         setUsername('');
         setPassword('');
         setIsAdmin(false);
         setIsRegistering(false);
-        setUserToDelete('');
+        setMessage('');
     }, []);
 
     useEffect(() => {
@@ -218,92 +37,111 @@ export function Auth() {
         };
     }, [resetState]);
 
-    const sendPostRequest = async (message: API) => {
+    const sendPostRequest = async (apiMessage: API) => {
         setIsLoading(true);
+        setMessage('');
         try {
-            const response = await axios.post(message.getURL(), JSON.stringify(message), {
+            const response = await axios.post(apiMessage.getURL(), JSON.stringify(apiMessage), {
                 headers: { 'Content-Type': 'application/json' },
             });
             console.log('Response status:', response.status);
             console.log('Response body:', response.data);
-
-            handleSuccessResponse(message, response.data);
+            handleSuccessResponse(apiMessage, response.data);
+            return response;
         } catch (error) {
-            handleErrorResponse(message, error);
+            handleErrorResponse(apiMessage, error);
         } finally {
             setIsLoading(false);
         }
     };
 
-    const handleSuccessResponse = (message: API, data: any) => {
-        if (message instanceof RegisterMessage || message instanceof PatientRegisterMessage) {
-            alert('注册成功');
+    const handleSuccessResponse = (apiMessage: API, data: any) => {
+        if (apiMessage instanceof RegisterMessage || apiMessage instanceof PatientRegisterMessage) {
+            setMessage('注册成功');
             setIsRegistering(false);
-        } else if (message instanceof LoginMessage || message instanceof PatientLoginMessage) {
+        } else if (apiMessage instanceof LoginMessage || apiMessage instanceof PatientLoginMessage) {
             if (data === "Valid user") {
-                alert('登录成功');
+                setMessage('登录成功');
                 setIsLoggedIn(true);
                 setUser(username, isAdmin);
             } else {
-                alert('登录失败：用户名或密码错误');
+                setMessage('登录失败：用户名或密码错误');
             }
-        } else if (message instanceof UserDeleteMessage) {
-            alert(`用户 ${message.userName} 已成功删除`);
-            setUserToDelete('');
+        } else if (apiMessage instanceof UserDeleteMessage) {
+            setMessage(`用户删除成功`);
+            fetchUsers();
+        } else if (apiMessage instanceof AllUsersQueryMessage) {
+            if (Array.isArray(data)) {
+                setUsers(data);
+                if (data.length === 0) {
+                    setMessage('没有找到任何用户');
+                } else {
+                    setMessage('');
+                }
+            } else {
+                console.error('Received unexpected data format:', data);
+                setMessage('获取用户列表失败：返回数据格式不正确');
+            }
         }
     };
 
-    const handleErrorResponse = (message: API, error: any) => {
+    const handleErrorResponse = (apiMessage: API, error: any) => {
         console.error('Operation failed:', error);
+        if (axios.isAxiosError(error) && error.response) {
+            const errorData = error.response.data;
+            let errorMessage = typeof errorData === 'string' ? errorData : JSON.stringify(errorData);
 
-        if (isAxiosError(error) && error.response) {
-            const errorMessage = error.response.data;
-
-            if (message instanceof RegisterMessage || message instanceof PatientRegisterMessage) {
-                if (errorMessage.includes('invalid user')) {
-                    alert('该用户名已被注册，请选择其他用户名');
+            if (apiMessage instanceof RegisterMessage || apiMessage instanceof PatientRegisterMessage) {
+                if (errorMessage.includes('invalid user') || error.response.status === 500) {
+                    setMessage('该用户名已被注册，请选择其他用户名');
                 } else {
-                    alert('注册失败，请稍后重试');
+                    setMessage('注册失败，请稍后重试');
                 }
-            } else if (message instanceof LoginMessage || message instanceof PatientLoginMessage) {
+            } else if (apiMessage instanceof LoginMessage || apiMessage instanceof PatientLoginMessage) {
                 if (errorMessage === "Invalid user") {
-                    alert('用户不存在，请检查用户名');
+                    setMessage('用户不存在，请检查用户名');
                 } else {
-                    alert('登录失败：用户名或密码错误');
+                    setMessage('登录失败：用户名或密码错误');
                 }
-            } else if (message instanceof UserDeleteMessage) {
-                alert('删除用户失败，请确认用户名是否正确');
+            } else if (apiMessage instanceof UserDeleteMessage) {
+                setMessage('删除用户失败，请确认用户名是否正确');
+            } else if (apiMessage instanceof AllUsersQueryMessage) {
+                setMessage('获取用户列表失败，请稍后重试');
             } else {
-                alert(`操作失败: ${errorMessage}`);
+                setMessage(`操作失败: ${errorMessage}`);
             }
         } else {
-            alert('网络错误，请检查您的连接并重试');
+            setMessage('网络错误，请检查您的连接并重试');
         }
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        let apiMessage: API;
         if (isAdmin) {
-            if (isRegistering) {
-                sendPostRequest(new RegisterMessage(username, password));
-            } else {
-                sendPostRequest(new LoginMessage(username, password));
-            }
+            apiMessage = isRegistering ? new RegisterMessage(username, password) : new LoginMessage(username, password);
         } else {
-            if (isRegistering) {
-                sendPostRequest(new PatientRegisterMessage(username, password));
-            } else {
-                sendPostRequest(new PatientLoginMessage(username, password));
-            }
+            apiMessage = isRegistering ? new PatientRegisterMessage(username, password) : new PatientLoginMessage(username, password);
         }
+        await sendPostRequest(apiMessage);
     };
 
-    const handleDeleteUser = async () => {
-        if (!userToDelete) {
-            alert('请输入要删除的用户名');
-            return;
+    const fetchUsers = useCallback(async () => {
+        if (isAdmin) {
+            await sendPostRequest(new AllUsersQueryMessage());
         }
-        await sendPostRequest(new UserDeleteMessage(userToDelete));
+    }, [isAdmin]);
+
+    useEffect(() => {
+        if (isLoggedIn && isAdmin) {
+            fetchUsers();
+        }
+    }, [isLoggedIn, isAdmin, fetchUsers]);
+
+    const handleDeleteUser = async (userToDelete: string) => {
+        if (window.confirm(`确定要删除用户 ${userToDelete} 吗？`)) {
+            await sendPostRequest(new UserDeleteMessage(userToDelete));
+        }
     };
 
     const handleLogout = () => {
@@ -315,9 +153,7 @@ export function Auth() {
     return (
         <div className="auth-container">
             <div className="auth-card">
-                {isLoading ? (
-                    <div className="loading">正在处理，请稍候...</div>
-                ) : !isLoggedIn ? (
+                {!isLoggedIn ? (
                     <>
                         <h2 className="auth-title">
                             {isRegistering ? '注册' : '登录'}
@@ -331,6 +167,7 @@ export function Auth() {
                                     value={username}
                                     onChange={(e) => setUsername(e.target.value)}
                                     required
+                                    disabled={isLoading}
                                 />
                             </div>
                             <div className="form-group">
@@ -341,19 +178,22 @@ export function Auth() {
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
                                     required
+                                    disabled={isLoading}
                                 />
                             </div>
+                            {message && <div className="error-message">{message}</div>}
                             <div className="checkbox-group">
                                 <input
                                     id="isAdmin"
                                     type="checkbox"
                                     checked={isAdmin}
                                     onChange={(e) => setIsAdmin(e.target.checked)}
+                                    disabled={isLoading}
                                 />
                                 <label htmlFor="isAdmin">管理员账户</label>
                             </div>
-                            <button type="submit" className="submit-button">
-                                {isRegistering ? '注册' : '登录'}
+                            <button type="submit" className="submit-button" disabled={isLoading}>
+                                {isLoading ? '处理中...' : (isRegistering ? '注册' : '登录')}
                             </button>
                         </form>
                         <div className="toggle-auth-mode">
@@ -364,31 +204,29 @@ export function Auth() {
                     </>
                 ) : (
                     <>
-                        <h2 className="auth-title">
-                            欢迎, {username}!
-                        </h2>
+                        <h2 className="auth-title">欢迎, {username}!</h2>
                         {isAdmin && (
                             <div className="user-management">
-                                <h3>删除用户</h3>
-                                <div className="form-group">
-                                    <input
-                                        type="text"
-                                        value={userToDelete}
-                                        onChange={(e) => setUserToDelete(e.target.value)}
-                                        placeholder="输入要删除的用户名"
-                                    />
-                                    <button onClick={handleDeleteUser} className="delete-button">
-                                        删除用户
-                                    </button>
-                                </div>
+                                <h3>用户列表</h3>
+                                {isLoading ? (
+                                    <p>加载中...</p>
+                                ) : users.length > 0 ? (
+                                    <ul className="user-list">
+                                        {users.map(user => (
+                                            <li key={user} className="user-item">
+                                                {user}
+                                                <button onClick={() => handleDeleteUser(user)} className="delete-button" disabled={isLoading}>
+                                                    删除
+                                                </button>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                ) : (
+                                    <p>{message || '没有找到任何用户'}</p>
+                                )}
                             </div>
                         )}
-                        <button
-                            onClick={handleLogout}
-                            className="logout-button"
-                        >
-                            登出
-                        </button>
+                        <button onClick={handleLogout} className="logout-button" disabled={isLoading}>登出</button>
                     </>
                 )}
                 <button
