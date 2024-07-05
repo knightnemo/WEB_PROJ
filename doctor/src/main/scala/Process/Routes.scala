@@ -26,9 +26,6 @@ object Routes:
       case "UserQueryMessage" =>
         IO(decode[UserQueryMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for UserQueryMessage")))
           .flatMap(_.fullPlan.map(_.asJson.toString))
-      case "UserDeleteMessage" =>
-        IO(decode[UserDeleteMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for UserDeleteMessage")))
-          .flatMap(_.fullPlan.map(_.asJson.toString))
       case _ =>
         IO.raiseError(new Exception(s"Unknown type: $messageType"))
     }

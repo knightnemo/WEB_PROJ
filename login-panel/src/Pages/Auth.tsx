@@ -189,7 +189,7 @@ import { LoginMessage } from 'Plugins/DoctorAPI/LoginMessage';
 import { RegisterMessage } from 'Plugins/DoctorAPI/RegisterMessage';
 import { PatientLoginMessage } from 'Plugins/PatientAPI/PatientLoginMessage';
 import { PatientRegisterMessage } from 'Plugins/PatientAPI/PatientRegisterMessage';
-import { UserDeleteMessage } from 'Plugins/DoctorAPI/UserDeleteMessage';
+import { UserDeleteMessage } from 'Plugins/PatientAPI/UserDeleteMessage';
 import './Auth.css';
 
 export function Auth() {
@@ -238,8 +238,12 @@ export function Auth() {
             alert('注册成功');
             setIsRegistering(false);
         } else if (message instanceof LoginMessage || message instanceof PatientLoginMessage) {
-            alert('登录成功');
-            setIsLoggedIn(true);
+            if (data === "Valid user") {
+                alert('登录成功');
+                setIsLoggedIn(true);
+            } else {
+                alert('登录失败：用户名或密码错误');
+            }
         } else if (message instanceof UserDeleteMessage) {
             alert(`用户 ${message.userName} 已成功删除`);
             setUserToDelete('');
@@ -259,7 +263,11 @@ export function Auth() {
                     alert('注册失败，请稍后重试');
                 }
             } else if (message instanceof LoginMessage || message instanceof PatientLoginMessage) {
-                alert('用户名或密码错误，请重试');
+                if (errorMessage === "Invalid user") {
+                    alert('用户不存在，请检查用户名');
+                } else {
+                    alert('登录失败：用户名或密码错误');
+                }
             } else if (message instanceof UserDeleteMessage) {
                 alert('删除用户失败，请确认用户名是否正确');
             } else {
