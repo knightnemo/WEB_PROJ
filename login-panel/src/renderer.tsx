@@ -21,10 +21,12 @@ import { render } from 'react-dom'
 import { HashRouter, Route, Switch } from 'react-router-dom'
 import { Main } from 'Pages/Main'
 import { CourseDetails } from 'Pages/CourseDetails'
+import { UserProvider } from 'Pages/UserContext';
 import { Auth } from 'Pages/Auth';
 
 const Layout = () => {
     return (
+        <UserProvider>
         <HashRouter>
             <Switch>
                 <Route path="/" exact component={Main} />
@@ -32,6 +34,7 @@ const Layout = () => {
                 <Route path="/auth" exact component={Auth} />
             </Switch>
         </HashRouter>
+        </UserProvider>
     )
 }
 render(<Layout />, document.getElementById('root'))

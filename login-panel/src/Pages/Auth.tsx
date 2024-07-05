@@ -190,15 +190,17 @@ import { RegisterMessage } from 'Plugins/DoctorAPI/RegisterMessage';
 import { PatientLoginMessage } from 'Plugins/PatientAPI/PatientLoginMessage';
 import { PatientRegisterMessage } from 'Plugins/PatientAPI/PatientRegisterMessage';
 import { UserDeleteMessage } from 'Plugins/PatientAPI/UserDeleteMessage';
+import { useUser } from './UserContext';
 import './Auth.css';
 
 export function Auth() {
     const history = useHistory();
-    const [username, setUsername] = useState('');
+    const { username: contextUsername, isAdmin: contextIsAdmin, setUser, clearUser } = useUser();
+    const [username, setUsername] = useState(contextUsername);
     const [password, setPassword] = useState('');
-    const [isAdmin, setIsAdmin] = useState(false);
+    const [isAdmin, setIsAdmin] = useState(contextIsAdmin);
     const [isRegistering, setIsRegistering] = useState(false);
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [isLoggedIn, setIsLoggedIn] = useState(!!contextUsername);
     const [userToDelete, setUserToDelete] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
@@ -241,6 +243,7 @@ export function Auth() {
             if (data === "Valid user") {
                 alert('登录成功');
                 setIsLoggedIn(true);
+                setUser(username, isAdmin);
             } else {
                 alert('登录失败：用户名或密码错误');
             }
@@ -305,6 +308,7 @@ export function Auth() {
 
     const handleLogout = () => {
         setIsLoggedIn(false);
+        clearUser();
         resetState();
     };
 
