@@ -50,4 +50,17 @@ module.exports = [
             },
         ],
     },
+    {
+        test: /\.tsx?$/,
+        exclude: /(node_modules|\.webpack)/,
+        use: {
+            loader: 'ts-loader',
+            options: {
+                getCustomTransformers: () => ({
+                    before: [isDevelopment && ReactRefreshTypeScript()].filter(Boolean),
+                }),
+                transpileOnly: isDevelopment,
+            },
+        },
+    }
 ]
