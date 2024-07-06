@@ -26,7 +26,6 @@ object Routes:
       case "DeleteCourseMessage" =>
         IO(decode[DeleteCourseMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for DeleteCourseMessage")))
           .flatMap(m => m.fullPlan.map(_.asJson.toString))
-
       case "UpdateCourseMessage" =>
         IO(decode[UpdateCourseMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for UpdateCourseMessage")))
           .flatMap(m => m.fullPlan.map(_.asJson.toString))

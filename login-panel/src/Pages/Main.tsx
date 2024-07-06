@@ -80,24 +80,23 @@ export function Main() {
             });
             console.log('Raw response:', response.data);
             if (isMounted) {
+                let parsedData: Course[];
                 if (typeof response.data === 'string' && response.data.startsWith('List(')) {
-                    const parsedData = parseScalaList(response.data);
-                    console.log('Parsed data:', parsedData);
-                    setCourses(parsedData);
-                    setError(null);
+                    parsedData = parseScalaList(response.data);
+                } else if (Array.isArray(response.data)) {
+                    parsedData = response.data;
                 } else {
                     console.error('Unexpected response format:', response.data);
-                    throw new Error('Received data is not in the expected format');
+                    parsedData = []; // Set to empty array instead of throwing an error
                 }
+                console.log('Parsed data:', parsedData);
+                setCourses(parsedData);
+                setError(null);
             }
         } catch (err) {
             console.error('Error loading courses:', err);
             if (isMounted) {
-                if (axios.isAxiosError(err)) {
-                    setError(`Failed to load courses. Server responded with: ${err.response?.status} ${err.response?.statusText}`);
-                } else {
-                    setError('Failed to load courses. Please try again later.');
-                }
+                setError('Failed to load courses. Please try again later.');
             }
         } finally {
             if (isMounted) {
@@ -197,7 +196,7 @@ export function Main() {
                 ) : error ? (
                     <p className="error-message">{error}</p>
                 ) : courses.length === 0 ? (
-                    <p>No courses available.</p>
+                    <p>No courses available. {isAdmin ? 'Try adding a new course!' : ''}</p>
                 ) : (
                     <div className="course-grid">
                         {filteredCourses.map((course) => (
