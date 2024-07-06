@@ -205,3 +205,70 @@
 .user-info:hover .fork-count {
     animation: pulse 1s infinite;
 }
+/*跳转个人主页*/
+/* Main.css */
+.user-info {
+    display: flex;
+    align-items: center;
+    background-color: #007bff;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.user-info:hover {
+    background-color: #0056b3;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+.user-icon {
+    margin-right: 8px;
+    font-size: 1.2rem;
+    transition: transform 0.3s ease;
+}
+
+.user-name {
+    font-size: 1rem;
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+.icon {
+    font-size: 1.2rem;
+    margin-right: 8px;
+}
+
+.star-count, .fork-count {
+    font-size: 1rem;
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+.user-info:hover .user-icon {
+    transform: rotate(360deg);
+}
+
+.user-info:hover .icon {
+    color: yellow;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.user-info:hover .star-count,
+.user-info:hover .fork-count {
+    animation: pulse 1s infinite;
+}

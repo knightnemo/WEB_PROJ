@@ -5,6 +5,9 @@ import { AllCoursesQueryMessage } from 'Plugins/CourseAPI/AllCoursesQueryMessage
 import { AddCourseMessage } from 'Plugins/CourseAPI/AddCourseMessage';
 import axios from 'axios';
 import './Main.css';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faUser, faStar, faCodeBranch } from '@fortawesome/free-solid-svg-icons';
+
 
 interface Course {
     id: string;
@@ -126,8 +129,12 @@ export function Main() {
     );
 
     const handleUserClick = () => {
-        history.push('/auth');
-    };
+        if (username) {
+            history.push(`/user/${username}`);
+        } else {
+            history.push('/auth');
+        }
+    };//knightnemo; 7.7; 这里是加入了一个个人主页界面的跳转
 
     return (
         <div className="app-container">
@@ -143,8 +150,13 @@ export function Main() {
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
                         {username ? (
-                            <button onClick={handleUserClick} className="user-button">
-                                {username}
+                            <button onClick={handleUserClick} className="user-info">
+                                <FontAwesomeIcon icon={faUser} className="user-icon" />
+                                <span className="user-name">{username}</span>
+                                <FontAwesomeIcon icon={faStar} className="icon" />
+                                <span className="star-count">52.3k</span>
+                                <FontAwesomeIcon icon={faCodeBranch} className="icon" />
+                                <span className="fork-count">6.4k</span>
                             </button>
                         ) : (
                             <button
