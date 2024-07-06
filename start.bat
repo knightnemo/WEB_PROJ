@@ -7,6 +7,9 @@ timeout /t 5 /nobreak
 echo Starting doctor...
 start "" cmd /c "cd doctor && call doctor-start.bat"
 
+echo Starting course...
+start "" cmd /c "cd source && call source-start.bat"
+
 echo Starting patient...
 start "" cmd /c "cd patient && call patient-start.bat"
 

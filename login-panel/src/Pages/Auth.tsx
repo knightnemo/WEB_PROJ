@@ -89,7 +89,7 @@ export function Auth() {
         console.error('Operation failed:', error);
         if (axios.isAxiosError(error) && error.response) {
             const errorData = error.response.data;
-            let errorMessage = typeof errorData === 'string' ? errorData : JSON.stringify(errorData);
+            const errorMessage = typeof errorData === 'string' ? errorData : JSON.stringify(errorData);
 
             if (apiMessage instanceof RegisterMessage || apiMessage instanceof PatientRegisterMessage) {
                 if (errorMessage.includes('invalid user') || error.response.status === 500) {
