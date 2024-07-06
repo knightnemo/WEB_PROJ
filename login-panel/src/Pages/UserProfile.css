@@ -1,0 +1,118 @@
+.user-profile-container {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+}
+
+.user-profile-content {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+
+.user-info-section {
+    background-color: white;
+    border-radius: 0.5rem;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.user-info-section h2 {
+    font-size: 1.5rem;
+    color: #3b82f6;
+    margin-bottom: 1rem;
+}
+
+.user-stats {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 1rem;
+}
+
+.user-stats span {
+    font-size: 0.9rem;
+    color: #6b7280;
+}
+
+.user-reviews-section {
+    background-color: white;
+    border-radius: 0.5rem;
+    padding: 2rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.user-reviews-section h3 {
+    font-size: 1.2rem;
+    color: #3b82f6;
+    margin-bottom: 1rem;
+}
+
+.review-card {
+    border-bottom: 1px solid #e5e7eb;
+    padding: 1rem 0;
+}
+
+.review-card:last-child {
+    border-bottom: none;
+}
+
+.review-card h4 {
+    font-size: 1rem;
+    color: #1f2937;
+    margin-bottom: 0.5rem;
+}
+
+.review-rating {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.review-rating .star {
+    color: #fbbf24;
+    margin-right: 0.25rem;
+}
+
+.review-content {
+    font-size: 0.9rem;
+    color: #4b5563;
+    margin-bottom: 0.5rem;
+}
+
+.review-date {
+    font-size: 0.8rem;
+    color: #9ca3af;
+}
+
+.back-button {
+    background-color: #3b82f6;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 0.25rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.back-button:hover {
+    background-color: #2563eb;
+}
+
+.header-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.auth-button {
+    background-color: #3b82f6;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 0.25rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.auth-button:hover {
+    background-color: #2563eb;
+}
