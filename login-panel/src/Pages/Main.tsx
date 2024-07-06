@@ -1,15 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 import { useUser } from './UserContext';
+import { AllCoursesQueryMessage } from 'Plugins/CourseAPI/AllCoursesQueryMessage';
+import { AddCourseMessage } from 'Plugins/CourseAPI/AddCourseMessage';
+import axios from 'axios';
 import './Main.css';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUser, faStar, faCodeBranch } from '@fortawesome/free-solid-svg-icons';
 
 interface Course {
-    id: number;
+    id: string;
     title: string;
     instructor: string;
-    rating: number;
+    description: string;
+    rating: string;
     reviews: number;
 }
 
@@ -17,7 +19,7 @@ const PlaceholderImage: React.FC<{ text: string }> = ({ text }) => (
     <svg
         xmlns="http://www.w3.org/2000/svg"
         width="100%"
-        height="150" // 调整高度以匹配 CSS 中的设置
+        height="150"
         viewBox="0 0 200 120"
         style={{ backgroundColor: '#f0f0f0' }}
     >
@@ -39,21 +41,86 @@ export function Main() {
     const { username, isAdmin } = useUser();
     const [courses, setCourses] = useState<Course[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+    const [newCourse, setNewCourse] = useState({ title: '', instructor: '', description: '' });
+    const [showAddCourseForm, setShowAddCourseForm] = useState(false);
 
     useEffect(() => {
-        const fetchCourses = async () => {
-            const mockCourses: Course[] = [
-                { id: 1, title: "Web开发入门", instructor: "张三", rating: 4.5, reviews: 120 },
-                { id: 2, title: "数据科学与机器学习", instructor: "李四", rating: 4.8, reviews: 200 },
-                { id: 3, title: "移动应用开发", instructor: "王五", rating: 4.2, reviews: 80 },
-                { id: 4, title: "人工智能基础", instructor: "赵六", rating: 4.6, reviews: 150 },
-                { id: 5, title: "网络安全入门", instructor: "钱七", rating: 4.3, reviews: 90 },
-                { id: 6, title: "云计算技术", instructor: "孙八", rating: 4.7, reviews: 180 },
-            ];
-            setCourses(mockCourses);
-        };
-        fetchCourses();
+        let isMounted = true;
+        fetchCourses(isMounted);
+        return () => { isMounted = false };
     }, []);
+
+    const parseScalaList = (input: string): any[] => {
+        // 移除 "List(" 前缀和结尾的 ")"
+        const content = input.slice(5, -1).trim();
+
+        // 如果内容为空，返回空数组
+        if (content === '') {
+            return [];
+        }
+
+        // 使用正则表达式匹配每个 JSON 对象
+        const jsonObjects = content.match(/\{[^{}]*\}/g);
+
+        if (!jsonObjects) {
+            throw new Error('No valid JSON objects found in the input string');
+        }
+
+        // 解析每个 JSON 对象
+        return jsonObjects.map(jsonStr => JSON.parse(jsonStr));
+    };
+
+    const fetchCourses = async (isMounted: boolean) => {
+        setIsLoading(true);
+        try {
+            const response = await axios.post(new AllCoursesQueryMessage().getURL(), JSON.stringify(new AllCoursesQueryMessage()), {
+                headers: { 'Content-Type': 'application/json' },
+            });
+            console.log('Raw response:', response.data);
+            if (isMounted) {
+                if (typeof response.data === 'string' && response.data.startsWith('List(')) {
+                    const parsedData = parseScalaList(response.data);
+                    console.log('Parsed data:', parsedData);
+                    setCourses(parsedData);
+                    setError(null);
+                } else {
+                    console.error('Unexpected response format:', response.data);
+                    throw new Error('Received data is not in the expected format');
+                }
+            }
+        } catch (err) {
+            console.error('Error loading courses:', err);
+            if (isMounted) {
+                if (axios.isAxiosError(err)) {
+                    setError(`Failed to load courses. Server responded with: ${err.response?.status} ${err.response?.statusText}`);
+                } else {
+                    setError('Failed to load courses. Please try again later.');
+                }
+            }
+        } finally {
+            if (isMounted) {
+                setIsLoading(false);
+            }
+        }
+    };
+
+    const handleAddCourse = async (e: React.FormEvent) => {
+        e.preventDefault();
+        try {
+            const addCourseMessage = new AddCourseMessage(newCourse.title, newCourse.instructor, newCourse.description);
+            await axios.post(addCourseMessage.getURL(), JSON.stringify(addCourseMessage), {
+                headers: { 'Content-Type': 'application/json' },
+            });
+            setNewCourse({ title: '', instructor: '', description: '' });
+            setShowAddCourseForm(false);
+            fetchCourses(true);
+        } catch (err) {
+            console.error('Error adding course:', err);
+            alert('Failed to add course. Please try again.');
+        }
+    };
 
     const filteredCourses = courses.filter(course =>
         course.title.toLowerCase().includes(searchTerm.toLowerCase())
@@ -77,13 +144,8 @@ export function Main() {
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
                         {username ? (
-                            <button onClick={handleUserClick} className="user-info">
-                                <FontAwesomeIcon icon={faUser} className="user-icon" />
-                                <span className="user-name">{username}</span>
-                                <FontAwesomeIcon icon={faStar} className="icon" />
-                                <span className="star-count">52.3k</span>
-                                <FontAwesomeIcon icon={faCodeBranch} className="icon" />
-                                <span className="fork-count">6.4k</span>
+                            <button onClick={handleUserClick} className="user-button">
+                                {username}
                             </button>
                         ) : (
                             <button
@@ -98,28 +160,68 @@ export function Main() {
             </header>
 
             <main className="main-content">
-                <div className="course-grid">
-                    {filteredCourses.map((course) => (
-                        <div key={course.id} className="course-card">
-                            <PlaceholderImage text={course.title} />
-                            <div className="course-details">
-                                <h2 className="course-title">{course.title}</h2>
-                                <p className="course-instructor">讲师: {course.instructor}</p>
-                                <div className="course-rating">
-                                    <span className="star">★</span>
-                                    <span className="rating-value">{course.rating.toFixed(1)}</span>
-                                    <span className="review-count">({course.reviews} 评价)</span>
+                {isAdmin && (
+                    <div className="add-course-section">
+                        <button onClick={() => setShowAddCourseForm(!showAddCourseForm)}>
+                            {showAddCourseForm ? '取消' : '添加课程'}
+                        </button>
+                        {showAddCourseForm && (
+                            <form onSubmit={handleAddCourse} className="add-course-form">
+                                <input
+                                    type="text"
+                                    placeholder="课程标题"
+                                    value={newCourse.title}
+                                    onChange={(e) => setNewCourse({ ...newCourse, title: e.target.value })}
+                                    required
+                                />
+                                <input
+                                    type="text"
+                                    placeholder="讲师"
+                                    value={newCourse.instructor}
+                                    onChange={(e) => setNewCourse({ ...newCourse, instructor: e.target.value })}
+                                    required
+                                />
+                                <textarea
+                                    placeholder="课程描述"
+                                    value={newCourse.description}
+                                    onChange={(e) => setNewCourse({ ...newCourse, description: e.target.value })}
+                                    required
+                                ></textarea>
+                                <button type="submit">添加课程</button>
+                            </form>
+                        )}
+                    </div>
+                )}
+                {isLoading ? (
+                    <p>Loading courses...</p>
+                ) : error ? (
+                    <p className="error-message">{error}</p>
+                ) : courses.length === 0 ? (
+                    <p>No courses available.</p>
+                ) : (
+                    <div className="course-grid">
+                        {filteredCourses.map((course) => (
+                            <div key={course.id} className="course-card">
+                                <PlaceholderImage text={course.title} />
+                                <div className="course-details">
+                                    <h2 className="course-title">{course.title}</h2>
+                                    <p className="course-instructor">讲师: {course.instructor}</p>
+                                    <div className="course-rating">
+                                        <span className="star">★</span>
+                                        <span className="rating-value">{parseFloat(course.rating).toFixed(1)}</span>
+                                        <span className="review-count">({course.reviews} 评价)</span>
+                                    </div>
+                                    <button
+                                        onClick={() => history.push(`/course/${course.id}`)}
+                                        className="details-button"
+                                    >
+                                        查看详情
+                                    </button>
                                 </div>
-                                <button
-                                    onClick={() => history.push(`/course/${course.id}`)}
-                                    className="details-button"
-                                >
-                                    查看详情
-                                </button>
                             </div>
-                        </div>
-                    ))}
-                </div>
+                        ))}
+                    </div>
+                )}
             </main>
         </div>
     );
