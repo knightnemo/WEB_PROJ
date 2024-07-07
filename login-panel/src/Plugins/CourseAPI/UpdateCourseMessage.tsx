@@ -7,8 +7,17 @@ export class UpdateCourseMessage extends CourseMessage {
     description?: string;
     rating?: number;
     reviews?: number;
+    imageUrl?: string;  // 新增字段
 
-    constructor(id: string, title?: string, instructor?: string, description?: string, rating?: number, reviews?: number) {
+    constructor(
+        id: string,
+        title?: string,
+        instructor?: string,
+        description?: string,
+        rating?: number,
+        reviews?: number,
+        imageUrl?: string  // 新增参数
+    ) {
         super();
         this.id = id;
         this.title = title;
@@ -16,5 +25,6 @@ export class UpdateCourseMessage extends CourseMessage {
         this.description = description;
         this.rating = rating;
         this.reviews = reviews;
+        this.imageUrl = imageUrl;  // 初始化新字段
     }
 }

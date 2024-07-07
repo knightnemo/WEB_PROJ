@@ -14,6 +14,7 @@ interface Course {
     description: string;
     rating: number;
     reviews: number;
+    imageUrl?: string;
 }
 
 interface Comment {
@@ -23,7 +24,7 @@ interface Comment {
     likes: number;
     dislikes: number;
 }
-
+const DEFAULT_IMAGE_URL = 'https://via.placeholder.com/800x600.png?text=Default+Background+Image';
 const mockComments: Comment[] = [
     { id: 1, user: "张三", content: "非常棒的课程！讲解深入浅出。", likes: 15, dislikes: 2 },
     { id: 2, user: "李明", content: "老师讲得很好，但是作业有点难。", likes: 10, dislikes: 1 },
@@ -71,7 +72,8 @@ export function CourseDetails() {
                     instructor: courseData.instructor || '未知讲师',
                     description: courseData.description || '暂无简介',
                     rating: parseFloat(courseData.rating) || 0,
-                    reviews: parseInt(courseData.reviews) || 0
+                    reviews: parseInt(courseData.reviews) || 0,
+                    imageUrl: courseData.imageUrl
                 };
                 console.log('Processed course data:', courseData);  // 添加这行来查看处理后的数据
                 setCourse(courseData);
@@ -131,7 +133,10 @@ export function CourseDetails() {
                 editedCourse.id,
                 editedCourse.title !== course?.title ? editedCourse.title : undefined,
                 editedCourse.instructor !== course?.instructor ? editedCourse.instructor : undefined,
-                editedCourse.description !== course?.description ? editedCourse.description : undefined
+                editedCourse.description !== course?.description ? editedCourse.description : undefined,
+                editedCourse.rating !== course?.rating ? editedCourse.rating : undefined,
+                editedCourse.reviews !== course?.reviews ? editedCourse.reviews : undefined,
+                editedCourse.imageUrl !== course?.imageUrl ? editedCourse.imageUrl : undefined
             );
             const response = await axios.post(updateCourseMessage.getURL(), JSON.stringify(updateCourseMessage), {
                 headers: { 'Content-Type': 'application/json' },
@@ -189,21 +194,39 @@ export function CourseDetails() {
                     返回上一页
                 </button>
                 <div className="course-info">
+                    <img
+                        src={course.imageUrl || DEFAULT_IMAGE_URL}
+                        alt={course.title}
+                        className="course-image"
+                        onError={(e) => {
+                            const target = e.target as HTMLImageElement
+                            target.src = DEFAULT_IMAGE_URL
+                        }}
+                    />
                     {isEditing ? (
                         <div className="edit-course-form">
                             <input
                                 type="text"
                                 value={editedCourse?.title}
-                                onChange={(e) => setEditedCourse(prev => prev ? {...prev, title: e.target.value} : null)}
+                                onChange={(e) => setEditedCourse(prev => prev ? {
+                                    ...prev,
+                                    title: e.target.value,
+                                } : null)}
                             />
                             <input
                                 type="text"
                                 value={editedCourse?.instructor}
-                                onChange={(e) => setEditedCourse(prev => prev ? {...prev, instructor: e.target.value} : null)}
+                                onChange={(e) => setEditedCourse(prev => prev ? {
+                                    ...prev,
+                                    instructor: e.target.value,
+                                } : null)}
                             />
                             <textarea
                                 value={editedCourse?.description}
-                                onChange={(e) => setEditedCourse(prev => prev ? {...prev, description: e.target.value} : null)}
+                                onChange={(e) => setEditedCourse(prev => prev ? {
+                                    ...prev,
+                                    description: e.target.value,
+                                } : null)}
                             ></textarea>
                             <button onClick={handleUpdateCourse}>保存更改</button>
                             <button onClick={() => setIsEditing(false)}>取消</button>
