@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useHistory } from 'react-router-dom';
 import { useUser } from './UserContext';
 import { AllCoursesQueryMessage } from 'Plugins/CourseAPI/AllCoursesQueryMessage';
@@ -8,6 +8,80 @@ import './Main.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faStar, faCodeBranch } from '@fortawesome/free-solid-svg-icons';
 
+interface ImageUploaderProps {
+    onImageUpload: (base64Image: string) => void;
+}
+const DEFAULT_IMAGE_URL = 'https://via.placeholder.com/800x600.png?text=Default+Background+Image';
+const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageUpload }) => {
+    const [dragActive, setDragActive] = useState(false);
+
+    const handleDrag = useCallback((e: React.DragEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (e.type === "dragenter" || e.type === "dragover") {
+            setDragActive(true);
+        } else if (e.type === "dragleave") {
+            setDragActive(false);
+        }
+    }, []);
+
+    const handleDrop = useCallback((e: React.DragEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setDragActive(false);
+        if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+            handleFiles(e.dataTransfer.files);
+        }
+    }, []);
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        e.preventDefault();
+        if (e.target.files && e.target.files[0]) {
+            handleFiles(e.target.files);
+        }
+    };
+
+    const handleFiles = (files: FileList) => {
+        const file = files[0];
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            onImageUpload(reader.result as string);
+        };
+        reader.readAsDataURL(file);
+    };
+
+    const handlePaste = (e: React.ClipboardEvent) => {
+        const items = e.clipboardData.items;
+        for (let i = 0; i < items.length; i++) {
+            if (items[i].type.indexOf('image') !== -1) {
+                const blob = items[i].getAsFile();
+                if (blob) handleFiles([blob] as unknown as FileList);
+            }
+        }
+    };
+
+    return (
+        <div
+            onDragEnter={handleDrag}
+            onDragLeave={handleDrag}
+            onDragOver={handleDrag}
+            onDrop={handleDrop}
+            onPaste={handlePaste}
+            className={`image-upload-area ${dragActive ? 'drag-active' : ''}`}
+        >
+            <input
+                type="file"
+                id="image-upload"
+                onChange={handleChange}
+                accept="image/*"
+                className="file-input"
+            />
+            <label htmlFor="image-upload" className="file-label">
+                拖放图片到这里，或点击上传
+            </label>
+        </div>
+    );
+};
 
 interface Course {
     id: string;
@@ -16,8 +90,9 @@ interface Course {
     description: string;
     rating: string;
     reviews: number;
+    imageUrl?: string;
 }
-
+/*
 const PlaceholderImage: React.FC<{ text: string }> = ({ text }) => (
     <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -38,6 +113,8 @@ const PlaceholderImage: React.FC<{ text: string }> = ({ text }) => (
         </text>
     </svg>
 );
+*/
+
 
 export function Main() {
     const history = useHistory();
@@ -46,8 +123,12 @@ export function Main() {
     const [searchTerm, setSearchTerm] = useState('');
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const [newCourse, setNewCourse] = useState({ title: '', instructor: '', description: '' });
+    const [newCourse, setNewCourse] = useState({ title: '', instructor: '', description: '', imageUrl: '' });
     const [showAddCourseForm, setShowAddCourseForm] = useState(false);
+
+    const handleImageUpload = (base64Image: string) => {
+        setNewCourse(prev => ({ ...prev, imageUrl: base64Image }));
+    };
 
     useEffect(() => {
         let isMounted = true;
@@ -111,11 +192,16 @@ export function Main() {
     const handleAddCourse = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            const addCourseMessage = new AddCourseMessage(newCourse.title, newCourse.instructor, newCourse.description);
+            const addCourseMessage = new AddCourseMessage(
+                newCourse.title,
+                newCourse.instructor,
+                newCourse.description,
+                newCourse.imageUrl || DEFAULT_IMAGE_URL
+            );
             await axios.post(addCourseMessage.getURL(), JSON.stringify(addCourseMessage), {
                 headers: { 'Content-Type': 'application/json' },
             });
-            setNewCourse({ title: '', instructor: '', description: '' });
+            setNewCourse({ title: '', instructor: '', description: '', imageUrl: '' });
             setShowAddCourseForm(false);
             fetchCourses(true);
         } catch (err) {
@@ -123,6 +209,7 @@ export function Main() {
             alert('Failed to add course. Please try again.');
         }
     };
+
 
     const filteredCourses = courses.filter(course =>
         course.title.toLowerCase().includes(searchTerm.toLowerCase())
@@ -198,7 +285,11 @@ export function Main() {
                                     onChange={(e) => setNewCourse({ ...newCourse, description: e.target.value })}
                                     required
                                 ></textarea>
+                                <ImageUploader onImageUpload={handleImageUpload} />
                                 <button type="submit">添加课程</button>
+                                <p style={{ color: 'darkgray', fontStyle: 'italic' }}>
+                                    如果不上传图片，将使用默认背景图片。
+                                </p>
                             </form>
                         )}
                     </div>
@@ -213,7 +304,15 @@ export function Main() {
                     <div className="course-grid">
                         {filteredCourses.map((course) => (
                             <div key={course.id} className="course-card">
-                                <PlaceholderImage text={course.title} />
+                                <img
+                                    src={course.imageUrl|| DEFAULT_IMAGE_URL}
+                                    alt={course.title}
+                                    className="course-image"
+                                    onError={(e) => {
+                                        const target = e.target as HTMLImageElement;
+                                        target.src ='https://via.placeholder.com/800x600.png?text=Default+Background+Image'; // 设置一个默认的占位图片
+                                    }}
+                                />
                                 <div className="course-details">
                                     <h2 className="course-title">{course.title}</h2>
                                     <p className="course-instructor">讲师: {course.instructor}</p>

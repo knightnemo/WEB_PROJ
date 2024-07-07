@@ -8,6 +8,7 @@ export interface CourseData {
     description: string;
     rating: number;
     reviews: number;
+    imageURL: string;
 }
 
 abstract class CourseMessage extends API {
@@ -15,7 +16,7 @@ abstract class CourseMessage extends API {
 }
 
 class AddCourseMessage extends CourseMessage {
-    constructor(public title: string, public instructor: string, public description: string) {
+    constructor(public title: string, public instructor: string, public description: string, public imageURL: string) {
         super();
     }
 }
@@ -39,7 +40,8 @@ class UpdateCourseMessage extends CourseMessage {
         public instructor?: string,
         public description?: string,
         public rating?: number,
-        public reviews?: number
+        public reviews?: number,
+        public imageURL?: string
     ) {
         super();
     }
@@ -91,13 +93,26 @@ export const fetchCourse = async (id: string): Promise<CourseData | null> => {
     }
 };
 
-export const addCourse = async (title: string, instructor: string, description: string): Promise<string> => {
-    const response = await sendPostRequest(new AddCourseMessage(title, instructor, description));
+export const addCourse = async (
+    title: string,
+    instructor: string,
+    description: string,
+    imageUrl: string // 新增参数
+): Promise<string> => {
+    const response = await sendPostRequest(new AddCourseMessage(title, instructor, description, imageUrl));
     return response;
 };
 
-export const updateCourse = async (id: string, title?: string, instructor?: string, description?: string, rating?: number, reviews?: number): Promise<boolean> => {
-    const response = await sendPostRequest(new UpdateCourseMessage(id, title, instructor, description, rating, reviews));
+export const updateCourse = async (
+    id: string,
+    title?: string,
+    instructor?: string,
+    description?: string,
+    rating?: number,
+    reviews?: number,
+    imageUrl?: string // 新增参数
+): Promise<boolean> => {
+    const response = await sendPostRequest(new UpdateCourseMessage(id, title, instructor, description, rating, reviews, imageUrl));
     return response;
 };
 
