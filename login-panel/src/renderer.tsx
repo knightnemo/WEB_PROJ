@@ -24,6 +24,7 @@ import { CourseDetails } from 'Pages/CourseDetails'
 import { UserProvider } from 'Pages/UserContext';
 import { Auth } from 'Pages/Auth';
 import {UserProfile} from 'Pages/UserProfile';
+import { ChangePassword } from 'Pages/ChangePassword'
 
 const Layout = () => {
     return (
@@ -34,6 +35,7 @@ const Layout = () => {
                 <Route path="/course/:id" exact component={CourseDetails} />
                 <Route path="/auth" exact component={Auth} />
                 <Route path="/user/:username" component={UserProfile} />
+                <Route path="/change-password" component={ChangePassword} />
             </Switch>
         </HashRouter>
         </UserProvider>
