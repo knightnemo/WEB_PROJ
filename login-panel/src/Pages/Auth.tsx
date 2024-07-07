@@ -22,6 +22,8 @@ export function Auth() {
     const [isLoading, setIsLoading] = useState(false);
     const [users, setUsers] = useState<string[]>([]);
     const [message, setMessage] = useState('');
+    const [errors, setErrors] = useState({ username: '', password: '' });
+    const [touched, setTouched] = useState({ username: false, password: false });
 
     const resetState = useCallback(() => {
         setUsername('');
@@ -115,8 +117,56 @@ export function Auth() {
         }
     };
 
+    const validateField = (field: 'username' | 'password', value: string) => {
+        if (!value.trim()) {
+            return `请输入${field === 'username' ? '用户名' : '密码'}`;
+        }
+        return '';
+    };
+
+    const toggleAuthMode = () => {
+        setIsRegistering(!isRegistering);
+        setErrors({ username: '', password: '' });
+        setTouched({ username: false, password: false });
+        setMessage('');
+    };
+
+    const handleInputChange = (field: 'username' | 'password', value: string) => {
+        if (field === 'username') {
+            setUsername(value);
+        } else {
+            setPassword(value);
+        }
+
+        if (touched[field]) {
+            setErrors(prev => ({
+                ...prev,
+                [field]: validateField(field, value)
+            }));
+        }
+    };
+
+    const handleBlur = (field: 'username' | 'password') => {
+        setTouched(prev => ({ ...prev, [field]: true }));
+        setErrors(prev => ({
+            ...prev,
+            [field]: validateField(field, field === 'username' ? username : password)
+        }));
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        setTouched({ username: true, password: true });
+
+        const usernameError = validateField('username', username);
+        const passwordError = validateField('password', password);
+
+        setErrors({ username: usernameError, password: passwordError });
+
+        if (usernameError || passwordError) {
+            return;
+        }
+
         let apiMessage: API;
         if (isAdmin) {
             apiMessage = isRegistering ? new RegisterMessage(username, password) : new LoginMessage(username, password);
@@ -158,6 +208,7 @@ export function Auth() {
                         <h2 className="auth-title">
                             {isRegistering ? '注册' : '登录'}
                         </h2>
+                        {message && <div className="error-message">{message}</div>}
                         <form onSubmit={handleSubmit} className="auth-form">
                             <div className="form-group">
                                 <label htmlFor="username">用户名</label>
@@ -165,10 +216,12 @@ export function Auth() {
                                     id="username"
                                     type="text"
                                     value={username}
-                                    onChange={(e) => setUsername(e.target.value)}
-                                    required
+                                    onChange={(e) => handleInputChange('username', e.target.value)}
+                                    onBlur={() => handleBlur('username')}
+                                    className={touched.username && errors.username ? 'error' : ''}
                                     disabled={isLoading}
                                 />
+                                {touched.username && errors.username && <span className="error-message">{errors.username}</span>}
                             </div>
                             <div className="form-group">
                                 <label htmlFor="password">密码</label>
@@ -176,12 +229,13 @@ export function Auth() {
                                     id="password"
                                     type="password"
                                     value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    required
+                                    onChange={(e) => handleInputChange('password', e.target.value)}
+                                    onBlur={() => handleBlur('password')}
+                                    className={touched.password && errors.password ? 'error' : ''}
                                     disabled={isLoading}
                                 />
+                                {touched.password && errors.password && <span className="error-message">{errors.password}</span>}
                             </div>
-                            {message && <div className="error-message">{message}</div>}
                             <div className="checkbox-group">
                                 <input
                                     id="isAdmin"
@@ -195,12 +249,12 @@ export function Auth() {
                             <button type="submit" className="submit-button" disabled={isLoading}>
                                 {isLoading ? '处理中...' : (isRegistering ? '注册' : '登录')}
                             </button>
+                            <div className="toggle-auth-mode">
+                                <button type="button" onClick={toggleAuthMode} disabled={isLoading}>
+                                    {isRegistering ? '已有账户？立即登录' : '没有账户？立即注册'}
+                                </button>
+                            </div>
                         </form>
-                        <div className="toggle-auth-mode">
-                            <button onClick={() => setIsRegistering(!isRegistering)} disabled={isLoading}>
-                                {isRegistering ? '已有账户？立即登录' : '没有账户？立即注册'}
-                            </button>
-                        </div>
                     </>
                 ) : (
                     <>
@@ -215,7 +269,8 @@ export function Auth() {
                                         {users.map(user => (
                                             <li key={user} className="user-item">
                                                 {user}
-                                                <button onClick={() => handleDeleteUser(user)} className="delete-button" disabled={isLoading}>
+                                                <button onClick={() => handleDeleteUser(user)} className="delete-button"
+                                                        disabled={isLoading}>
                                                     删除
                                                 </button>
                                             </li>
