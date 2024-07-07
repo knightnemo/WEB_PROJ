@@ -6,10 +6,11 @@
 ---
 7.6
 * 用户(Patient)与管理员(Doctor)的增删👀 4人共同完成
-* 用户(Patient)与管理员(Doctor)的查询🔍 Leo
+* 前后端用户列表的实现🔍 Leo
 * 登录界面🥾 Leo
 * 主界面💡 Leo,KnightNemo
-* 课程微服务📗 Leo
+* 课程类后端📗 spy
+* 课程类后端完善与前端实现 Leo
 7.7
 * 个人主页与更完善的管理员数据类型👤 KnightNemo
 * 修改密码界面与后端🔐 KnightNemo
