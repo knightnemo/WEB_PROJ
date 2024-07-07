@@ -35,6 +35,9 @@ object Routes:
       case "AllUsersQueryMessage" =>
         IO(decode[AllUsersQueryMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for AllUsersQueryMessage")))
           .flatMap(_.fullPlan.map(_.asJson.toString))
+      case "PatientChangePasswordMessage" =>
+        IO(decode[PatientChangePasswordMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for PatientChangePasswordMessage")))
+          .flatMap(_.fullPlan.map(_.asJson.toString))
       case _ =>
         IO.raiseError(new Exception(s"Unknown type: $messageType"))
     }

@@ -179,6 +179,9 @@ export function UserProfile() {
                         <span>关注: {userInfo.following}</span>
                         <span>评价数: {userInfo.reviewCount}</span>
                     </div>
+                    <button onClick={() => history.push('/change-password')} className="back-button">
+                        修改密码
+                    </button>
                 </section>
 
                 <section className="user-reviews-section">
