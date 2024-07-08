@@ -24,17 +24,42 @@ object Init {
           instructor TEXT NOT NULL,
           description TEXT,
           rating REAL DEFAULT 0,
-          reviews INTEGER DEFAULT 0,
-          image_url TEXT
+          image_url TEXT,
+          resource_url TEXT,
+          created_at TIMESTAMP NOT NULL,
+          updated_at TIMESTAMP NOT NULL,
+          duration_minutes INTEGER,
+          difficulty_level TEXT,
+          category TEXT,
+          subcategory TEXT,
+          language TEXT,
+          prerequisites TEXT,
+          learning_objectives TEXT
         )
       """, List())
-      //如果表已经存在了
+      // Add new columns if they don't exist
       _ <- writeDB(s"""
         ALTER TABLE ${schemaName}.courses
-        ADD COLUMN IF NOT EXISTS image_url TEXT
+        ADD COLUMN IF NOT EXISTS created_at TIMESTAMP;
+        ALTER TABLE ${schemaName}.courses
+        ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP;
+        ALTER TABLE ${schemaName}.courses
+        ADD COLUMN IF NOT EXISTS duration_minutes INTEGER;
+        ALTER TABLE ${schemaName}.courses
+        ADD COLUMN IF NOT EXISTS difficulty_level TEXT;
+        ALTER TABLE ${schemaName}.courses
+        ADD COLUMN IF NOT EXISTS category TEXT;
+        ALTER TABLE ${schemaName}.courses
+        ADD COLUMN IF NOT EXISTS subcategory TEXT;
+        ALTER TABLE ${schemaName}.courses
+        ADD COLUMN IF NOT EXISTS language TEXT;
+        ALTER TABLE ${schemaName}.courses
+        ADD COLUMN IF NOT EXISTS prerequisites TEXT;
+        ALTER TABLE ${schemaName}.courses
+        ADD COLUMN IF NOT EXISTS learning_objectives TEXT;
       """, List()).attempt.flatMap {
         case Right(_) => IO.unit
-        case Left(e) => IO(println(s"Note: Unable to add image_url column. It may already exist. Error: ${e.getMessage}"))
+        case Left(e) => IO(println(s"Note: Unable to add new columns. They may already exist. Error: ${e.getMessage}"))
       }
     } yield ()
-}//这里加入了一个image_url
+}

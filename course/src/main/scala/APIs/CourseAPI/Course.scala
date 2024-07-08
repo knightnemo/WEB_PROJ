@@ -5,11 +5,13 @@ import io.circe.generic.semiauto._
 
 case class Course(
                    id: String,
+                   tag: String,
                    title: String,
                    instructor: String,
                    description: String,
                    rating: Double,
-                   reviews: Int
+                   image_url: String,
+                   resource_url: String,
                  )
 
 object Course {
