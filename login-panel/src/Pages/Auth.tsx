@@ -261,24 +261,44 @@ export function Auth() {
                         <h2 className="auth-title">欢迎, {username}!</h2>
                         {isAdmin && (
                             <div className="user-management">
-                                <h3>用户列表</h3>
-                                {isLoading ? (
-                                    <p>加载中...</p>
-                                ) : users.length > 0 ? (
-                                    <ul className="user-list">
+        <span className="caption-container">
+            <span className="table-title">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="9" cy="7" r="4"></circle>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                </svg>
+                用户列表
+            </span>
+            <span className="table-row-count">({users.length} 用户)</span>
+        </span>
+                                <div className="table-wrapper">
+                                    <table>
+                                        <thead>
+                                        <tr>
+                                            <th className="sticky-left">用户名</th>
+                                            <th className="sticky-right"></th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
                                         {users.map(user => (
-                                            <li key={user} className="user-item">
-                                                {user}
-                                                <button onClick={() => handleDeleteUser(user)} className="delete-button"
-                                                        disabled={isLoading}>
-                                                    删除
-                                                </button>
-                                            </li>
+                                            <tr key={user}>
+                                                <td className="user-name sticky-left">{user}</td>
+                                                <td className="sticky-right">
+                                                    <button
+                                                        onClick={() => handleDeleteUser(user)}
+                                                        className="delete-button"
+                                                        disabled={isLoading}
+                                                    >
+                                                        删除
+                                                    </button>
+                                                </td>
+                                            </tr>
                                         ))}
-                                    </ul>
-                                ) : (
-                                    <p>{message || '没有找到任何用户'}</p>
-                                )}
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         )}
                         <button onClick={handleLogout} className="logout-button" disabled={isLoading}>登出</button>

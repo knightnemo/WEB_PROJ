@@ -1,13 +1,11 @@
 package APIs.CourseAPI
 
-import java.time.LocalDateTime
-
 case class AddCourseMessage(
                              id: String,
                              title: String,
                              instructor: String,
                              description: String,
-                             rating: Double,
+                             rating: String,
                              image_url: String,
                              resource_url: String,
                              duration_minutes: Int,
@@ -17,7 +15,4 @@ case class AddCourseMessage(
                              language: String,
                              prerequisites: List[String],
                              learning_objectives: List[String]
-                           ) extends CourseMessage[String] {
-  val created_at: LocalDateTime = LocalDateTime.now()
-  val updated_at: LocalDateTime = created_at
-}
+                           )

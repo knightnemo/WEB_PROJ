@@ -5,8 +5,7 @@ export class UpdateCourseMessage extends CourseMessage {
     title?: string;
     instructor?: string;
     description?: string;
-    rating?: number;
-    reviews?: number;
+    rating?: string;
     imageUrl?: string;
     resourceUrl?: string;
     durationMinutes?: number;
@@ -22,8 +21,7 @@ export class UpdateCourseMessage extends CourseMessage {
         title?: string,
         instructor?: string,
         description?: string,
-        rating?: number,
-        reviews?: number,
+        rating?: string,
         imageUrl?: string,
         resourceUrl?: string,
         durationMinutes?: number,
@@ -40,7 +38,6 @@ export class UpdateCourseMessage extends CourseMessage {
         this.instructor = instructor;
         this.description = description;
         this.rating = rating;
-        this.reviews = reviews;
         this.imageUrl = imageUrl;
         this.resourceUrl = resourceUrl;
         this.durationMinutes = durationMinutes;
