@@ -1,45 +1,70 @@
 import { CourseMessage } from 'Plugins/CourseAPI/CourseMessage'
+import { v4 as uuidv4 } from 'uuid';
 
 export class AddCourseMessage extends CourseMessage {
+    id: string;
     title: string;
     instructor: string;
     description: string;
-    imageUrl: string;
-    resourceUrl: string;
-    durationMinutes: number;
-    difficultyLevel: string;
+    rating: string;
+    image_url: string;
+    resource_url: string;
+    duration_minutes: number;
+    difficulty_level: string;
     category: string;
     subcategory?: string;
     language: string;
     prerequisites: string[];
-    learningObjectives: string[];
+    learning_objectives: string[];
 
     constructor(
         title: string,
         instructor: string,
         description: string,
-        imageUrl: string,
-        resourceUrl: string,
-        durationMinutes: number,
-        difficultyLevel: string,
+        rating: string,
+        image_url: string,
+        resource_url: string,
+        duration_minutes: number,
+        difficulty_level: string,
         category: string,
+        subcategory: string | undefined,
         language: string,
         prerequisites: string[],
-        learningObjectives: string[],
-        subcategory?: string
+        learning_objectives: string[]
     ) {
         super();
+        this.id = uuidv4();
         this.title = title;
         this.instructor = instructor;
         this.description = description;
-        this.imageUrl = imageUrl;
-        this.resourceUrl = resourceUrl;
-        this.durationMinutes = durationMinutes;
-        this.difficultyLevel = difficultyLevel;
+        this.rating = rating;
+        this.image_url = image_url;
+        this.resource_url = resource_url;
+        this.duration_minutes = duration_minutes;
+        this.difficulty_level = difficulty_level;
         this.category = category;
         this.subcategory = subcategory;
         this.language = language;
         this.prerequisites = prerequisites;
-        this.learningObjectives = learningObjectives;
+        this.learning_objectives = learning_objectives;
+    }
+
+    toJSON() {
+        return {
+            id: this.id,
+            title: this.title,
+            instructor: this.instructor,
+            description: this.description,
+            rating: this.rating,
+            image_url: this.image_url,
+            resource_url: this.resource_url,
+            duration_minutes: this.duration_minutes,
+            difficulty_level: this.difficulty_level,
+            category: this.category,
+            subcategory: this.subcategory,
+            language: this.language,
+            prerequisites: this.prerequisites,
+            learning_objectives: this.learning_objectives
+        };
     }
 }

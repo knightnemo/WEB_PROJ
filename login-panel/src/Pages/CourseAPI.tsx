@@ -6,8 +6,7 @@ export interface CourseData {
     title: string;
     instructor: string;
     description: string;
-    rating: number;
-    reviews: number;
+    rating: string;
     imageUrl: string;
     resourceUrl: string;
     durationMinutes: number;
@@ -27,6 +26,7 @@ class AddCourseMessage extends CourseMessage {
         public title: string,
         public instructor: string,
         public description: string,
+        public rating: string,
         public imageUrl: string,
         public resourceUrl: string,
         public durationMinutes: number,
@@ -47,8 +47,7 @@ class UpdateCourseMessage extends CourseMessage {
         public title?: string,
         public instructor?: string,
         public description?: string,
-        public rating?: number,
-        public reviews?: number,
+        public rating?: string,
         public imageUrl?: string,
         public resourceUrl?: string,
         public durationMinutes?: number,
@@ -67,6 +66,7 @@ export const addCourse = async (
     title: string,
     instructor: string,
     description: string,
+    rating: string,
     imageUrl: string,
     resourceUrl: string,
     durationMinutes: number,
@@ -78,7 +78,7 @@ export const addCourse = async (
     subcategory?: string
 ): Promise<string> => {
     const response = await sendPostRequest(new AddCourseMessage(
-        title, instructor, description, imageUrl, resourceUrl,
+        title, instructor, description, rating, imageUrl, resourceUrl,
         durationMinutes, difficultyLevel, category, language,
         prerequisites, learningObjectives, subcategory
     ));
@@ -102,8 +102,7 @@ export const updateCourse = async (
     title?: string,
     instructor?: string,
     description?: string,
-    rating?: number,
-    reviews?: number,
+    rating?: string,
     imageUrl?: string,
     resourceUrl?: string,
     durationMinutes?: number,
@@ -115,7 +114,7 @@ export const updateCourse = async (
     learningObjectives?: string[]
 ): Promise<boolean> => {
     const response = await sendPostRequest(new UpdateCourseMessage(
-        id, title, instructor, description, rating, reviews, imageUrl,
+        id, title, instructor, description, rating, imageUrl,
         resourceUrl, durationMinutes, difficultyLevel, category,
         subcategory, language, prerequisites, learningObjectives
     ));

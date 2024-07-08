@@ -156,47 +156,58 @@ export function UserProfile() {
 
     return (
         <div className="user-profile-container">
-            <header className="app-header">
-                <div className="header-content">
-                    <h1 className="site-title">课程评价网站</h1>
-                    <div className="header-buttons">
-                        <button onClick={() => history.push('/')} className="back-button">
-                            返回首页
-                        </button>
-                        <button onClick={handleAuthClick} className="back-button">
-                            切换用户
-                        </button>
-                    </div>
-                </div>
+            <header className="profile-header">
+                <h1 className="site-title">课程评价网站</h1>
+                <nav className="profile-nav">
+                    <button onClick={() => history.push('/')} className="nav-button">
+                        返回主页
+                    </button>
+                    <button onClick={handleAuthClick} className="nav-button">
+                        切换用户
+                    </button>
+                </nav>
             </header>
 
-            <main className="user-profile-content">
+            <main className="profile-content">
                 <section className="user-info-section">
-                    <h2>{userInfo.username}</h2>
-                    <p>{userInfo.bio}</p>
-                    <div className="user-stats">
-                        <span>关注者: {userInfo.followers}</span>
-                        <span>关注: {userInfo.following}</span>
-                        <span>评价数: {userInfo.reviewCount}</span>
+                    <div className="user-header">
+                        <h2>{userInfo.username}</h2>
+                        <button onClick={() => history.push('/change-password')} className="change-password-button">
+                            修改密码
+                        </button>
                     </div>
-                    <button onClick={() => history.push('/change-password')} className="back-button">
-                        修改密码
-                    </button>
+                    <p className="user-bio">{userInfo.bio}</p>
+                    <div className="user-stats">
+                        <div className="stat-item">
+                            <span className="stat-value">{userInfo.followers}</span>
+                            <span className="stat-label">关注者</span>
+                        </div>
+                        <div className="stat-item">
+                            <span className="stat-value">{userInfo.following}</span>
+                            <span className="stat-label">关注</span>
+                        </div>
+                        <div className="stat-item">
+                            <span className="stat-value">{userInfo.reviewCount}</span>
+                            <span className="stat-label">评价数</span>
+                        </div>
+                    </div>
                 </section>
 
                 <section className="user-reviews-section">
                     <h3>用户评价</h3>
-                    {reviews.map((review) => (
-                        <div key={review.id} className="review-card">
-                            <h4>{review.courseTitle}</h4>
-                            <div className="review-rating">
-                                <span className="star">★</span>
-                                <span>{review.rating.toFixed(1)}</span>
+                    <div className="reviews-list">
+                        {reviews.map((review) => (
+                            <div key={review.id} className="review-card">
+                                <h4>{review.courseTitle}</h4>
+                                <div className="review-rating">
+                                    <span className="star">★</span>
+                                    <span>{review.rating.toFixed(1)}</span>
+                                </div>
+                                <p className="review-content">{review.content}</p>
+                                <span className="review-date">{review.date}</span>
                             </div>
-                            <p>{review.content}</p>
-                            <span className="review-date">{review.date}</span>
-                        </div>
-                    ))}
+                        ))}
+                    </div>
                 </section>
             </main>
         </div>

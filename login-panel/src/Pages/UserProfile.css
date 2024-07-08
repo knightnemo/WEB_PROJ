@@ -1,10 +1,45 @@
 .user-profile-container {
     min-height: 100vh;
     background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    font-family: 'Arial', sans-serif;
 }
 
-.user-profile-content {
-    max-width: 1200px;
+.profile-header {
+    background-color: #ffffff;
+    padding: 1rem 2rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.site-title {
+    font-size: 1.5rem;
+    color: #3b82f6;
+    margin: 0;
+}
+
+.profile-nav {
+    display: flex;
+    gap: 1rem;
+}
+
+.nav-button {
+    background-color: #3b82f6;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 0.25rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.nav-button:hover {
+    background-color: #2563eb;
+}
+
+.profile-content {
+    max-width: 1000px;
     margin: 2rem auto;
     padding: 0 1rem;
 }
@@ -17,19 +52,57 @@
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-.user-info-section h2 {
-    font-size: 1.5rem;
-    color: #3b82f6;
+.user-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     margin-bottom: 1rem;
+}
+
+.user-header h2 {
+    font-size: 1.8rem;
+    color: #1f2937;
+    margin: 0;
+}
+
+.change-password-button {
+    background-color: #10b981;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 0.25rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.change-password-button:hover {
+    background-color: #059669;
+}
+
+.user-bio {
+    font-size: 1rem;
+    color: #4b5563;
+    margin-bottom: 1.5rem;
 }
 
 .user-stats {
     display: flex;
-    justify-content: space-between;
-    margin-top: 1rem;
+    justify-content: space-around;
+    text-align: center;
 }
 
-.user-stats span {
+.stat-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.stat-value {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #3b82f6;
+}
+
+.stat-label {
     font-size: 0.9rem;
     color: #6b7280;
 }
@@ -42,22 +115,29 @@
 }
 
 .user-reviews-section h3 {
-    font-size: 1.2rem;
+    font-size: 1.5rem;
     color: #3b82f6;
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.reviews-list {
+    display: grid;
+    gap: 1.5rem;
 }
 
 .review-card {
-    border-bottom: 1px solid #e5e7eb;
-    padding: 1rem 0;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+    transition: box-shadow 0.3s;
 }
 
-.review-card:last-child {
-    border-bottom: none;
+.review-card:hover {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .review-card h4 {
-    font-size: 1rem;
+    font-size: 1.2rem;
     color: #1f2937;
     margin-bottom: 0.5rem;
 }
@@ -74,7 +154,7 @@
 }
 
 .review-content {
-    font-size: 0.9rem;
+    font-size: 0.95rem;
     color: #4b5563;
     margin-bottom: 0.5rem;
 }
@@ -84,35 +164,31 @@
     color: #9ca3af;
 }
 
-.back-button {
-    background-color: #3b82f6;
-    color: white;
-    border: none;
-    padding: 0.5rem 1rem;
-    border-radius: 0.25rem;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
+@media (max-width: 768px) {
+    .profile-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
 
-.back-button:hover {
-    background-color: #2563eb;
-}
+    .profile-nav {
+        margin-top: 1rem;
+    }
 
-.header-buttons {
-    display: flex;
-    gap: 10px;
-}
+    .user-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
 
-.auth-button {
-    background-color: #3b82f6;
-    color: white;
-    border: none;
-    padding: 0.5rem 1rem;
-    border-radius: 0.25rem;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
+    .change-password-button {
+        margin-top: 1rem;
+    }
 
-.auth-button:hover {
-    background-color: #2563eb;
+    .user-stats {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .stat-item {
+        margin-bottom: 1rem;
+    }
 }

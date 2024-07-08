@@ -12,8 +12,7 @@ interface Course {
     title: string;
     instructor: string;
     description: string;
-    rating: number;
-    reviews: number;
+    rating: string;
     imageUrl: string;
     resourceUrl: string;
     durationMinutes: number;
@@ -72,13 +71,16 @@ export function CourseDetails() {
                         throw new Error('Invalid course data format');
                     }
                 }
+
+                // 确保 prerequisites 和 learningObjectives 是数组
+                const ensureArray = (value: any) => Array.isArray(value) ? value : [];
+
                 courseData = {
                     id: courseData.id || '',
                     title: courseData.title || '无标题',
                     instructor: courseData.instructor || '未知讲师',
                     description: courseData.description || '暂无简介',
-                    rating: parseFloat(courseData.rating) || 0,
-                    reviews: parseInt(courseData.reviews) || 0,
+                    rating: courseData.rating || '0',
                     imageUrl: courseData.imageUrl || DEFAULT_IMAGE_URL,
                     resourceUrl: courseData.resourceUrl || '',
                     durationMinutes: parseInt(courseData.durationMinutes) || 0,
@@ -86,8 +88,8 @@ export function CourseDetails() {
                     category: courseData.category || '未分类',
                     subcategory: courseData.subcategory,
                     language: courseData.language || '未知',
-                    prerequisites: courseData.prerequisites || [],
-                    learningObjectives: courseData.learningObjectives || [],
+                    prerequisites: ensureArray(courseData.prerequisites),
+                    learningObjectives: ensureArray(courseData.learningObjectives),
                 };
                 console.log('Processed course data:', courseData);
                 setCourse(courseData);
@@ -149,7 +151,6 @@ export function CourseDetails() {
                 editedCourse.instructor !== course?.instructor ? editedCourse.instructor : undefined,
                 editedCourse.description !== course?.description ? editedCourse.description : undefined,
                 editedCourse.rating !== course?.rating ? editedCourse.rating : undefined,
-                editedCourse.reviews !== course?.reviews ? editedCourse.reviews : undefined,
                 editedCourse.imageUrl !== course?.imageUrl ? editedCourse.imageUrl : undefined,
                 editedCourse.resourceUrl !== course?.resourceUrl ? editedCourse.resourceUrl : undefined,
                 editedCourse.durationMinutes !== course?.durationMinutes ? editedCourse.durationMinutes : undefined,
@@ -175,7 +176,6 @@ export function CourseDetails() {
             alert('更新课程时出错');
         }
     };
-
 
     const handleDeleteCourse = async () => {
         if (!course) return;
@@ -206,147 +206,83 @@ export function CourseDetails() {
         return <div className="error">{error || '未找到课程信息'}</div>;
     }
 
-    // 在渲染之前确保 rating 是一个数字
-    const rating = typeof course.rating === 'string' ? parseFloat(course.rating) : (course.rating || 0);
-
-
     return (
         <div className="course-details">
-            <div className="container">
-                <button onClick={() => history.goBack()} className="back-button">
-                    返回上一页
-                </button>
-                <div className="course-info">
+            <div className="course-header">
+                <div className="course-header-content">
+                    <button onClick={() => history.push('/')} className="back-button">
+                        返回主页
+                    </button>
+                    <h1 className="course-title">{course.title}</h1>
+                    <p className="instructor-name">讲师: {course.instructor}</p>
+                    <div className="course-meta">
+                        <span className="rating">
+                            <span className="star">★</span>
+                            <span className="rating-value">{course.rating}</span>
+                        </span>
+                        <span className="duration">{course.durationMinutes} 分钟</span>
+                        <span className="difficulty-level">{course.difficultyLevel}</span>
+                        <span className="category">{course.category}{course.subcategory ? ` - ${course.subcategory}` : ''}</span>
+                        <span className="language">{course.language}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div className="course-content">
+                <div className="course-main">
                     <img
                         src={course.imageUrl || DEFAULT_IMAGE_URL}
                         alt={course.title}
                         className="course-image"
                         onError={(e) => {
-                            const target = e.target as HTMLImageElement
-                            target.src = DEFAULT_IMAGE_URL
+                            const target = e.target as HTMLImageElement;
+                            target.src = DEFAULT_IMAGE_URL;
                         }}
                     />
-                    {isEditing ? (
-                        <div className="edit-course-form">
-                            <input
-                                type="text"
-                                value={editedCourse?.title}
-                                onChange={(e) => setEditedCourse(prev => prev ? { ...prev, title: e.target.value } : null)}
-                                placeholder="标题"
-                            />
-                            <input
-                                type="text"
-                                value={editedCourse?.instructor}
-                                onChange={(e) => setEditedCourse(prev => prev ? { ...prev, instructor: e.target.value } : null)}
-                                placeholder="讲师"
-                            />
-                            <textarea
-                                value={editedCourse?.description}
-                                onChange={(e) => setEditedCourse(prev => prev ? { ...prev, description: e.target.value } : null)}
-                                placeholder="描述"
-                            ></textarea>
-                            <input
-                                type="text"
-                                value={editedCourse?.resourceUrl}
-                                onChange={(e) => setEditedCourse(prev => prev ? { ...prev, resourceUrl: e.target.value } : null)}
-                                placeholder="资源链接"
-                            />
-                            <input
-                                type="number"
-                                value={editedCourse?.durationMinutes}
-                                onChange={(e) => setEditedCourse(prev => prev ? { ...prev, durationMinutes: parseInt(e.target.value) } : null)}
-                                placeholder="课程时长（分钟）"
-                            />
-                            <input
-                                type="text"
-                                value={editedCourse?.difficultyLevel}
-                                onChange={(e) => setEditedCourse(prev => prev ? { ...prev, difficultyLevel: e.target.value } : null)}
-                                placeholder="难度级别"
-                            />
-                            <input
-                                type="text"
-                                value={editedCourse?.category}
-                                onChange={(e) => setEditedCourse(prev => prev ? { ...prev, category: e.target.value } : null)}
-                                placeholder="类别"
-                            />
-                            <input
-                                type="text"
-                                value={editedCourse?.subcategory}
-                                onChange={(e) => setEditedCourse(prev => prev ? { ...prev, subcategory: e.target.value } : null)}
-                                placeholder="子类别"
-                            />
-                            <input
-                                type="text"
-                                value={editedCourse?.language}
-                                onChange={(e) => setEditedCourse(prev => prev ? { ...prev, language: e.target.value } : null)}
-                                placeholder="语言"
-                            />
-                            <input
-                                type="text"
-                                value={editedCourse?.prerequisites.join(', ')}
-                                onChange={(e) => setEditedCourse(prev => prev ? { ...prev, prerequisites: e.target.value.split(',').map(item => item.trim()) } : null)}
-                                placeholder="先决条件（用逗号分隔）"
-                            />
-                            <input
-                                type="text"
-                                value={editedCourse?.learningObjectives.join(', ')}
-                                onChange={(e) => setEditedCourse(prev => prev ? { ...prev, learningObjectives: e.target.value.split(',').map(item => item.trim()) } : null)}
-                                placeholder="学习目标（用逗号分隔）"
-                            />
-                            <button onClick={handleUpdateCourse}>保存更改</button>
-                            <button onClick={() => setIsEditing(false)}>取消</button>
-                        </div>
-                    ) : (
-                        <>
-                            <h1 className="course-title">{course.title}</h1>
-                            <p className="instructor-name">讲师: {course.instructor}</p>
-                            <div className="rating">
-                                <span className="star">★</span>
-                                <span className="rating-value">{course.rating.toFixed(1)}</span>
-                                <span className="review-count">({course.reviews} 评价)</span>
-                            </div>
-                            <p className="description">{course.description}</p>
-                            <p className="resource-url">资源链接: <a href={course.resourceUrl} target="_blank"
-                                                                     rel="noopener noreferrer">{course.resourceUrl}</a>
-                            </p>
-                            <p className="duration">课程时长: {course.durationMinutes} 分钟</p>
-                            <p className="difficulty-level">难度级别: {course.difficultyLevel}</p>
-                            <p className="category">类别: {course.category}{course.subcategory ? ` - ${course.subcategory}` : ''}</p>
-                            <p className="language">语言: {course.language}</p>
-                            <div className="prerequisites">
-                                <h3>先决条件:</h3>
-                                <ul>
-                                    {course.prerequisites && course.prerequisites.length > 0 ? (
-                                        course.prerequisites.map((prerequisite, index) => (
-                                            <li key={index}>{prerequisite}</li>
-                                        ))
-                                    ) : (
-                                        <li>无先决条件</li>
-                                    )}
-                                </ul>
-                            </div>
-                            <div className="learning-objectives">
-                                <h3>学习目标:</h3>
-                                <ul>
-                                    {course.learningObjectives && course.learningObjectives.length > 0 ? (
-                                        course.learningObjectives.map((objective, index) => (
-                                            <li key={index}>{objective}</li>
-                                        ))
-                                    ) : (
-                                        <li>暂无学习目标</li>
-                                    )}
-                                </ul>
-                            </div>
-                            {isAdmin && (
-                                <div className="admin-actions">
-                                    <button onClick={() => setIsEditing(true)}>编辑课程</button>
-                                    <button onClick={handleDeleteCourse}>删除课程</button>
-                                </div>
+                    <div className="course-description">
+                        <h2>课程简介</h2>
+                        <p>{course.description}</p>
+                    </div>
+                    <div className="course-objectives">
+                        <h2>学习目标</h2>
+                        <ul>
+                            {Array.isArray(course.learningObjectives) && course.learningObjectives.length > 0 ? (
+                                course.learningObjectives.map((objective, index) => (
+                                    <li key={index}>{objective}</li>
+                                ))
+                            ) : (
+                                <li>暂无学习目标</li>
                             )}
-                        </>
-                    )}
+                        </ul>
+                    </div>
+                    <div className="course-prerequisites">
+                        <h2>先决条件</h2>
+                        <ul>
+                            {Array.isArray(course.prerequisites) && course.prerequisites.length > 0 ? (
+                                course.prerequisites.map((prerequisite, index) => (
+                                    <li key={index}>{prerequisite}</li>
+                                ))
+                            ) : (
+                                <li>无先决条件</li>
+                            )}
+                        </ul>
+                    </div>
                 </div>
 
+                <div className="course-sidebar">
+                    <a href={course.resourceUrl} target="_blank" rel="noopener noreferrer" className="enroll-button">
+                        开始学习
+                    </a>
+                    {isAdmin && (
+                        <div className="admin-actions">
+                            <button onClick={() => setIsEditing(true)} className="edit-button">编辑课程</button>
+                            <button onClick={handleDeleteCourse} className="delete-button">删除课程</button>
+                        </div>
+                    )}
+                </div>
+            </div>
+
+            <div className="comments-section">
                 <h2 className="comments-title">评论区</h2>
                 <div className="comments-list">
                     {comments.map((comment) => (

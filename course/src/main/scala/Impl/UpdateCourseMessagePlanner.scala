@@ -14,7 +14,7 @@ case class UpdateCourseMessagePlanner(
                                        title: Option[String],
                                        instructor: Option[String],
                                        description: Option[String],
-                                       rating: Option[Double],
+                                       rating: Option[String],
                                        image_url: Option[String],
                                        resource_url: Option[String],
                                        duration_minutes: Option[Int],
@@ -31,7 +31,7 @@ case class UpdateCourseMessagePlanner(
       title.map(t => (s"title = ?", SqlParameter("String", t))),
       instructor.map(i => (s"instructor = ?", SqlParameter("String", i))),
       description.map(d => (s"description = ?", SqlParameter("String", d))),
-      rating.map(r => (s"rating = ?", SqlParameter("String", r.toString))),
+      rating.map(r => (s"rating = ?", SqlParameter("String", r))),
       image_url.map(url => (s"image_url = ?", SqlParameter("String", url))),
       resource_url.map(url => (s"resource_url = ?", SqlParameter("String", url))),
       duration_minutes.map(d => (s"duration_minutes = ?", SqlParameter("Int", d.toString))),
@@ -47,10 +47,8 @@ case class UpdateCourseMessagePlanner(
       IO.pure("No updates provided")
     } else {
       val (setClause, params) = updates.unzip
-      val now = LocalDateTime.now()
       val query = s"UPDATE ${schemaName}.courses SET ${setClause.mkString(", ")}, updated_at = ? WHERE id = ?"
-      val allParams = params ++ List(SqlParameter("DateTime", now.toString), SqlParameter("String", id))
-
+      val allParams = params ++ List(SqlParameter("String", id))
       writeDB(query, allParams).map(_ => s"Course updated successfully for ID: $id")
     }
   }

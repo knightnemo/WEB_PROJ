@@ -1,11 +1,11 @@
 package APIs.CourseAPI
 
 case class UpdateCourseMessage(
-                                courseId: String,
+                                id: String,
                                 title: Option[String],
                                 instructor: Option[String],
                                 description: Option[String],
-                                rating: Option[Double],
+                                rating: Option[String],
                                 image_url: Option[String],
                                 resource_url: Option[String],
                                 duration_minutes: Option[Int],
