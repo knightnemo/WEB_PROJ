@@ -7,7 +7,15 @@ export class UpdateCourseMessage extends CourseMessage {
     description?: string;
     rating?: number;
     reviews?: number;
-    imageUrl?: string;  // 新增字段
+    imageUrl?: string;
+    resourceUrl?: string;
+    durationMinutes?: number;
+    difficultyLevel?: string;
+    category?: string;
+    subcategory?: string;
+    language?: string;
+    prerequisites?: string[];
+    learningObjectives?: string[];
 
     constructor(
         id: string,
@@ -16,7 +24,15 @@ export class UpdateCourseMessage extends CourseMessage {
         description?: string,
         rating?: number,
         reviews?: number,
-        imageUrl?: string  // 新增参数
+        imageUrl?: string,
+        resourceUrl?: string,
+        durationMinutes?: number,
+        difficultyLevel?: string,
+        category?: string,
+        subcategory?: string,
+        language?: string,
+        prerequisites?: string[],
+        learningObjectives?: string[]
     ) {
         super();
         this.id = id;
@@ -25,6 +41,14 @@ export class UpdateCourseMessage extends CourseMessage {
         this.description = description;
         this.rating = rating;
         this.reviews = reviews;
-        this.imageUrl = imageUrl;  // 初始化新字段
+        this.imageUrl = imageUrl;
+        this.resourceUrl = resourceUrl;
+        this.durationMinutes = durationMinutes;
+        this.difficultyLevel = difficultyLevel;
+        this.category = category;
+        this.subcategory = subcategory;
+        this.language = language;
+        this.prerequisites = prerequisites;
+        this.learningObjectives = learningObjectives;
     }
 }

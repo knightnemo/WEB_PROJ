@@ -91,6 +91,14 @@ interface Course {
     rating: string;
     reviews: number;
     imageUrl?: string;
+    resourceUrl: string;
+    durationMinutes: number;
+    difficultyLevel: string;
+    category: string;
+    subcategory?: string;
+    language: string;
+    prerequisites: string[];
+    learningObjectives: string[];
 }
 /*
 const PlaceholderImage: React.FC<{ text: string }> = ({ text }) => (
@@ -123,7 +131,20 @@ export function Main() {
     const [searchTerm, setSearchTerm] = useState('');
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const [newCourse, setNewCourse] = useState({ title: '', instructor: '', description: '', imageUrl: '' });
+    const [newCourse, setNewCourse] = useState({
+        title: '',
+        instructor: '',
+        description: '',
+        imageUrl: '',
+        resourceUrl: '',
+        durationMinutes: 0,
+        difficultyLevel: '',
+        category: '',
+        subcategory: '',
+        language: '',
+        prerequisites: '',
+        learningObjectives: ''
+    });
     const [showAddCourseForm, setShowAddCourseForm] = useState(false);
 
     const handleImageUpload = (base64Image: string) => {
@@ -196,12 +217,33 @@ export function Main() {
                 newCourse.title,
                 newCourse.instructor,
                 newCourse.description,
-                newCourse.imageUrl || DEFAULT_IMAGE_URL
+                newCourse.imageUrl || DEFAULT_IMAGE_URL,
+                newCourse.resourceUrl,
+                newCourse.durationMinutes,
+                newCourse.difficultyLevel,
+                newCourse.category,
+                newCourse.language,
+                newCourse.prerequisites.split(',').map(item => item.trim()),
+                newCourse.learningObjectives.split(',').map(item => item.trim()),
+                newCourse.subcategory
             );
             await axios.post(addCourseMessage.getURL(), JSON.stringify(addCourseMessage), {
                 headers: { 'Content-Type': 'application/json' },
             });
-            setNewCourse({ title: '', instructor: '', description: '', imageUrl: '' });
+            setNewCourse({
+                title: '',
+                instructor: '',
+                description: '',
+                imageUrl: '',
+                resourceUrl: '',
+                durationMinutes: 0,
+                difficultyLevel: '',
+                category: '',
+                subcategory: '',
+                language: '',
+                prerequisites: '',
+                learningObjectives: ''
+            });
             setShowAddCourseForm(false);
             fetchCourses(true);
         } catch (err) {
@@ -285,11 +327,61 @@ export function Main() {
                                     onChange={(e) => setNewCourse({ ...newCourse, description: e.target.value })}
                                     required
                                 ></textarea>
+                                <input
+                                    type="text"
+                                    placeholder="资源链接"
+                                    value={newCourse.resourceUrl}
+                                    onChange={(e) => setNewCourse({ ...newCourse, resourceUrl: e.target.value })}
+                                    required
+                                />
+                                <input
+                                    type="number"
+                                    placeholder="课程时长（分钟）"
+                                    value={newCourse.durationMinutes}
+                                    onChange={(e) => setNewCourse({ ...newCourse, durationMinutes: parseInt(e.target.value) })}
+                                    required
+                                />
+                                <input
+                                    type="text"
+                                    placeholder="难度级别"
+                                    value={newCourse.difficultyLevel}
+                                    onChange={(e) => setNewCourse({ ...newCourse, difficultyLevel: e.target.value })}
+                                    required
+                                />
+                                <input
+                                    type="text"
+                                    placeholder="类别"
+                                    value={newCourse.category}
+                                    onChange={(e) => setNewCourse({ ...newCourse, category: e.target.value })}
+                                    required
+                                />
+                                <input
+                                    type="text"
+                                    placeholder="子类别（可选）"
+                                    value={newCourse.subcategory}
+                                    onChange={(e) => setNewCourse({ ...newCourse, subcategory: e.target.value })}
+                                />
+                                <input
+                                    type="text"
+                                    placeholder="语言"
+                                    value={newCourse.language}
+                                    onChange={(e) => setNewCourse({ ...newCourse, language: e.target.value })}
+                                    required
+                                />
+                                <textarea
+                                    placeholder="先决条件（用逗号分隔）"
+                                    value={newCourse.prerequisites}
+                                    onChange={(e) => setNewCourse({ ...newCourse, prerequisites: e.target.value })}
+                                    required
+                                ></textarea>
+                                <textarea
+                                    placeholder="学习目标（用逗号分隔）"
+                                    value={newCourse.learningObjectives}
+                                    onChange={(e) => setNewCourse({ ...newCourse, learningObjectives: e.target.value })}
+                                    required
+                                ></textarea>
                                 <ImageUploader onImageUpload={handleImageUpload} />
                                 <button type="submit">添加课程</button>
-                                <p style={{ color: 'darkgray', fontStyle: 'italic' }}>
-                                    如果不上传图片，将使用默认背景图片。
-                                </p>
                             </form>
                         )}
                     </div>
@@ -305,17 +397,21 @@ export function Main() {
                         {filteredCourses.map((course) => (
                             <div key={course.id} className="course-card">
                                 <img
-                                    src={course.imageUrl|| DEFAULT_IMAGE_URL}
+                                    src={course.imageUrl || DEFAULT_IMAGE_URL}
                                     alt={course.title}
                                     className="course-image"
                                     onError={(e) => {
                                         const target = e.target as HTMLImageElement;
-                                        target.src ='https://via.placeholder.com/800x600.png?text=Default+Background+Image'; // 设置一个默认的占位图片
+                                        target.src = DEFAULT_IMAGE_URL;
                                     }}
                                 />
                                 <div className="course-details">
                                     <h2 className="course-title">{course.title}</h2>
                                     <p className="course-instructor">讲师: {course.instructor}</p>
+                                    <p className="course-category">类别: {course.category}{course.subcategory ? ` - ${course.subcategory}` : ''}</p>
+                                    <p className="course-difficulty">难度: {course.difficultyLevel}</p>
+                                    <p className="course-duration">时长: {course.durationMinutes} 分钟</p>
+                                    <p className="course-language">语言: {course.language}</p>
                                     <div className="course-rating">
                                         <span className="star">★</span>
                                         <span className="rating-value">{parseFloat(course.rating).toFixed(1)}</span>

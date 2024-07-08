@@ -8,18 +8,82 @@ export interface CourseData {
     description: string;
     rating: number;
     reviews: number;
-    imageURL: string;
+    imageUrl: string;
+    resourceUrl: string;
+    durationMinutes: number;
+    difficultyLevel: string;
+    category: string;
+    subcategory?: string;
+    language: string;
+    prerequisites: string[];
+    learningObjectives: string[];
 }
-
 abstract class CourseMessage extends API {
     override serviceName: string = "Course"
 }
 
 class AddCourseMessage extends CourseMessage {
-    constructor(public title: string, public instructor: string, public description: string, public imageURL: string) {
+    constructor(
+        public title: string,
+        public instructor: string,
+        public description: string,
+        public imageUrl: string,
+        public resourceUrl: string,
+        public durationMinutes: number,
+        public difficultyLevel: string,
+        public category: string,
+        public language: string,
+        public prerequisites: string[],
+        public learningObjectives: string[],
+        public subcategory?: string
+    ) {
         super();
     }
 }
+
+class UpdateCourseMessage extends CourseMessage {
+    constructor(
+        public id: string,
+        public title?: string,
+        public instructor?: string,
+        public description?: string,
+        public rating?: number,
+        public reviews?: number,
+        public imageUrl?: string,
+        public resourceUrl?: string,
+        public durationMinutes?: number,
+        public difficultyLevel?: string,
+        public category?: string,
+        public subcategory?: string,
+        public language?: string,
+        public prerequisites?: string[],
+        public learningObjectives?: string[]
+    ) {
+        super();
+    }
+}
+
+export const addCourse = async (
+    title: string,
+    instructor: string,
+    description: string,
+    imageUrl: string,
+    resourceUrl: string,
+    durationMinutes: number,
+    difficultyLevel: string,
+    category: string,
+    language: string,
+    prerequisites: string[],
+    learningObjectives: string[],
+    subcategory?: string
+): Promise<string> => {
+    const response = await sendPostRequest(new AddCourseMessage(
+        title, instructor, description, imageUrl, resourceUrl,
+        durationMinutes, difficultyLevel, category, language,
+        prerequisites, learningObjectives, subcategory
+    ));
+    return response;
+};
 
 class CourseQueryMessage extends CourseMessage {
     constructor(public courseId: string) {
@@ -33,19 +97,30 @@ class DeleteCourseMessage extends CourseMessage {
     }
 }
 
-class UpdateCourseMessage extends CourseMessage {
-    constructor(
-        public id: string,
-        public title?: string,
-        public instructor?: string,
-        public description?: string,
-        public rating?: number,
-        public reviews?: number,
-        public imageURL?: string
-    ) {
-        super();
-    }
-}
+export const updateCourse = async (
+    id: string,
+    title?: string,
+    instructor?: string,
+    description?: string,
+    rating?: number,
+    reviews?: number,
+    imageUrl?: string,
+    resourceUrl?: string,
+    durationMinutes?: number,
+    difficultyLevel?: string,
+    category?: string,
+    subcategory?: string,
+    language?: string,
+    prerequisites?: string[],
+    learningObjectives?: string[]
+): Promise<boolean> => {
+    const response = await sendPostRequest(new UpdateCourseMessage(
+        id, title, instructor, description, rating, reviews, imageUrl,
+        resourceUrl, durationMinutes, difficultyLevel, category,
+        subcategory, language, prerequisites, learningObjectives
+    ));
+    return response;
+};
 
 const sendPostRequest = async (apiMessage: API): Promise<any> => {
     try {
@@ -91,29 +166,6 @@ export const fetchCourse = async (id: string): Promise<CourseData | null> => {
         console.error('Error in fetchCourse:', error);
         throw error;
     }
-};
-
-export const addCourse = async (
-    title: string,
-    instructor: string,
-    description: string,
-    imageUrl: string // 新增参数
-): Promise<string> => {
-    const response = await sendPostRequest(new AddCourseMessage(title, instructor, description, imageUrl));
-    return response;
-};
-
-export const updateCourse = async (
-    id: string,
-    title?: string,
-    instructor?: string,
-    description?: string,
-    rating?: number,
-    reviews?: number,
-    imageUrl?: string // 新增参数
-): Promise<boolean> => {
-    const response = await sendPostRequest(new UpdateCourseMessage(id, title, instructor, description, rating, reviews, imageUrl));
-    return response;
 };
 
 export const deleteCourse = async (id: string): Promise<boolean> => {

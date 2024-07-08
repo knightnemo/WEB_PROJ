@@ -14,7 +14,15 @@ interface Course {
     description: string;
     rating: number;
     reviews: number;
-    imageUrl?: string;
+    imageUrl: string;
+    resourceUrl: string;
+    durationMinutes: number;
+    difficultyLevel: string;
+    category: string;
+    subcategory?: string;
+    language: string;
+    prerequisites: string[];
+    learningObjectives: string[];
 }
 
 interface Comment {
@@ -53,10 +61,9 @@ export function CourseDetails() {
             const response = await axios.post(courseQueryMessage.getURL(), JSON.stringify(courseQueryMessage), {
                 headers: { 'Content-Type': 'application/json' },
             });
-            console.log('Raw course data:', response.data);  // 保留这行日志
+            console.log('Raw course data:', response.data);
             if (response.data) {
                 let courseData = response.data;
-                // 检查响应是否是字符串，如果是，尝试解析它
                 if (typeof courseData === 'string') {
                     try {
                         courseData = JSON.parse(courseData);
@@ -65,7 +72,6 @@ export function CourseDetails() {
                         throw new Error('Invalid course data format');
                     }
                 }
-                // 确保所有必要的字段都存在
                 courseData = {
                     id: courseData.id || '',
                     title: courseData.title || '无标题',
@@ -73,9 +79,17 @@ export function CourseDetails() {
                     description: courseData.description || '暂无简介',
                     rating: parseFloat(courseData.rating) || 0,
                     reviews: parseInt(courseData.reviews) || 0,
-                    imageUrl: courseData.imageUrl
+                    imageUrl: courseData.imageUrl || DEFAULT_IMAGE_URL,
+                    resourceUrl: courseData.resourceUrl || '',
+                    durationMinutes: parseInt(courseData.durationMinutes) || 0,
+                    difficultyLevel: courseData.difficultyLevel || '未知',
+                    category: courseData.category || '未分类',
+                    subcategory: courseData.subcategory,
+                    language: courseData.language || '未知',
+                    prerequisites: courseData.prerequisites || [],
+                    learningObjectives: courseData.learningObjectives || [],
                 };
-                console.log('Processed course data:', courseData);  // 添加这行来查看处理后的数据
+                console.log('Processed course data:', courseData);
                 setCourse(courseData);
                 setEditedCourse(courseData);
                 setComments(mockComments);
@@ -136,7 +150,15 @@ export function CourseDetails() {
                 editedCourse.description !== course?.description ? editedCourse.description : undefined,
                 editedCourse.rating !== course?.rating ? editedCourse.rating : undefined,
                 editedCourse.reviews !== course?.reviews ? editedCourse.reviews : undefined,
-                editedCourse.imageUrl !== course?.imageUrl ? editedCourse.imageUrl : undefined
+                editedCourse.imageUrl !== course?.imageUrl ? editedCourse.imageUrl : undefined,
+                editedCourse.resourceUrl !== course?.resourceUrl ? editedCourse.resourceUrl : undefined,
+                editedCourse.durationMinutes !== course?.durationMinutes ? editedCourse.durationMinutes : undefined,
+                editedCourse.difficultyLevel !== course?.difficultyLevel ? editedCourse.difficultyLevel : undefined,
+                editedCourse.category !== course?.category ? editedCourse.category : undefined,
+                editedCourse.subcategory !== course?.subcategory ? editedCourse.subcategory : undefined,
+                editedCourse.language !== course?.language ? editedCourse.language : undefined,
+                editedCourse.prerequisites !== course?.prerequisites ? editedCourse.prerequisites : undefined,
+                editedCourse.learningObjectives !== course?.learningObjectives ? editedCourse.learningObjectives : undefined
             );
             const response = await axios.post(updateCourseMessage.getURL(), JSON.stringify(updateCourseMessage), {
                 headers: { 'Content-Type': 'application/json' },
@@ -153,6 +175,7 @@ export function CourseDetails() {
             alert('更新课程时出错');
         }
     };
+
 
     const handleDeleteCourse = async () => {
         if (!course) return;
@@ -208,26 +231,68 @@ export function CourseDetails() {
                             <input
                                 type="text"
                                 value={editedCourse?.title}
-                                onChange={(e) => setEditedCourse(prev => prev ? {
-                                    ...prev,
-                                    title: e.target.value,
-                                } : null)}
+                                onChange={(e) => setEditedCourse(prev => prev ? { ...prev, title: e.target.value } : null)}
+                                placeholder="标题"
                             />
                             <input
                                 type="text"
                                 value={editedCourse?.instructor}
-                                onChange={(e) => setEditedCourse(prev => prev ? {
-                                    ...prev,
-                                    instructor: e.target.value,
-                                } : null)}
+                                onChange={(e) => setEditedCourse(prev => prev ? { ...prev, instructor: e.target.value } : null)}
+                                placeholder="讲师"
                             />
                             <textarea
                                 value={editedCourse?.description}
-                                onChange={(e) => setEditedCourse(prev => prev ? {
-                                    ...prev,
-                                    description: e.target.value,
-                                } : null)}
+                                onChange={(e) => setEditedCourse(prev => prev ? { ...prev, description: e.target.value } : null)}
+                                placeholder="描述"
                             ></textarea>
+                            <input
+                                type="text"
+                                value={editedCourse?.resourceUrl}
+                                onChange={(e) => setEditedCourse(prev => prev ? { ...prev, resourceUrl: e.target.value } : null)}
+                                placeholder="资源链接"
+                            />
+                            <input
+                                type="number"
+                                value={editedCourse?.durationMinutes}
+                                onChange={(e) => setEditedCourse(prev => prev ? { ...prev, durationMinutes: parseInt(e.target.value) } : null)}
+                                placeholder="课程时长（分钟）"
+                            />
+                            <input
+                                type="text"
+                                value={editedCourse?.difficultyLevel}
+                                onChange={(e) => setEditedCourse(prev => prev ? { ...prev, difficultyLevel: e.target.value } : null)}
+                                placeholder="难度级别"
+                            />
+                            <input
+                                type="text"
+                                value={editedCourse?.category}
+                                onChange={(e) => setEditedCourse(prev => prev ? { ...prev, category: e.target.value } : null)}
+                                placeholder="类别"
+                            />
+                            <input
+                                type="text"
+                                value={editedCourse?.subcategory}
+                                onChange={(e) => setEditedCourse(prev => prev ? { ...prev, subcategory: e.target.value } : null)}
+                                placeholder="子类别"
+                            />
+                            <input
+                                type="text"
+                                value={editedCourse?.language}
+                                onChange={(e) => setEditedCourse(prev => prev ? { ...prev, language: e.target.value } : null)}
+                                placeholder="语言"
+                            />
+                            <input
+                                type="text"
+                                value={editedCourse?.prerequisites.join(', ')}
+                                onChange={(e) => setEditedCourse(prev => prev ? { ...prev, prerequisites: e.target.value.split(',').map(item => item.trim()) } : null)}
+                                placeholder="先决条件（用逗号分隔）"
+                            />
+                            <input
+                                type="text"
+                                value={editedCourse?.learningObjectives.join(', ')}
+                                onChange={(e) => setEditedCourse(prev => prev ? { ...prev, learningObjectives: e.target.value.split(',').map(item => item.trim()) } : null)}
+                                placeholder="学习目标（用逗号分隔）"
+                            />
                             <button onClick={handleUpdateCourse}>保存更改</button>
                             <button onClick={() => setIsEditing(false)}>取消</button>
                         </div>
@@ -241,6 +306,37 @@ export function CourseDetails() {
                                 <span className="review-count">({course.reviews} 评价)</span>
                             </div>
                             <p className="description">{course.description}</p>
+                            <p className="resource-url">资源链接: <a href={course.resourceUrl} target="_blank"
+                                                                     rel="noopener noreferrer">{course.resourceUrl}</a>
+                            </p>
+                            <p className="duration">课程时长: {course.durationMinutes} 分钟</p>
+                            <p className="difficulty-level">难度级别: {course.difficultyLevel}</p>
+                            <p className="category">类别: {course.category}{course.subcategory ? ` - ${course.subcategory}` : ''}</p>
+                            <p className="language">语言: {course.language}</p>
+                            <div className="prerequisites">
+                                <h3>先决条件:</h3>
+                                <ul>
+                                    {course.prerequisites && course.prerequisites.length > 0 ? (
+                                        course.prerequisites.map((prerequisite, index) => (
+                                            <li key={index}>{prerequisite}</li>
+                                        ))
+                                    ) : (
+                                        <li>无先决条件</li>
+                                    )}
+                                </ul>
+                            </div>
+                            <div className="learning-objectives">
+                                <h3>学习目标:</h3>
+                                <ul>
+                                    {course.learningObjectives && course.learningObjectives.length > 0 ? (
+                                        course.learningObjectives.map((objective, index) => (
+                                            <li key={index}>{objective}</li>
+                                        ))
+                                    ) : (
+                                        <li>暂无学习目标</li>
+                                    )}
+                                </ul>
+                            </div>
                             {isAdmin && (
                                 <div className="admin-actions">
                                     <button onClick={() => setIsEditing(true)}>编辑课程</button>
