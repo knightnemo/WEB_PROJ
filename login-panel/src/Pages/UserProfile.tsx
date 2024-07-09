@@ -55,7 +55,7 @@ export function UserProfile() {
             if (response.data) {
                 let userData: UserData;
                 if (isAdmin) {
-                    userData = response.data as UserData; // 假设后端直接返回管理员信息
+                    userData = response.data as UserData;
                 } else {
                     const allUsers: UserData[] = response.data;
                     userData = allUsers.find(user =>
@@ -71,7 +71,6 @@ export function UserProfile() {
                         following: typeof userData === 'string' ? Math.floor(Math.random() * 500) : (userData.following || Math.floor(Math.random() * 500)),
                         reviewCount: typeof userData === 'string' ? Math.floor(Math.random() * 50) : (userData.reviewCount || Math.floor(Math.random() * 50))
                     });
-                    console.log(userData)
                 } else {
                     throw new Error('User not found');
                 }
