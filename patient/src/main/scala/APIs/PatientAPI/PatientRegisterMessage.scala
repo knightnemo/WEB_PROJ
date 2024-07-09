@@ -1,3 +1,3 @@
 package APIs.PatientAPI
 
-case class PatientRegisterMessage(userName: String, bio: Option[String]) extends PatientMessage[Int]
+case class PatientRegisterMessage(userName: String, password: String, bio: Option[String], gender: Option[String]) extends PatientMessage[String]
