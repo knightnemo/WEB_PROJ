@@ -1,0 +1,17 @@
+{
+  "serverIP": "127.0.0.1",
+  "serverPort": 10007,
+  "maximumServerConnection": 10000,
+  "maximumClientConnection": 10000,
+  "fileServiceConfig": {
+    "uploadPath": "/path/to/upload/directory",
+    "maxFileSize": 10485760,
+    "allowedFileTypes": ["pdf", "doc", "docx", "jpg", "png"],
+    "scanForVirus": true
+  },
+  "databaseConfig": {
+    "url": "jdbc:postgresql://localhost:5432/filedb",
+    "user": "fileuser",
+    "password": "filepassword"
+  }
+}
