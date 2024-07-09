@@ -8,13 +8,19 @@ import Common.Object.SqlParameter
 import Common.ServiceUtils.schemaName
 import io.circe.Json
 
-case class CourseQueryMessagePlanner(courseId: String, override val planContext: PlanContext) extends Planner[String]:
+case class CourseQueryMessagePlanner(searchTerm: String, override val planContext: PlanContext) extends Planner[String]:
   override def plan(using PlanContext): IO[String] = {
     readDBRows(
-      s"SELECT * FROM ${schemaName}.courses WHERE id = ?",
-      List(SqlParameter("String", courseId))
+      s"""
+      SELECT * FROM ${schemaName}.courses
+      WHERE name LIKE ? OR description LIKE ?
+      """,
+      List(
+        SqlParameter("String", s"%$searchTerm%"),
+        SqlParameter("String", s"%$searchTerm%")
+      )
     ).map { results =>
-      if (results.isEmpty) "Course not found"
-      else results.head.toString // Convert the Json object to a string
+      if (results.isEmpty) "No courses found"
+      else results.map(_.toString).mkString("\n") // Convert each Json object to a string and join them
     }
   }

@@ -1,13 +1,16 @@
 package APIs.CourseAPI
 
-import io.circe.Decoder
+import io.circe.{Decoder, Encoder}
 
-case class CourseQueryMessage(courseId: String) extends CourseMessage[Option[Course]]
+case class CourseQueryMessage(searchTerm: String) extends CourseMessage[List[Course]]
 
 object CourseQueryMessage {
-  // This import brings the Course.courseDecoder into scope
+  // Import Course decoder and encoder
   import Course._
 
-  // Decoder for Option[Course] is automatically derived by circe
-  implicit val optionCourseDecoder: Decoder[Option[Course]] = Decoder.decodeOption[Course]
+  // Decoder for List[Course] is automatically derived by circe
+  implicit val coursesDecoder: Decoder[List[Course]] = Decoder.decodeList[Course]
+
+  // Encoder for List[Course] is automatically derived by circe
+  implicit val coursesEncoder: Encoder[List[Course]] = Encoder.encodeList[Course]
 }
