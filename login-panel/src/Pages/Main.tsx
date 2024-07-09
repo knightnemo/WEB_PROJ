@@ -8,11 +8,21 @@ import './Main.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faStar, faCodeBranch } from '@fortawesome/free-solid-svg-icons';
 import { CourseCard } from './CourseCard';
+import COS,{ PutObjectResult,PutObjectParams } from 'cos-js-sdk-v5';
+
 
 interface ImageUploaderProps {
     onImageUpload: (base64Image: string) => void;
 }
-const DEFAULT_IMAGE_URL = 'https://via.placeholder.com/800x600.png?text=Default+Background+Image';
+const DEFAULT_IMAGE_URL = 'default_course_bg.jpeg';
+
+////这是knightnemo真正的腾讯云账号，请千万千万不要泄漏
+const cos = new COS({
+    SecretId: 'AKIDKQZErVAvmedkp2Kl8UzT6wwNoKoDkO93',
+    SecretKey: 'BMdQG9AFWtUbnChCkEo7Ng9gK4tkpvCb',
+});
+////
+
 const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageUpload }) => {
     const [dragActive, setDragActive] = useState(false);
 
@@ -45,8 +55,10 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageUpload }) => {
     const handleFiles = (files: FileList) => {
         const file = files[0];
         const reader = new FileReader();
-        reader.onloadend = () => {
-            onImageUpload(reader.result as string);
+        reader.onloadend = async () => {
+            const base64Image = reader.result as string;
+            const imageUrl = await uploadImageToTencentCloud(file.name, base64Image);
+            onImageUpload(imageUrl);
         };
         reader.readAsDataURL(file);
     };
@@ -60,7 +72,28 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageUpload }) => {
             }
         }
     };
+    const uploadImageToTencentCloud = async (fileName: string, base64Image: string): Promise<string> => {
+        const byteString = atob(base64Image.split(',')[1]);
+        const mimeString = base64Image.split(',')[0].split(':')[1].split(';')[0];
+        const ab = new ArrayBuffer(byteString.length);
+        const ia = new Uint8Array(ab);
+        for (let i = 0; i < byteString.length; i++) {
+            ia[i] = byteString.charCodeAt(i);
+        }
+        const blob = new Blob([ab], { type: mimeString });
 
+
+
+        const putObjectParams: COS.PutObjectParams = {
+            Bucket: 'typesafe-onlinedb-1327835848',
+            Region: 'ap-beijing',
+            Key: fileName,
+            Body: blob,
+        };
+
+        const result: PutObjectResult = await cos.putObject(putObjectParams);
+        return `https://${putObjectParams.Bucket}.cos.${putObjectParams.Region}.myqcloud.com/${putObjectParams.Key}`;
+    };
     return (
         <div
             onDragEnter={handleDrag}
@@ -212,7 +245,7 @@ export function Main() {
         }
     };
 
-    const DEFAULT_EMPTY_IMAGE_URL = 'https://via.placeholder.com/300x200?text=No+Image';
+    const DEFAULT_EMPTY_IMAGE_URL = 'default_course_bg.jpeg';
 
     const handleAddCourse = async (e: React.FormEvent) => {
         e.preventDefault();
