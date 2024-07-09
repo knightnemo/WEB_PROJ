@@ -18,7 +18,7 @@ interface CourseCardProps {
 
 export const CourseCard: React.FC<CourseCardProps> = ({ course }) => {
     const history = useHistory();
-    const defaultImageUrl = "https://via.placeholder.com/800x600?text=Course+Image";
+    const defaultImageUrl = "default_course_bg.jpeg";
 
     return (
         <article onClick={() => history.push(`/course/${course.id}`)}>

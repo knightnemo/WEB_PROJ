@@ -149,6 +149,7 @@
         "class-transformer": "^0.5.1",
         "compressing": "^1.10.0",
         "copy-webpack-plugin": "^11.0.0",
+        "cos-js-sdk-v5": "^1.8.3",
         "crypto-js": "^4.1.1",
         "date-fns": "^3.6.0",
         "element-react": "^1.4.34",

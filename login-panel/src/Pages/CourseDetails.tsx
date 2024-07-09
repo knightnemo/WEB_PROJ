@@ -31,7 +31,7 @@ interface Comment {
     likes: number;
     dislikes: number;
 }
-const DEFAULT_IMAGE_URL = 'https://via.placeholder.com/800x600.png?text=Default+Background+Image';
+const DEFAULT_IMAGE_URL = 'default_course_bg.jpeg';
 const mockComments: Comment[] = [
     { id: 1, user: "张三", content: "非常棒的课程！讲解深入浅出。", likes: 15, dislikes: 2 },
     { id: 2, user: "李明", content: "老师讲得很好，但是作业有点难。", likes: 10, dislikes: 1 },
