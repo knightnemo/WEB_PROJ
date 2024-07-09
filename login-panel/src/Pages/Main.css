@@ -44,13 +44,24 @@ body {
 }
 
 .logo {
-    cursor: pointer;
-    display: flex;
-    align-items: center;
+    cursor: default;
+    text-decoration: none;
 }
 
-.logo svg {
-    fill: var(--primary);
+.logo-text {
+    font-size: 24px;
+    font-weight: bold;
+    background: linear-gradient(45deg, #4a90e2, #63b3ed);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    padding: 5px 10px;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+}
+
+.logo-text:hover {
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+    transform: scale(1.05);
 }
 
 .navigation {
@@ -369,12 +380,36 @@ body {
     padding-top: 1rem;
 }
 
-.search-input {
-    flex-grow: 1;
+.search-container {
+    display: flex;
+    align-items: center;
+    background-color: #f0f0f0;
+    border-radius: 20px;
+    padding: 5px 15px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.search-container:focus-within {
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+}
+
+.search-icon {
+    color: #666;
     margin-right: 10px;
-    padding: 0.5rem;
-    border: 1px solid #d1d5db;
-    border-radius: 0.25rem;
+}
+
+.search-input {
+    border: none;
+    background: transparent;
+    outline: none;
+    font-size: 14px;
+    width: 200px;
+    transition: width 0.3s ease;
+}
+
+.search-input:focus {
+    width: 220px;
 }
 
 .category-select {

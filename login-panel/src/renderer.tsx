@@ -23,8 +23,9 @@ import { Main } from 'Pages/Main'
 import { CourseDetails } from 'Pages/CourseDetails'
 import { UserProvider } from 'Pages/UserContext';
 import { Auth } from 'Pages/Auth';
-import {UserProfile} from 'Pages/UserProfile';
+import { UserProfile } from 'Pages/UserProfile';
 import { ChangePassword } from 'Pages/ChangePassword'
+import { AddCourse } from 'Pages/AddCourse';
 
 const Layout = () => {
     return (
@@ -36,6 +37,7 @@ const Layout = () => {
                 <Route path="/auth" exact component={Auth} />
                 <Route path="/user/:username" component={UserProfile} />
                 <Route path="/change-password" component={ChangePassword} />
+                <Route path="/add-course" component={AddCourse} />
             </Switch>
         </HashRouter>
         </UserProvider>
