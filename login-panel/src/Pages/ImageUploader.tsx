@@ -1,17 +1,21 @@
 import React, { useState, useCallback, useRef } from 'react';
 import './ImageUploader.css';
+import { useHistory } from 'react-router-dom'
 
 interface ImageUploaderProps {
     onImageSelect: (file: File | null) => void;
 }
 
 export const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageSelect }) => {
+    const history = useHistory();
     const [dragActive, setDragActive] = useState(false);
     const [fileName, setFileName] = useState<string | null>(null);
     const [fileSize, setFileSize] = useState<number | null>(null);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
-
+    const handleGenerateImageClick = () => {
+        history.push('/generate-image');
+    };
     const handleDrag = useCallback((e: React.DragEvent) => {
         e.preventDefault();
         e.stopPropagation();
@@ -76,7 +80,8 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageSelect }) =
                 ) : (
                     <>
                         <div className="file-upload-icon">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" strokeWidth="2"
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                 strokeWidth="2"
                                  stroke="currentColor" fill="none" strokeLinecap="round" strokeLinejoin="round">
                                 <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                                 <path d="M14 3v4a1 1 0 0 0 1 1h4" />
@@ -103,6 +108,8 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageSelect }) =
                     取消
                 </button>
             </div>
+            <p>假如不上传图片，将会使用默认图片</p>
+            <p>如果你想生成图片，请点击 <button type="button" onClick={handleGenerateImageClick}>这里</button>。</p>
         </div>
     );
 };
