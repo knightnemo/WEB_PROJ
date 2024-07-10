@@ -5,7 +5,7 @@ import { AllCoursesQueryMessage } from 'Plugins/CourseAPI/AllCoursesQueryMessage
 import axios from 'axios';
 import './Main.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUser, faStar, faCodeBranch, faSearch } from '@fortawesome/free-solid-svg-icons';
+import { faUser, faStar, faCodeBranch, faSearch, faRobot } from '@fortawesome/free-solid-svg-icons';
 import { CourseCard } from './CourseCard';
 
 interface Course {
@@ -40,6 +40,9 @@ export function Main() {
         return () => { isMounted = false };
     }, []);
 
+    const handleGroqButtonClick = () => {
+        history.push('/groq-chat');
+    };
     const parseScalaList = (input: string): any[] => {
         // 移除 "List(" 前缀和结尾的 ")"
         const content = input.slice(5, -1).trim();
@@ -121,7 +124,8 @@ export function Main() {
                                 <button onClick={() => setSelectedCategory('all')}>
                                     课程分类
                                     <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16">
-                                        <path d="M12.78 5.22a.749.749 0 0 1 0 1.06l-4.25 4.25a.749.749 0 0 1-1.06 0L3.22 6.28a.749.749 0 1 1 1.06-1.06L8 8.939l3.72-3.719a.749.749 0 0 1 1.06 0Z"></path>
+                                        <path
+                                            d="M12.78 5.22a.749.749 0 0 1 0 1.06l-4.25 4.25a.749.749 0 0 1-1.06 0L3.22 6.28a.749.749 0 1 1 1.06-1.06L8 8.939l3.72-3.719a.749.749 0 0 1 1.06 0Z"></path>
                                     </svg>
                                 </button>
                                 <div className="dropdown__wrapper">
@@ -138,7 +142,7 @@ export function Main() {
                                     </div>
                                 </div>
                             </li>
-                            {isAdmin && <li><a onClick={() => history.push('/add-course')}>添加课程</a></li>}
+                            <li><a onClick={() => history.push('/add-course')}>添加课程</a></li>
                         </ul>
                     </nav>
                 </div>
@@ -166,10 +170,10 @@ export function Main() {
                         </button>
                     ) : (
                         <>
-                            <a onClick={() => history.push('/auth?mode=login')} className="secondary">
+                            <a onClick={() => history.push('/auth?mode=login')} className="auth-button secondary">
                                 登录
                             </a>
-                            <a onClick={() => history.push('/auth?mode=register')} className="primary">
+                            <a onClick={() => history.push('/auth?mode=register')} className="auth-button primary">
                                 注册
                             </a>
                         </>
@@ -191,6 +195,13 @@ export function Main() {
                     </div>
                 )}
             </main>
+            <button
+                className="floating-button"
+                onClick={handleGroqButtonClick}
+            >
+                <FontAwesomeIcon icon={faRobot} />
+                问问Groq
+            </button>
         </div>
     );
 }

@@ -26,7 +26,7 @@ import { Auth } from 'Pages/Auth';
 import { UserProfile } from 'Pages/UserProfile';
 import { ChangePassword } from 'Pages/ChangePassword'
 import { AddCourse } from 'Pages/AddCourse';
-
+import GroqChatPage from 'Pages/GroqChatPage';
 const Layout = () => {
     return (
         <UserProvider>
@@ -38,6 +38,7 @@ const Layout = () => {
                 <Route path="/user/:username" component={UserProfile} />
                 <Route path="/change-password" component={ChangePassword} />
                 <Route path="/add-course" component={AddCourse} />
+                <Route path="/groq-chat" component={GroqChatPage} />
             </Switch>
         </HashRouter>
         </UserProvider>
