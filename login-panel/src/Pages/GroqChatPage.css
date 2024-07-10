@@ -1,0 +1,96 @@
+.groq-chat-page {
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding-top: calc(var(--navbar-height) + 20px);
+}
+
+.groq-chat-page header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.back-button {
+    background: none;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+    margin-right: 20px;
+    color: var(--link-gray);
+    transition: color 0.3s ease;
+}
+
+.back-button:hover {
+    color: var(--link-gray-hover);
+}
+
+.groq-chat-page h1 {
+    font-size: 24px;
+    color: var(--primary);
+}
+
+.chat-container {
+    background: var(--white);
+    border-radius: 0.5rem;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.chat-container form {
+    display: flex;
+    margin-bottom: 20px;
+}
+
+.chat-container input {
+    flex-grow: 1;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid var(--gray-border);
+    border-radius: 4px;
+    outline: none;
+    transition: border-color 0.3s ease;
+}
+
+.chat-container input:focus {
+    border-color: var(--primary);
+}
+
+.chat-container button {
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: var(--primary);
+    color: var(--white);
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-left: 10px;
+    transition: background-color 0.3s ease;
+}
+
+.chat-container button:hover {
+    background-color: var(--primary-hover);
+}
+
+.chat-container button:disabled {
+    background-color: var(--gray);
+    cursor: not-allowed;
+}
+
+.response {
+    background-color: var(--secondary-background);
+    border-radius: 4px;
+    padding: 20px;
+    margin-top: 20px;
+}
+
+.response h3 {
+    margin-top: 0;
+    color: var(--primary);
+    font-size: 18px;
+}
+
+.response p {
+    color: var(--link-gray-hover);
+    line-height: 1.5;
+}
