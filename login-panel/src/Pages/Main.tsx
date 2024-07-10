@@ -7,6 +7,7 @@ import './Main.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faStar, faCodeBranch, faSearch, faRobot } from '@fortawesome/free-solid-svg-icons';
 import { CourseCard } from './CourseCard';
+import GroqChatWidget from './GroqChatWidget';
 
 interface Course {
     id: string;
@@ -33,6 +34,17 @@ export function Main() {
     const [selectedCategory, setSelectedCategory] = useState('all');
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [isGroqDialogOpen, setIsGroqDialogOpen] = useState(false);
+    const [recommendedCourseIds, setRecommendedCourseIds] = useState<string[]>([]);
+
+    const handleRecommendation = (recommendedIds: string[]) => {
+        setRecommendedCourseIds(recommendedIds);
+        setSelectedCategory('recommended');
+    };
+
+    const handleGroqButtonClick = () => {
+        setIsGroqDialogOpen(true);
+    };
 
     useEffect(() => {
         let isMounted = true;
@@ -40,9 +52,6 @@ export function Main() {
         return () => { isMounted = false };
     }, []);
 
-    const handleGroqButtonClick = () => {
-        history.push('/groq-chat');
-    };
     const parseScalaList = (input: string): any[] => {
         // 移除 "List(" 前缀和结尾的 ")"
         const content = input.slice(5, -1).trim();
@@ -96,12 +105,15 @@ export function Main() {
         }
     };
 
-    const filteredCourses = courses.filter(course =>
-        course.title.toLowerCase().includes(searchTerm.toLowerCase()) &&
-        (selectedCategory === 'all' || course.category === selectedCategory)
-    );
+    const filteredCourses = courses.filter(course => {
+        if (selectedCategory === 'recommended') {
+            return recommendedCourseIds.includes(course.id);
+        }
+        return course.title.toLowerCase().includes(searchTerm.toLowerCase()) &&
+            (selectedCategory === 'all' || course.category === selectedCategory);
+    });
 
-    const categories = ['all', ...new Set(courses.map(course => course.category))];
+    const categories = ['all', 'recommended', ...new Set(courses.map(course => course.category))];
 
     const handleUserClick = () => {
         if (username) {
@@ -134,7 +146,7 @@ export function Main() {
                                             {categories.map(category => (
                                                 <li key={category} onClick={() => setSelectedCategory(category)}>
                                                     <div className="item-title">
-                                                        <h3>{category === 'all' ? '所有类别' : category}</h3>
+                                                        <h3>{category === 'all' ? '所有类别' : category === 'recommended' ? '推荐课程' : category}</h3>
                                                     </div>
                                                 </li>
                                             ))}
@@ -142,7 +154,9 @@ export function Main() {
                                     </div>
                                 </div>
                             </li>
-                            <li><a onClick={() => history.push('/add-course')}>添加课程</a></li>
+                            {isAdmin && (
+                                <li><a onClick={() => history.push('/add-course')}>添加课程</a></li>
+                            )}
                         </ul>
                     </nav>
                 </div>
@@ -195,13 +209,7 @@ export function Main() {
                     </div>
                 )}
             </main>
-            <button
-                className="floating-button"
-                onClick={handleGroqButtonClick}
-            >
-                <FontAwesomeIcon icon={faRobot} />
-                问问Groq
-            </button>
+            <GroqChatWidget courses={courses} onRecommendation={handleRecommendation} />
         </div>
     );
 }
