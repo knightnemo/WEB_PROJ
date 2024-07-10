@@ -2,11 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Groq from 'groq-sdk';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes, faComments } from '@fortawesome/free-solid-svg-icons';
-
-const groq = new Groq({
-    apiKey: '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',
-    dangerouslyAllowBrowser: true
-});
+//
 
 interface Course {
     id: string;
@@ -15,6 +11,12 @@ interface Course {
     description: string;
     category: string;
 }
+///knightnemo:这里又是真的api_key,咱们的proj简直是网络安全反面典范
+const groq = new Groq({
+    apiKey: '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',
+    dangerouslyAllowBrowser: true
+});
+///
 
 interface GroqChatWidgetProps {
     courses: Course[];
