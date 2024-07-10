@@ -6,6 +6,17 @@ import { UpdateCourseMessage } from 'Plugins/CourseAPI/UpdateCourseMessage';
 import { DeleteCourseMessage } from 'Plugins/CourseAPI/DeleteCourseMessage';
 import axios from 'axios';
 import './CourseDetails.css';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTimes } from '@fortawesome/free-solid-svg-icons';
+import { ImageUploader } from './ImageUploader';
+import COS from 'cos-js-sdk-v5';
+
+const DEFAULT_IMAGE_URL = 'default_course_bg.jpeg';
+
+const cos = new COS({
+    SecretId: 'AKIDKQZErVAvmedkp2Kl8UzT6wwNoKoDkO93',
+    SecretKey: 'BMdQG9AFWtUbnChCkEo7Ng9gK4tkpvCb',
+});
 
 interface Course {
     id: string;
@@ -13,15 +24,15 @@ interface Course {
     instructor: string;
     description: string;
     rating: string;
-    imageUrl: string;
+    imageUrl?: string;
     resourceUrl: string;
     durationMinutes: number;
     difficultyLevel: string;
     category: string;
     subcategory?: string;
     language: string;
-    prerequisites: string[];
-    learningObjectives: string[];
+    prerequisites: string[] | string;
+    learningObjectives: string[] | string;
 }
 
 interface Comment {
@@ -31,7 +42,7 @@ interface Comment {
     likes: number;
     dislikes: number;
 }
-const DEFAULT_IMAGE_URL = 'default_course_bg.jpeg';
+
 const mockComments: Comment[] = [
     { id: 1, user: "张三", content: "非常棒的课程！讲解深入浅出。", likes: 15, dislikes: 2 },
     { id: 2, user: "李明", content: "老师讲得很好，但是作业有点难。", likes: 10, dislikes: 1 },
@@ -48,6 +59,7 @@ export function CourseDetails() {
     const [error, setError] = useState<string | null>(null);
     const [isEditing, setIsEditing] = useState(false);
     const [editedCourse, setEditedCourse] = useState<Course | null>(null);
+    const [newImageFile, setNewImageFile] = useState<File | null>(null);
 
     useEffect(() => {
         fetchCourse();
@@ -72,8 +84,8 @@ export function CourseDetails() {
                     }
                 }
 
-                // 确保 prerequisites 和 learningObjectives 是数组
-                const ensureArray = (value: any) => Array.isArray(value) ? value : [];
+                const ensureArray = (value: any): string[] =>
+                    Array.isArray(value) ? value : (typeof value === 'string' ? value.split(',').map(item => item.trim()) : []);
 
                 courseData = {
                     id: courseData.id || '',
@@ -142,38 +154,74 @@ export function CourseDetails() {
         ));
     };
 
-    const handleUpdateCourse = async () => {
+    const uploadImageToTencentCloud = async (file: File): Promise<string> => {
+        const putObjectParams: COS.PutObjectParams = {
+            Bucket: 'typesafe-onlinedb-1327835848',
+            Region: 'ap-beijing',
+            Key: file.name,
+            Body: file,
+        };
+
+        const result = await cos.putObject(putObjectParams);
+        return `https://${putObjectParams.Bucket}.cos.${putObjectParams.Region}.myqcloud.com/${putObjectParams.Key}`;
+    };
+
+    const handleUpdateCourse = async (e: React.FormEvent) => {
+        e.preventDefault();
         if (!editedCourse) return;
         try {
+            let imageUrl = editedCourse.imageUrl || DEFAULT_IMAGE_URL;
+            if (newImageFile) {
+                imageUrl = await uploadImageToTencentCloud(newImageFile);
+            }
+
+            const prerequisites = Array.isArray(editedCourse.prerequisites)
+                ? editedCourse.prerequisites
+                : editedCourse.prerequisites.split(',').map(item => item.trim());
+
+            const learningObjectives = Array.isArray(editedCourse.learningObjectives)
+                ? editedCourse.learningObjectives
+                : editedCourse.learningObjectives.split(',').map(item => item.trim());
+
             const updateCourseMessage = new UpdateCourseMessage(
                 editedCourse.id,
-                editedCourse.title !== course?.title ? editedCourse.title : undefined,
-                editedCourse.instructor !== course?.instructor ? editedCourse.instructor : undefined,
-                editedCourse.description !== course?.description ? editedCourse.description : undefined,
-                editedCourse.rating !== course?.rating ? editedCourse.rating : undefined,
-                editedCourse.imageUrl !== course?.imageUrl ? editedCourse.imageUrl : undefined,
-                editedCourse.resourceUrl !== course?.resourceUrl ? editedCourse.resourceUrl : undefined,
-                editedCourse.durationMinutes !== course?.durationMinutes ? editedCourse.durationMinutes : undefined,
-                editedCourse.difficultyLevel !== course?.difficultyLevel ? editedCourse.difficultyLevel : undefined,
-                editedCourse.category !== course?.category ? editedCourse.category : undefined,
-                editedCourse.subcategory !== course?.subcategory ? editedCourse.subcategory : undefined,
-                editedCourse.language !== course?.language ? editedCourse.language : undefined,
-                editedCourse.prerequisites !== course?.prerequisites ? editedCourse.prerequisites : undefined,
-                editedCourse.learningObjectives !== course?.learningObjectives ? editedCourse.learningObjectives : undefined
+                editedCourse.title,
+                editedCourse.instructor,
+                editedCourse.description,
+                editedCourse.rating,
+                imageUrl,
+                editedCourse.resourceUrl,
+                editedCourse.durationMinutes,
+                editedCourse.difficultyLevel,
+                editedCourse.category,
+                editedCourse.subcategory,
+                editedCourse.language,
+                prerequisites,
+                learningObjectives
             );
-            const response = await axios.post(updateCourseMessage.getURL(), JSON.stringify(updateCourseMessage), {
+
+            console.log('Sending update data:', JSON.stringify(updateCourseMessage.toJSON()));
+            const response = await axios.post(updateCourseMessage.getURL(), JSON.stringify(updateCourseMessage.toJSON()), {
                 headers: { 'Content-Type': 'application/json' },
             });
-            if (response.data) {
-                setCourse(editedCourse);
+            console.log('Server response:', response.data);
+
+            if (response.status === 200) {
+                setCourse({...editedCourse, imageUrl, prerequisites, learningObjectives});
                 setIsEditing(false);
+                setNewImageFile(null);
                 alert('课程更新成功');
             } else {
-                alert('课程更新失败');
+                alert(`课程更新失败: ${response.data}`);
             }
         } catch (err) {
             console.error('Error updating course:', err);
-            alert('更新课程时出错');
+            if (axios.isAxiosError(err)) {
+                const errorMessage = err.response?.data || err.message;
+                alert(`更新课程时出错: ${errorMessage}`);
+            } else {
+                alert('更新课程时出错，请稍后再试');
+            }
         }
     };
 
@@ -230,43 +278,189 @@ export function CourseDetails() {
 
             <div className="course-content">
                 <div className="course-main">
-                    <img
-                        src={course.imageUrl || DEFAULT_IMAGE_URL}
-                        alt={course.title}
-                        className="course-image"
-                        onError={(e) => {
-                            const target = e.target as HTMLImageElement;
-                            target.src = DEFAULT_IMAGE_URL;
-                        }}
-                    />
-                    <div className="course-description">
-                        <h2>课程简介</h2>
-                        <p>{course.description}</p>
-                    </div>
-                    <div className="course-objectives">
-                        <h2>学习目标</h2>
-                        <ul>
-                            {Array.isArray(course.learningObjectives) && course.learningObjectives.length > 0 ? (
-                                course.learningObjectives.map((objective, index) => (
-                                    <li key={index}>{objective}</li>
-                                ))
-                            ) : (
-                                <li>暂无学习目标</li>
-                            )}
-                        </ul>
-                    </div>
-                    <div className="course-prerequisites">
-                        <h2>先决条件</h2>
-                        <ul>
-                            {Array.isArray(course.prerequisites) && course.prerequisites.length > 0 ? (
-                                course.prerequisites.map((prerequisite, index) => (
-                                    <li key={index}>{prerequisite}</li>
-                                ))
-                            ) : (
-                                <li>无先决条件</li>
-                            )}
-                        </ul>
-                    </div>
+                    {isEditing && editedCourse ? (
+                        <form onSubmit={handleUpdateCourse} className="edit-course-form">
+                            <div className="form-group">
+                                <label htmlFor="title">课程标题</label>
+                                <input
+                                    id="title"
+                                    type="text"
+                                    value={editedCourse.title}
+                                    onChange={(e) => setEditedCourse({...editedCourse, title: e.target.value})}
+                                    required
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label htmlFor="instructor">讲师</label>
+                                <input
+                                    id="instructor"
+                                    type="text"
+                                    value={editedCourse.instructor}
+                                    onChange={(e) => setEditedCourse({...editedCourse, instructor: e.target.value})}
+                                    required
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label htmlFor="description">课程描述</label>
+                                <textarea
+                                    id="description"
+                                    value={editedCourse.description}
+                                    onChange={(e) => setEditedCourse({...editedCourse, description: e.target.value})}
+                                    required
+                                ></textarea>
+                            </div>
+                            <div className="form-group">
+                                <label htmlFor="rating">课程评分</label>
+                                <input
+                                    id="rating"
+                                    type="text"
+                                    value={editedCourse.rating}
+                                    onChange={(e) => setEditedCourse({...editedCourse, rating: e.target.value})}
+                                    required
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label htmlFor="resourceUrl">资源链接</label>
+                                <input
+                                    id="resourceUrl"
+                                    type="text"
+                                    value={editedCourse.resourceUrl}
+                                    onChange={(e) => setEditedCourse({...editedCourse, resourceUrl: e.target.value})}
+                                    required
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label htmlFor="durationMinutes">课程时长（分钟）</label>
+                                <input
+                                    id="durationMinutes"
+                                    type="number"
+                                    value={editedCourse.durationMinutes}
+                                    onChange={(e) => setEditedCourse({...editedCourse, durationMinutes: parseInt(e.target.value)})}
+                                    required
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label htmlFor="difficultyLevel">难度级别</label>
+                                <select
+                                    id="difficultyLevel"
+                                    value={editedCourse.difficultyLevel}
+                                    onChange={(e) => setEditedCourse({...editedCourse, difficultyLevel: e.target.value})}
+                                    required
+                                >
+                                    <option value="">选择难度级别</option>
+                                    <option value="beginner">初级</option>
+                                    <option value="intermediate">中级</option>
+                                    <option value="advanced">高级</option>
+                                </select>
+                            </div>
+                            <div className="form-group">
+                                <label htmlFor="category">类别</label>
+                                <input
+                                    id="category"
+                                    type="text"
+                                    value={editedCourse.category}
+                                    onChange={(e) => setEditedCourse({...editedCourse, category: e.target.value})}
+                                    required
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label htmlFor="subcategory">子类别（可选）</label>
+                                <input
+                                    id="subcategory"
+                                    type="text"
+                                    value={editedCourse.subcategory || ''}
+                                    onChange={(e) => setEditedCourse({...editedCourse, subcategory: e.target.value})}
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label htmlFor="language">语言</label>
+                                <input
+                                    id="language"
+                                    type="text"
+                                    value={editedCourse.language}
+                                    onChange={(e) => setEditedCourse({...editedCourse, language: e.target.value})}
+                                    required
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label htmlFor="prerequisites">先决条件（用逗号分隔）</label>
+                                <textarea
+                                    id="prerequisites"
+                                    value={Array.isArray(editedCourse.prerequisites) ? editedCourse.prerequisites.join(', ') : editedCourse.prerequisites}
+                                    onChange={(e) => setEditedCourse({...editedCourse, prerequisites: e.target.value})}
+                                    required
+                                ></textarea>
+                            </div>
+                            <div className="form-group">
+                                <label htmlFor="learningObjectives">学习目标（用逗号分隔）</label>
+                                <textarea
+                                    id="learningObjectives"
+                                    value={Array.isArray(editedCourse.learningObjectives) ? editedCourse.learningObjectives.join(', ') : editedCourse.learningObjectives}
+                                    onChange={(e) => setEditedCourse({...editedCourse, learningObjectives: e.target.value})}
+                                    required
+                                ></textarea>
+                            </div>
+                            <div className="form-group">
+                                <ImageUploader
+                                    onImageSelect={(file) => {
+                                        setNewImageFile(file);
+                                        if (file) {
+                                            setEditedCourse({...editedCourse, imageUrl: URL.createObjectURL(file)});
+                                        }
+                                    }}
+                                />
+                            </div>
+                            <div className="form-actions">
+                                <button type="submit" className="submit-btn">保存更改</button>
+                                <button type="button" className="cancel-btn" onClick={() => {
+                                    setIsEditing(false);
+                                    setNewImageFile(null);
+                                }}>
+                                    <FontAwesomeIcon icon={faTimes} /> 取消
+                                </button>
+                            </div>
+                        </form>
+                    ) : (
+                        <>
+                            <img
+                                src={course.imageUrl || DEFAULT_IMAGE_URL}
+                                alt={course.title}
+                                className="course-image"
+                                onError={(e) => {
+                                    const target = e.target as HTMLImageElement;
+                                    target.src = DEFAULT_IMAGE_URL;
+                                }}
+                            />
+                            <div className="course-description">
+                                <h2>课程简介</h2>
+                                <p>{course.description}</p>
+                            </div>
+                            <div className="course-objectives">
+                                <h2>学习目标</h2>
+                                <ul>
+                                    {Array.isArray(course.learningObjectives) ? (
+                                        course.learningObjectives.map((objective, index) => (
+                                            <li key={index}>{objective}</li>
+                                        ))
+                                    ) : (
+                                        <li>{course.learningObjectives}</li>
+                                    )}
+                                </ul>
+                            </div>
+                            <div className="course-prerequisites">
+                                <h2>先决条件</h2>
+                                <ul>
+                                    {Array.isArray(course.prerequisites) ? (
+                                        course.prerequisites.map((prerequisite, index) => (
+                                            <li key={index}>{prerequisite}</li>
+                                        ))
+                                    ) : (
+                                        <li>{course.prerequisites}</li>
+                                    )}
+                                </ul>
+                            </div>
+                        </>
+                    )}
                 </div>
 
                 <div className="course-sidebar">
@@ -275,7 +469,12 @@ export function CourseDetails() {
                     </a>
                     {isAdmin && (
                         <div className="admin-actions">
-                            <button onClick={() => setIsEditing(true)} className="edit-button">编辑课程</button>
+                            <button onClick={() => {
+                                setIsEditing(true);
+                                setEditedCourse({ ...course });
+                            }} className="edit-button">
+                                编辑课程
+                            </button>
                             <button onClick={handleDeleteCourse} className="delete-button">删除课程</button>
                         </div>
                     )}

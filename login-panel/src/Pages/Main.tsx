@@ -138,7 +138,7 @@ export function Main() {
                                     </div>
                                 </div>
                             </li>
-                            <li><a onClick={() => history.push('/add-course')}>添加课程</a></li>
+                            {isAdmin && <li><a onClick={() => history.push('/add-course')}>添加课程</a></li>}
                         </ul>
                     </nav>
                 </div>
@@ -166,10 +166,10 @@ export function Main() {
                         </button>
                     ) : (
                         <>
-                            <a onClick={() => history.push('/auth?mode=login')} className="auth-button secondary">
+                            <a onClick={() => history.push('/auth?mode=login')} className="secondary">
                                 登录
                             </a>
-                            <a onClick={() => history.push('/auth?mode=register')} className="auth-button primary">
+                            <a onClick={() => history.push('/auth?mode=register')} className="primary">
                                 注册
                             </a>
                         </>
