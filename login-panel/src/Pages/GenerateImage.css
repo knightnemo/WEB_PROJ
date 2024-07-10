@@ -1,0 +1,85 @@
+body {
+    background-color: #f0f8ff;
+    font-family: 'Arial', sans-serif;
+}
+
+.generate-image-container {
+    max-width: 600px;
+    margin: 40px auto;
+    padding: 30px;
+    background-color: white;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0, 100, 255, 0.1);
+}
+
+.generate-image-title {
+    color: #0066cc;
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 2.5em;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.generate-image-form {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.generate-button {
+    background-color: #0066cc !important;
+    color: white !important;
+    font-size: 1.1em !important;
+    padding: 12px 0 !important;
+    transition: all 0.3s ease !important;
+}
+
+.generate-button:hover {
+    background-color: #0055aa !important;
+    box-shadow: 0 0 15px rgba(0, 100, 255, 0.5) !important;
+}
+
+.error-message {
+    color: #ff3366;
+    text-align: center;
+    margin-top: 15px;
+    font-weight: bold;
+}
+
+.generated-image {
+    margin-top: 30px;
+    max-width: 100%;
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0, 100, 255, 0.2);
+}
+
+.powered-by {
+    text-align: center;
+    margin-top: 25px;
+    font-size: 0.9em;
+    color: #0066cc;
+    font-weight: bold;
+}
+
+/* 自定义输入框样式 */
+.MuiOutlinedInput-root {
+    border-radius: 8px !important;
+}
+
+.MuiOutlinedInput-notchedOutline {
+    border-color: #0066cc !important;
+}
+
+.MuiInputLabel-outlined {
+    color: #0066cc !important;
+}
+
+.MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline {
+    border-color: #0055aa !important;
+}
+
+.MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+    border-color: #0066cc !important;
+    border-width: 2px !important;
+}

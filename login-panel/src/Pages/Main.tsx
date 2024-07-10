@@ -27,6 +27,11 @@ interface Course {
 }
 
 export function Main() {
+    const handleGenerateImageClick = () => {
+        history.push('/generate-image');
+    };
+
+
     const history = useHistory();
     const { username, isAdmin } = useUser();
     const [courses, setCourses] = useState<Course[]>([]);
