@@ -5,4 +5,4 @@
 *.o
 **/.vscode
 **/.main.dSYM
-*.dSYM
+*.dSYMnode_modules/
