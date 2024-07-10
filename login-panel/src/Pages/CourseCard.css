@@ -23,7 +23,8 @@ body {
     width: 100%;
     cursor: pointer;
     position: relative;
-    display: block;
+    display: flex;
+    flex-direction: column;
     transition: all 0.4s ease-in-out;
     overflow: hidden;
     border-radius: 1rem;
@@ -53,6 +54,9 @@ body {
 .article-preview {
     padding: 1.5rem;
     background: white;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
 }
 
 .articles figure {
@@ -71,6 +75,16 @@ body {
 
 .rating {
     color: #fbbf24;
+}
+
+/* 新增：课程描述样式 */
+.course-description {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    margin-bottom: 0.5rem;
+    color: var(--text);
 }
 
 /* 保留原有的响应式设计 */

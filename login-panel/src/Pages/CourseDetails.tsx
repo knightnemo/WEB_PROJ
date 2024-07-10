@@ -4,6 +4,11 @@ import { useUser } from './UserContext';
 import { CourseQueryMessage } from 'Plugins/CourseAPI/CourseQueryMessage';
 import { UpdateCourseMessage } from 'Plugins/CourseAPI/UpdateCourseMessage';
 import { DeleteCourseMessage } from 'Plugins/CourseAPI/DeleteCourseMessage';
+import { AddCommentMessage } from 'Plugins/CommentAPI/AddCommentMessage';
+import { DeleteCommentMessage } from 'Plugins/CommentAPI/DeleteCommentMessage';
+import { GetCommentsMessage } from 'Plugins/CommentAPI/GetCommentsMessage';
+import { LikeCommentMessage } from 'Plugins/CommentAPI/LikeCommentMessage';
+import { DislikeCommentMessage } from 'Plugins/CommentAPI/DislikeCommentMessage';
 import axios from 'axios';
 import './CourseDetails.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -36,17 +41,16 @@ interface Course {
 }
 
 interface Comment {
-    id: number;
-    user: string;
+    id: string;
+    courseId: string;
+    userId: string;
     content: string;
-    likes: number;
-    dislikes: number;
+    likes: string;
+    dislikes: string;
+    createdAt: string;
+    parentId?: string;
+    replies: Comment[];
 }
-
-const mockComments: Comment[] = [
-    { id: 1, user: "张三", content: "非常棒的课程！讲解深入浅出。", likes: 15, dislikes: 2 },
-    { id: 2, user: "李明", content: "老师讲得很好，但是作业有点难。", likes: 10, dislikes: 1 },
-];
 
 export function CourseDetails() {
     const { id } = useParams<{ id: string }>();
@@ -60,6 +64,7 @@ export function CourseDetails() {
     const [isEditing, setIsEditing] = useState(false);
     const [editedCourse, setEditedCourse] = useState<Course | null>(null);
     const [newImageFile, setNewImageFile] = useState<File | null>(null);
+    const [replyingTo, setReplyingTo] = useState<string | null>(null);
 
     useEffect(() => {
         fetchCourse();
@@ -72,16 +77,10 @@ export function CourseDetails() {
             const response = await axios.post(courseQueryMessage.getURL(), JSON.stringify(courseQueryMessage), {
                 headers: { 'Content-Type': 'application/json' },
             });
-            console.log('Raw course data:', response.data);
             if (response.data) {
                 let courseData = response.data;
                 if (typeof courseData === 'string') {
-                    try {
-                        courseData = JSON.parse(courseData);
-                    } catch (error) {
-                        console.error('Error parsing course data:', error);
-                        throw new Error('Invalid course data format');
-                    }
+                    courseData = JSON.parse(courseData);
                 }
 
                 const ensureArray = (value: any): string[] =>
@@ -103,10 +102,28 @@ export function CourseDetails() {
                     prerequisites: ensureArray(courseData.prerequisites),
                     learningObjectives: ensureArray(courseData.learningObjectives),
                 };
-                console.log('Processed course data:', courseData);
                 setCourse(courseData);
                 setEditedCourse(courseData);
-                setComments(mockComments);
+
+                // Fetch comments
+                const getCommentsMessage = new GetCommentsMessage(id);
+                try {
+                    const commentResponse = await axios.post(getCommentsMessage.getURL(), JSON.stringify(getCommentsMessage), {
+                        headers: { 'Content-Type': 'application/json' },
+                    });
+                    if (Array.isArray(commentResponse.data)) {
+                        setComments(commentResponse.data);
+                    } else {
+                        console.error('Unexpected comment data format:', commentResponse.data);
+                        setComments([]);
+                    }
+                } catch (commentErr) {
+                    console.error('Error fetching comments:', commentErr);
+                    if (axios.isAxiosError(commentErr)) {
+                        console.error('Comment API response:', commentErr.response?.data);
+                    }
+                    setComments([]);
+                }
             } else {
                 throw new Error('Course not found');
             }
@@ -123,35 +140,145 @@ export function CourseDetails() {
         }
     };
 
-    const handleCommentSubmit = (e: React.FormEvent) => {
+    const handleCommentSubmit = async (e: React.FormEvent, parentId?: string) => {
         e.preventDefault();
         if (!username) {
             alert("请先登录后再评论");
             return;
         }
         if (newComment.trim()) {
-            const newCommentObj: Comment = {
-                id: comments.length + 1,
-                user: username,
-                content: newComment,
-                likes: 0,
-                dislikes: 0,
-            };
-            setComments([...comments, newCommentObj]);
-            setNewComment('');
+            try {
+                const addCommentMessage = new AddCommentMessage(
+                    course!.id,
+                    username,
+                    newComment,
+                    parentId || undefined
+                );
+
+                const messageJson = JSON.stringify(addCommentMessage.toJSON());
+
+                console.log('Sending AddCommentMessage:', messageJson);
+
+                const response = await axios.post(addCommentMessage.getURL(), messageJson, {
+                    headers: { 'Content-Type': 'application/json' },
+                });
+
+                console.log('Received AddCommentMessage response:', response.data);
+
+                const newCommentObj: Comment = {
+                    ...response.data,
+                    likes: response.data.likes || '0',
+                    dislikes: response.data.dislikes || '0',
+                    createdAt: response.data.createdAt || Date.now().toString(),
+                    replies: response.data.replies || []
+                };
+
+                setComments(prevComments => {
+                    if (parentId) {
+                        return prevComments.map(comment =>
+                            comment.id === parentId
+                                ? { ...comment, replies: [...comment.replies, newCommentObj] }
+                                : comment
+                        );
+                    } else {
+                        return [...prevComments, newCommentObj];
+                    }
+                });
+
+                setNewComment('');
+                setReplyingTo(null);
+
+            } catch (error) {
+                console.error('Error adding comment:', error);
+                if (axios.isAxiosError(error)) {
+                    console.error('AddCommentMessage API response:', error.response?.data);
+                }
+                alert('添加评论失败，请稍后再试');
+            }
         }
     };
 
-    const handleLike = (commentId: number) => {
-        setComments(comments.map(comment =>
-            comment.id === commentId ? { ...comment, likes: comment.likes + 1 } : comment
-        ));
+
+    const handleDeleteComment = async (commentId: string) => {
+        if (window.confirm('确定要删除这条评论吗？')) {
+            try {
+                const deleteCommentMessage = new DeleteCommentMessage(commentId);
+                const response = await axios.post(deleteCommentMessage.getURL(), JSON.stringify(deleteCommentMessage), {
+                    headers: { 'Content-Type': 'application/json' },
+                });
+                if (response.data) {
+                    setComments(prevComments => {
+                        const deleteComment = (comments: Comment[]): Comment[] => {
+                            return comments.filter(comment => {
+                                if (comment.id === commentId) {
+                                    return false;
+                                }
+                                if (comment.replies) {
+                                    comment.replies = deleteComment(comment.replies);
+                                }
+                                return true;
+                            });
+                        };
+                        return deleteComment(prevComments);
+                    });
+                    alert('评论删除成功');
+                } else {
+                    alert('评论删除失败');
+                }
+            } catch (error) {
+                console.error('Error deleting comment:', error);
+                alert('删除评论时出错，请稍后再试');
+            }
+        }
     };
 
-    const handleDislike = (commentId: number) => {
-        setComments(comments.map(comment =>
-            comment.id === commentId ? { ...comment, dislikes: comment.dislikes + 1 } : comment
-        ));
+    const handleLike = async (commentId: string) => {
+        try {
+            const likeCommentMessage = new LikeCommentMessage(commentId);
+            const response = await axios.post(likeCommentMessage.getURL(), JSON.stringify(likeCommentMessage), {
+                headers: { 'Content-Type': 'application/json' },
+            });
+            if (response.data) {
+                setComments(prevComments => updateCommentLikes(prevComments, commentId, true));
+            }
+        } catch (error) {
+            console.error('Error liking comment:', error);
+            alert('点赞失败，请稍后再试');
+        }
+    };
+
+    const handleDislike = async (commentId: string) => {
+        try {
+            const dislikeCommentMessage = new DislikeCommentMessage(commentId);
+            const response = await axios.post(dislikeCommentMessage.getURL(), JSON.stringify(dislikeCommentMessage), {
+                headers: { 'Content-Type': 'application/json' },
+            });
+            if (response.data) {
+                setComments(prevComments => updateCommentLikes(prevComments, commentId, false));
+            }
+        } catch (error) {
+            console.error('Error disliking comment:', error);
+            alert('点踩失败，请稍后再试');
+        }
+    };
+
+    const updateCommentLikes = (comments: Comment[], commentId: string, isLike: boolean): Comment[] => {
+        return comments.map(comment => {
+            if (comment.id === commentId) {
+                return {
+                    ...comment,
+                    likes: isLike ? (parseInt(comment.likes) + 1).toString() : comment.likes,
+                    dislikes: !isLike ? (parseInt(comment.dislikes) + 1).toString() : comment.dislikes
+                };
+            }
+            if (comment.replies) {
+                return {
+                    ...comment,
+                    replies: updateCommentLikes(comment.replies, commentId, isLike)
+                };
+            }
+            return comment;
+        });
     };
 
     const uploadImageToTencentCloud = async (file: File): Promise<string> => {
@@ -200,11 +327,9 @@ export function CourseDetails() {
                 learningObjectives
             );
 
-            console.log('Sending update data:', JSON.stringify(updateCourseMessage.toJSON()));
-            const response = await axios.post(updateCourseMessage.getURL(), JSON.stringify(updateCourseMessage.toJSON()), {
+            const response = await axios.post(updateCourseMessage.getURL(), JSON.stringify(updateCourseMessage), {
                 headers: { 'Content-Type': 'application/json' },
             });
-            console.log('Server response:', response.data);
 
             if (response.status === 200) {
                 setCourse({...editedCourse, imageUrl, prerequisites, learningObjectives});
@@ -245,6 +370,42 @@ export function CourseDetails() {
             }
         }
     };
+
+    const CommentComponent: React.FC<{ comment: Comment, level: number }> = ({ comment, level }) => (
+        <div className={`comment level-${level}`}>
+            <p className="comment-user">{comment.userId}</p>
+            <p className="comment-content">{comment.content}</p>
+            <div className="comment-actions">
+                <button onClick={() => handleLike(comment.id)} className="like-button">
+                    👍 <span>{parseInt(comment.likes)}</span>
+                </button>
+                <button onClick={() => handleDislike(comment.id)} className="dislike-button">
+                    👎 <span>{parseInt(comment.dislikes)}</span>
+                </button>
+                <button onClick={() => setReplyingTo(comment.id)} className="reply-button">
+                    回复
+                </button>
+                {(username === comment.userId || isAdmin) && (
+                    <button onClick={() => handleDeleteComment(comment.id)} className="delete-button">
+                        删除
+                    </button>
+                )}
+            </div>
+            {replyingTo === comment.id && (
+                <form onSubmit={(e) => handleCommentSubmit(e, comment.id)} className="reply-form">
+                    <textarea
+                        value={newComment}
+                        onChange={(e) => setNewComment(e.target.value)}
+                        placeholder="写下你的回复..."
+                    ></textarea>
+                    <button type="submit" className="submit-button">提交回复</button>
+                </form>
+            )}
+            {comment.replies && comment.replies.map(reply => (
+                <CommentComponent key={reply.id} comment={reply} level={level + 1} />
+            ))}
+        </div>
+    );
 
     if (isLoading) {
         return <div className="loading">加载中...</div>;
@@ -480,28 +641,16 @@ export function CourseDetails() {
                     )}
                 </div>
             </div>
-
             <div className="comments-section">
                 <h2 className="comments-title">评论区</h2>
                 <div className="comments-list">
                     {comments.map((comment) => (
-                        <div key={comment.id} className="comment">
-                            <p className="comment-user">{comment.user}</p>
-                            <p className="comment-content">{comment.content}</p>
-                            <div className="comment-actions">
-                                <button onClick={() => handleLike(comment.id)} className="like-button">
-                                    👍 <span>{comment.likes}</span>
-                                </button>
-                                <button onClick={() => handleDislike(comment.id)} className="dislike-button">
-                                    👎 <span>{comment.dislikes}</span>
-                                </button>
-                            </div>
-                        </div>
+                        <CommentComponent key={comment.id} comment={comment} level={0} />
                     ))}
                 </div>
 
                 {username ? (
-                    <form onSubmit={handleCommentSubmit} className="comment-form">
+                    <form onSubmit={(e) => handleCommentSubmit(e)} className="comment-form">
                         <textarea
                             value={newComment}
                             onChange={(e) => setNewComment(e.target.value)}
