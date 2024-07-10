@@ -7,7 +7,7 @@ import Common.DBAPI.*
 import Common.Object.SqlParameter
 import Common.ServiceUtils.schemaName
 
-import java.time.LocalDateTime
+import scala.language.postfixOps
 
 case class UpdateCourseMessagePlanner(
                                        id: String,
@@ -26,6 +26,7 @@ case class UpdateCourseMessagePlanner(
                                        learning_objectives: Option[List[String]],
                                        override val planContext: PlanContext
                                      ) extends Planner[String]:
+
   override def plan(using PlanContext): IO[String] = {
     val updates = List(
       title.map(t => (s"title = ?", SqlParameter("String", t))),
@@ -47,8 +48,21 @@ case class UpdateCourseMessagePlanner(
       IO.pure("No updates provided")
     } else {
       val (setClause, params) = updates.unzip
-      val query = s"UPDATE ${schemaName}.courses SET ${setClause.mkString(", ")}, updated_at = ? WHERE id = ?"
-      val allParams = params ++ List(SqlParameter("String", id))
-      writeDB(query, allParams).map(_ => s"Course updated successfully for ID: $id")
+      val query = s"UPDATE ${schemaName}.courses SET ${setClause.mkString(", ")} WHERE id = ?"
+      val allParams = params :+ SqlParameter("String", id)
+
+      IO.println(s"Executing query: $query") >>
+        IO.println(s"With parameters: ${allParams.mkString(", ")}") >>
+
+      writeDB(query, allParams).attempt.flatMap {
+        case Right(_) => IO.pure(s"Course updated successfully for ID: $id")
+        case Left(error) =>
+          IO.println(s"Error updating course: ${error.getMessage}") >>
+            IO.println(s"Problematic query: $query") >>
+            IO.println(s"Problematic parameters: ${allParams.mkString(", ")}") >>
+            IO.raiseError(new Exception(s"Failed to update course: ${error.getMessage}"))
+      }
     }
   }
+  
+  
