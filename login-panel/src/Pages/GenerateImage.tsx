@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { TextField, Button } from '@material-ui/core';
 import { RequestRedirect } from 'node-fetch';
 import './GenerateImage.css';
+import { useParams, useHistory, Link } from 'react-router-dom';
 
 const SD_API_KEY ='JIPHrxv7RCnu5WLWNLJA04cjNEEwURkX3JehsTJV6DN62wrAwecQEBih1PLO';
 
@@ -10,6 +11,7 @@ const GenerateImage = () => {
     const [prompt, setPrompt] = useState('');
     const [imageUrl, setImageUrl] = useState('');
     const [error, setError] = useState('');
+    const history = useHistory();
 
     const handleGenerateImage = async () => {
         setError('');
@@ -54,6 +56,9 @@ const GenerateImage = () => {
 
     return (
         <div className="generate-image-container">
+            <button onClick={() => history.push('/')} className="back-button">
+                返回主页
+            </button>
             <h1 className="generate-image-title">生成图像</h1>
             <div className="generate-image-form">
                 <TextField
