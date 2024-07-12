@@ -9,6 +9,7 @@ import { faUser, faStar, faCodeBranch, faSearch, faRobot } from '@fortawesome/fr
 import { CourseCard } from './CourseCard';
 import GroqChatWidget from './GroqChatWidget';
 
+
 interface Course {
     id: string;
     title: string;
@@ -50,7 +51,12 @@ export function Main() {
     const handleGroqButtonClick = () => {
         setIsGroqDialogOpen(true);
     };
-
+    const handleAuthAction = (action: 'login' | 'register') => {
+        history.push({
+            pathname: '/auth',
+            state: { action }
+        });
+    };
     useEffect(() => {
         let isMounted = true;
         fetchCourses(isMounted);
@@ -188,14 +194,10 @@ export function Main() {
                             </div>
                         </button>
                     ) : (
-                        <>
-                            <a onClick={() => history.push('/auth?mode=login')} className="auth-button secondary">
-                                登录
-                            </a>
-                            <a onClick={() => history.push('/auth?mode=register')} className="auth-button primary">
-                                注册
-                            </a>
-                        </>
+                        <div className="auth-buttons">
+                            <button onClick={() => handleAuthAction('login')}>登录</button>
+                            <button onClick={() => handleAuthAction('register')}>注册</button>
+                        </div>
                     )}
                 </div>
             </header>
