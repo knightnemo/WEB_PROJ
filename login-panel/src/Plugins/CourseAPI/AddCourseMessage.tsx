@@ -15,7 +15,7 @@ export class AddCourseMessage extends CourseMessage {
     subcategory?: string;
     language: string;
     prerequisites: string[];
-    learning_objectives: string[];
+    interested_users: string[];
 
     constructor(
         title: string,
@@ -30,7 +30,7 @@ export class AddCourseMessage extends CourseMessage {
         subcategory: string | undefined,
         language: string,
         prerequisites: string[],
-        learning_objectives: string[]
+        interested_users: string[]
     ) {
         super();
         this.id = uuidv4();
@@ -46,7 +46,7 @@ export class AddCourseMessage extends CourseMessage {
         this.subcategory = subcategory;
         this.language = language;
         this.prerequisites = prerequisites;
-        this.learning_objectives = learning_objectives;
+        this.interested_users = interested_users;
     }
 
     toJSON() {
@@ -64,7 +64,7 @@ export class AddCourseMessage extends CourseMessage {
             subcategory: this.subcategory,
             language: this.language,
             prerequisites: this.prerequisites,
-            learning_objectives: this.learning_objectives
+            interested_users: this.interested_users
         };
     }
 }

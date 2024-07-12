@@ -31,7 +31,7 @@ interface Course {
     subcategory?: string;
     language: string;
     prerequisites: string[];
-    learningObjectives: string[];
+    interested_users: string[];
 }
 
 export function AddCourse() {
@@ -44,7 +44,6 @@ export function AddCourse() {
         title: '',
         instructor: '',
         description: '',
-        rating: '',
         imageFile: null as File | null,
         resourceUrl: '',
         durationMinutes: 0,
@@ -53,7 +52,6 @@ export function AddCourse() {
         subcategory: '',
         language: '',
         prerequisites: '',
-        learningObjectives: ''
     });
 
     useEffect(() => {
@@ -139,11 +137,15 @@ export function AddCourse() {
                 imageUrl = await uploadImageToTencentCloud(newCourse.imageFile);
             }
 
+            const prerequisites = Array.isArray(newCourse.prerequisites)
+                ? newCourse.prerequisites
+                : newCourse.prerequisites.split(',').map(item => item.trim());
+
             const addCourseMessage = new AddCourseMessage(
                 newCourse.title,
                 newCourse.instructor,
                 newCourse.description,
-                newCourse.rating,
+                "5",
                 imageUrl,
                 newCourse.resourceUrl,
                 newCourse.durationMinutes,
@@ -151,8 +153,8 @@ export function AddCourse() {
                 newCourse.category,
                 newCourse.subcategory,
                 newCourse.language,
-                newCourse.prerequisites.split(',').map(item => item.trim()),
-                newCourse.learningObjectives.split(',').map(item => item.trim())
+                prerequisites,
+                []
             );
             console.log('Sending course data:', JSON.stringify(addCourseMessage.toJSON()));
             const response = await axios.post(addCourseMessage.getURL(), JSON.stringify(addCourseMessage.toJSON()), {
@@ -200,16 +202,6 @@ export function AddCourse() {
                         onChange={(e) => setNewCourse({ ...newCourse, description: e.target.value })}
                         required
                     ></textarea>
-                </div>
-                <div className="form-group">
-                    <label htmlFor="rating">课程评分</label>
-                    <input
-                        id="rating"
-                        type="text"
-                        value={newCourse.rating}
-                        onChange={(e) => setNewCourse({ ...newCourse, rating: e.target.value })}
-                        required
-                    />
                 </div>
                 <div className="form-group">
                     <label htmlFor="resourceUrl">资源链接</label>
@@ -280,15 +272,6 @@ export function AddCourse() {
                         id="prerequisites"
                         value={newCourse.prerequisites}
                         onChange={(e) => setNewCourse({ ...newCourse, prerequisites: e.target.value })}
-                        required
-                    ></textarea>
-                </div>
-                <div className="form-group">
-                    <label htmlFor="learningObjectives">学习目标（用逗号分隔）</label>
-                    <textarea
-                        id="learningObjectives"
-                        value={newCourse.learningObjectives}
-                        onChange={(e) => setNewCourse({ ...newCourse, learningObjectives: e.target.value })}
                         required
                     ></textarea>
                 </div>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useHistory, useLocation } from 'react-router-dom';
 import axios from 'axios';
-import { useHistory } from 'react-router-dom';
 import { API } from 'Plugins/CommonUtils/API';
 import { LoginMessage } from 'Plugins/DoctorAPI/LoginMessage';
 import { RegisterMessage } from 'Plugins/DoctorAPI/RegisterMessage';
@@ -24,6 +24,7 @@ export function Auth() {
     const [message, setMessage] = useState('');
     const [errors, setErrors] = useState({ username: '', password: '' });
     const [touched, setTouched] = useState({ username: false, password: false });
+    const location = useLocation<{ action: 'login' | 'register' }>();
 
     const resetState = useCallback(() => {
         setUsername('');
@@ -32,6 +33,12 @@ export function Auth() {
         setIsRegistering(false);
         setMessage('');
     }, []);
+
+    useEffect(() => {
+        if (location.state?.action) {
+            setIsRegistering(location.state.action === 'register');
+        }
+    }, [location]);
 
     useEffect(() => {
         return () => {

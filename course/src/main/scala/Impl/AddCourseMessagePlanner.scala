@@ -24,7 +24,7 @@ case class AddCourseMessagePlanner(
                                     subcategory: Option[String],
                                     language: String,
                                     prerequisites: List[String],
-                                    learning_objectives: List[String],
+                                    interested_users: List[String],
                                     override val planContext: PlanContext
                                   ) extends Planner[String]:
 
@@ -49,7 +49,7 @@ case class AddCourseMessagePlanner(
         SqlParameter("String", subcategory.getOrElse("")),
         SqlParameter("String", language),
         SqlParameter("String", prerequisites.mkString(",")),
-        SqlParameter("String", learning_objectives.mkString(","))
+        SqlParameter("String", interested_users.mkString(","))
       )
     ).attempt.flatMap {
       case Right(_) => IO.pure(s"Course added successfully with ID: $id")

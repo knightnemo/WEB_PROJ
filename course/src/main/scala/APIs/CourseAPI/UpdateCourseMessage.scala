@@ -14,5 +14,5 @@ case class UpdateCourseMessage(
                                 subcategory: Option[String],
                                 language: Option[String],
                                 prerequisites: Option[List[String]],
-                                learning_objectives: Option[List[String]]
+                                interested_users: Option[List[String]]
                               ) extends CourseMessage[Boolean]

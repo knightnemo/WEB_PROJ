@@ -23,7 +23,7 @@ case class UpdateCourseMessagePlanner(
                                        subcategory: Option[String],
                                        language: Option[String],
                                        prerequisites: Option[List[String]],
-                                       learning_objectives: Option[List[String]],
+                                       interested_users: Option[List[String]],
                                        override val planContext: PlanContext
                                      ) extends Planner[String]:
 
@@ -41,7 +41,7 @@ case class UpdateCourseMessagePlanner(
       subcategory.map(s => (s"subcategory = ?", SqlParameter("String", s))),
       language.map(l => (s"language = ?", SqlParameter("String", l))),
       prerequisites.map(p => (s"prerequisites = ?", SqlParameter("String", p.mkString(",")))),
-      learning_objectives.map(lo => (s"learning_objectives = ?", SqlParameter("String", lo.mkString(","))))
+      interested_users.map(u => (s"interested_users = ?", SqlParameter("String", u.mkString(","))))
     ).flatten
 
     if (updates.isEmpty) {
@@ -64,5 +64,3 @@ case class UpdateCourseMessagePlanner(
       }
     }
   }
-  
-  

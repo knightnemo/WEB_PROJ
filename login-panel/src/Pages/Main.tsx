@@ -23,7 +23,7 @@ interface Course {
     subcategory?: string;
     language: string;
     prerequisites: string[];
-    learningObjectives: string[];
+    interested_users: string[];
 }
 
 export function Main() {
@@ -31,6 +31,12 @@ export function Main() {
         history.push('/generate-image');
     };
 
+    const handleAuthAction = (action: 'login' | 'register') => {
+        history.push({
+            pathname: '/auth',
+            state: { action }
+        });
+    };
 
     const history = useHistory();
     const { username, isAdmin } = useUser();
@@ -85,15 +91,7 @@ export function Main() {
             });
             console.log('Raw response:', response.data);
             if (isMounted) {
-                let parsedData: Course[];
-                if (typeof response.data === 'string' && response.data.startsWith('List(')) {
-                    parsedData = parseScalaList(response.data);
-                } else if (Array.isArray(response.data)) {
-                    parsedData = response.data;
-                } else {
-                    console.error('Unexpected response format:', response.data);
-                    parsedData = [];
-                }
+                const parsedData = parseScalaList(response.data);
                 console.log('Parsed data:', parsedData);
                 setCourses(parsedData);
                 setError(null);
@@ -188,14 +186,10 @@ export function Main() {
                             </div>
                         </button>
                     ) : (
-                        <>
-                            <a onClick={() => history.push('/auth?mode=login')} className="auth-button secondary">
-                                登录
-                            </a>
-                            <a onClick={() => history.push('/auth?mode=register')} className="auth-button primary">
-                                注册
-                            </a>
-                        </>
+                        <div className="auth-buttons">
+                            <button onClick={() => handleAuthAction('login')}>登录</button>
+                            <button onClick={() => handleAuthAction('register')}>注册</button>
+                        </div>
                     )}
                 </div>
             </header>

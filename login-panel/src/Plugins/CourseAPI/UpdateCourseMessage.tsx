@@ -14,7 +14,7 @@ export class UpdateCourseMessage extends CourseMessage {
     subcategory?: string;
     language?: string;
     prerequisites?: string[];
-    learningObjectives?: string[];
+    interested_users?: string[];
 
     constructor(
         id: string,
@@ -30,7 +30,7 @@ export class UpdateCourseMessage extends CourseMessage {
         subcategory?: string,
         language?: string,
         prerequisites?: string[],
-        learningObjectives?: string[]
+        interested_users?: string[]
     ) {
         super();
         this.id = id;
@@ -46,7 +46,7 @@ export class UpdateCourseMessage extends CourseMessage {
         this.subcategory = subcategory;
         this.language = language;
         this.prerequisites = prerequisites;
-        this.learningObjectives = learningObjectives;
+        this.interested_users = interested_users;
     }
 
     toJSON() {
@@ -64,7 +64,7 @@ export class UpdateCourseMessage extends CourseMessage {
             subcategory: this.subcategory,
             language: this.language,
             prerequisites: this.prerequisites,
-            learning_objectives: this.learningObjectives
+            interested_users: this.interested_users
         };
     }
 }

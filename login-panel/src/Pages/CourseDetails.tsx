@@ -7,9 +7,10 @@ import { DeleteCourseMessage } from 'Plugins/CourseAPI/DeleteCourseMessage';
 import axios from 'axios';
 import './CourseDetails.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { ImageUploader } from './ImageUploader';
 import COS from 'cos-js-sdk-v5';
+import { faStar as faStarRegular } from '@fortawesome/free-regular-svg-icons';
+import { faTimes, faStar as faStarSolid } from '@fortawesome/free-solid-svg-icons';
 
 const DEFAULT_IMAGE_URL = 'default_course_bg.jpeg';
 
@@ -32,7 +33,7 @@ interface Course {
     subcategory?: string;
     language: string;
     prerequisites: string[] | string;
-    learningObjectives: string[] | string;
+    interested_users: string[] | string;
 }
 
 interface Comment {
@@ -60,10 +61,123 @@ export function CourseDetails() {
     const [isEditing, setIsEditing] = useState(false);
     const [editedCourse, setEditedCourse] = useState<Course | null>(null);
     const [newImageFile, setNewImageFile] = useState<File | null>(null);
+    const [userRating, setUserRating] = useState<number>(0);
+    const [isFavorite, setIsFavorite] = useState(false);
 
     useEffect(() => {
         fetchCourse();
     }, [id]);
+
+    useEffect(() => {
+        if (username && course) {
+            const users = Array.isArray(course.interested_users)
+                ? course.interested_users
+                : course.interested_users.split(',').map(u => u.trim());
+            setIsFavorite(users.includes(username));
+            setUserRating(users.includes(username) ? parseInt(course.rating) : 0);
+        }
+    }, [username, course]);
+
+    const handleRating = async (rating: number) => {
+        if (!course || !username) return;
+
+        const currentUsers = Array.isArray(course.interested_users)
+            ? course.interested_users
+            : course.interested_users.split(',').map(u => u.trim());
+
+        if (currentUsers.includes(username) && userRating !== 0) {
+            alert("您已经评过分了，不能重复评分。");
+            return;
+        }
+
+        const currentRating = parseFloat(course.rating);
+        const totalUsers = currentUsers.length;
+        const newRating = userRating === 0
+            ? ((currentRating * totalUsers) + rating) / (totalUsers + 1)
+            : ((currentRating * totalUsers - userRating + rating) / totalUsers);
+
+        const updatedInterestedUsers = [...new Set([...currentUsers, username])];
+
+        console.log('Updated interested users after rating:', updatedInterestedUsers);
+        const prerequisites = Array.isArray(course.prerequisites)
+            ? course.prerequisites
+            : course.prerequisites.split(',').map(item => item.trim());
+        try {
+            const updateCourseMessage = new UpdateCourseMessage(
+                course.id,
+                course.title,
+                course.instructor,
+                course.description,
+                newRating.toFixed(1),
+                course.imageUrl || undefined,
+                course.resourceUrl,
+                course.durationMinutes,
+                course.difficultyLevel,
+                course.category,
+                course.subcategory,
+                course.language,
+                prerequisites,
+                updatedInterestedUsers
+            );
+
+            await axios.post(updateCourseMessage.getURL(), JSON.stringify(updateCourseMessage.toJSON()), {
+                headers: { 'Content-Type': 'application/json' },
+            });
+
+            setCourse({ ...course, rating: newRating.toFixed(1), interested_users: updatedInterestedUsers });
+            setUserRating(rating);
+            setIsFavorite(true);
+        } catch (error) {
+            console.error('Error updating course rating:', error);
+        }
+    };
+
+    const toggleFavorite = async () => {
+        if (!course || !username) return;
+
+        const currentUsers = Array.isArray(course.interested_users)
+            ? course.interested_users
+            : course.interested_users.split(',').map(u => u.trim());
+
+        console.log('CourseCard - Current users before toggling favorite:', currentUsers);
+
+        const updatedInterestedUsers = isFavorite
+            ? currentUsers.filter(u => u !== username)
+            : [...new Set([...currentUsers, username])];
+
+        console.log('CourseCard - Updated interested users after toggling favorite:', updatedInterestedUsers);
+
+        const prerequisites = Array.isArray(course.prerequisites)
+            ? course.prerequisites
+            : course.prerequisites.split(',').map(item => item.trim());
+        try {
+            const updateCourseMessage = new UpdateCourseMessage(
+                course.id,
+                course.title,
+                course.instructor,
+                course.description,
+                course.rating,
+                course.imageUrl || undefined,
+                course.resourceUrl,
+                course.durationMinutes,
+                course.difficultyLevel,
+                course.category,
+                course.subcategory,
+                course.language,
+                prerequisites,
+                updatedInterestedUsers
+            );
+
+            await axios.post(updateCourseMessage.getURL(), JSON.stringify(updateCourseMessage.toJSON()), {
+                headers: { 'Content-Type': 'application/json' },
+            });
+
+            setCourse({ ...course, interested_users: updatedInterestedUsers });
+            setIsFavorite(!isFavorite);
+        } catch (error) {
+            console.error('Error updating course favorites:', error);
+        }
+    };
 
     const fetchCourse = async () => {
         setIsLoading(true);
@@ -88,20 +202,9 @@ export function CourseDetails() {
                     Array.isArray(value) ? value : (typeof value === 'string' ? value.split(',').map(item => item.trim()) : []);
 
                 courseData = {
-                    id: courseData.id || '',
-                    title: courseData.title || '无标题',
-                    instructor: courseData.instructor || '未知讲师',
-                    description: courseData.description || '暂无简介',
-                    rating: courseData.rating || '0',
-                    imageUrl: courseData.imageUrl || DEFAULT_IMAGE_URL,
-                    resourceUrl: courseData.resourceUrl || '',
-                    durationMinutes: parseInt(courseData.durationMinutes) || 0,
-                    difficultyLevel: courseData.difficultyLevel || '未知',
-                    category: courseData.category || '未分类',
-                    subcategory: courseData.subcategory,
-                    language: courseData.language || '未知',
+                    ...courseData,
                     prerequisites: ensureArray(courseData.prerequisites),
-                    learningObjectives: ensureArray(courseData.learningObjectives),
+                    interested_users: ensureArray(courseData.interestedUsers),
                 };
                 console.log('Processed course data:', courseData);
                 setCourse(courseData);
@@ -168,20 +271,17 @@ export function CourseDetails() {
 
     const handleUpdateCourse = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!editedCourse) return;
+        if (!editedCourse || !course) return;
         try {
             let imageUrl = editedCourse.imageUrl || DEFAULT_IMAGE_URL;
             if (newImageFile) {
                 imageUrl = await uploadImageToTencentCloud(newImageFile);
             }
+            const updatedInterestedUsers = [username];
 
             const prerequisites = Array.isArray(editedCourse.prerequisites)
                 ? editedCourse.prerequisites
                 : editedCourse.prerequisites.split(',').map(item => item.trim());
-
-            const learningObjectives = Array.isArray(editedCourse.learningObjectives)
-                ? editedCourse.learningObjectives
-                : editedCourse.learningObjectives.split(',').map(item => item.trim());
 
             const updateCourseMessage = new UpdateCourseMessage(
                 editedCourse.id,
@@ -197,7 +297,7 @@ export function CourseDetails() {
                 editedCourse.subcategory,
                 editedCourse.language,
                 prerequisites,
-                learningObjectives
+                updatedInterestedUsers
             );
 
             console.log('Sending update data:', JSON.stringify(updateCourseMessage.toJSON()));
@@ -207,7 +307,12 @@ export function CourseDetails() {
             console.log('Server response:', response.data);
 
             if (response.status === 200) {
-                setCourse({...editedCourse, imageUrl, prerequisites, learningObjectives});
+                setCourse({
+                    ...editedCourse,
+                    imageUrl,
+                    prerequisites,
+                    interested_users: course.interested_users  // 保留原有的 interested_users
+                });
                 setIsEditing(false);
                 setNewImageFile(null);
                 alert('课程更新成功');
@@ -224,7 +329,6 @@ export function CourseDetails() {
             }
         }
     };
-
     const handleDeleteCourse = async () => {
         if (!course) return;
         if (window.confirm('确定要删除这门课程吗？')) {
@@ -272,6 +376,11 @@ export function CourseDetails() {
                         <span className="difficulty-level">{course.difficultyLevel}</span>
                         <span className="category">{course.category}{course.subcategory ? ` - ${course.subcategory}` : ''}</span>
                         <span className="language">{course.language}</span>
+                        {username && (
+                            <span className="favorite" onClick={toggleFavorite}>
+                                <FontAwesomeIcon icon={isFavorite ? faStarSolid : faStarRegular} />
+                            </span>
+                        )}
                     </div>
                 </div>
             </div>
@@ -392,15 +501,6 @@ export function CourseDetails() {
                                 ></textarea>
                             </div>
                             <div className="form-group">
-                                <label htmlFor="learningObjectives">学习目标（用逗号分隔）</label>
-                                <textarea
-                                    id="learningObjectives"
-                                    value={Array.isArray(editedCourse.learningObjectives) ? editedCourse.learningObjectives.join(', ') : editedCourse.learningObjectives}
-                                    onChange={(e) => setEditedCourse({...editedCourse, learningObjectives: e.target.value})}
-                                    required
-                                ></textarea>
-                            </div>
-                            <div className="form-group">
                                 <ImageUploader
                                     onImageSelect={(file) => {
                                         setNewImageFile(file);
@@ -435,18 +535,6 @@ export function CourseDetails() {
                                 <h2>课程简介</h2>
                                 <p>{course.description}</p>
                             </div>
-                            <div className="course-objectives">
-                                <h2>学习目标</h2>
-                                <ul>
-                                    {Array.isArray(course.learningObjectives) ? (
-                                        course.learningObjectives.map((objective, index) => (
-                                            <li key={index}>{objective}</li>
-                                        ))
-                                    ) : (
-                                        <li>{course.learningObjectives}</li>
-                                    )}
-                                </ul>
-                            </div>
                             <div className="course-prerequisites">
                                 <h2>先决条件</h2>
                                 <ul>
@@ -470,12 +558,25 @@ export function CourseDetails() {
                     {isAdmin && (
                         <div className="admin-actions">
                             <button onClick={() => {
-                                setIsEditing(true);
-                                setEditedCourse({ ...course });
+                                setIsEditing(true)
+                                setEditedCourse({ ...course })
                             }} className="edit-button">
                                 编辑课程
                             </button>
                             <button onClick={handleDeleteCourse} className="delete-button">删除课程</button>
+                        </div>
+                    )}
+                    {username && (
+                        <div className="rating-section">
+                            <h3>{userRating !== 0 ? '您的评分' : '为课程打分'}</h3>
+                            {[1, 2, 3, 4, 5].map((star) => (
+                                <FontAwesomeIcon
+                                    key={star}
+                                    icon={star <= userRating ? faStarSolid : faStarRegular}
+                                    onClick={() => handleRating(star)}
+                                    className={`rating-star ${userRating !== 0 ? 'disabled' : ''}`}
+                                />
+                            ))}
                         </div>
                     )}
                 </div>

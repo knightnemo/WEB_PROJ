@@ -17,7 +17,7 @@ case class Course(
                    subcategory: Option[String],
                    language: String,
                    prerequisites: List[String],
-                   learning_objectives: List[String]
+                   interested_users: List[String]
                  )
 
 object Course {
