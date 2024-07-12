@@ -5,8 +5,9 @@ import { AllCoursesQueryMessage } from 'Plugins/CourseAPI/AllCoursesQueryMessage
 import axios from 'axios';
 import './Main.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUser, faStar, faCodeBranch, faSearch } from '@fortawesome/free-solid-svg-icons';
+import { faUser, faStar, faCodeBranch, faSearch, faRobot } from '@fortawesome/free-solid-svg-icons';
 import { CourseCard } from './CourseCard';
+import GroqChatWidget from './GroqChatWidget';
 
 interface Course {
     id: string;
@@ -26,6 +27,11 @@ interface Course {
 }
 
 export function Main() {
+    const handleGenerateImageClick = () => {
+        history.push('/generate-image');
+    };
+
+
     const history = useHistory();
     const { username, isAdmin } = useUser();
     const [courses, setCourses] = useState<Course[]>([]);
@@ -33,6 +39,17 @@ export function Main() {
     const [selectedCategory, setSelectedCategory] = useState('all');
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [isGroqDialogOpen, setIsGroqDialogOpen] = useState(false);
+    const [recommendedCourseIds, setRecommendedCourseIds] = useState<string[]>([]);
+
+    const handleRecommendation = (recommendedIds: string[]) => {
+        setRecommendedCourseIds(recommendedIds);
+        setSelectedCategory('recommended');
+    };
+
+    const handleGroqButtonClick = () => {
+        setIsGroqDialogOpen(true);
+    };
 
     useEffect(() => {
         let isMounted = true;
@@ -93,12 +110,15 @@ export function Main() {
         }
     };
 
-    const filteredCourses = courses.filter(course =>
-        course.title.toLowerCase().includes(searchTerm.toLowerCase()) &&
-        (selectedCategory === 'all' || course.category === selectedCategory)
-    );
+    const filteredCourses = courses.filter(course => {
+        if (selectedCategory === 'recommended') {
+            return recommendedCourseIds.includes(course.id);
+        }
+        return course.title.toLowerCase().includes(searchTerm.toLowerCase()) &&
+            (selectedCategory === 'all' || course.category === selectedCategory);
+    });
 
-    const categories = ['all', ...new Set(courses.map(course => course.category))];
+    const categories = ['all', 'recommended', ...new Set(courses.map(course => course.category))];
 
     const handleUserClick = () => {
         if (username) {
@@ -121,7 +141,8 @@ export function Main() {
                                 <button onClick={() => setSelectedCategory('all')}>
                                     课程分类
                                     <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16">
-                                        <path d="M12.78 5.22a.749.749 0 0 1 0 1.06l-4.25 4.25a.749.749 0 0 1-1.06 0L3.22 6.28a.749.749 0 1 1 1.06-1.06L8 8.939l3.72-3.719a.749.749 0 0 1 1.06 0Z"></path>
+                                        <path
+                                            d="M12.78 5.22a.749.749 0 0 1 0 1.06l-4.25 4.25a.749.749 0 0 1-1.06 0L3.22 6.28a.749.749 0 1 1 1.06-1.06L8 8.939l3.72-3.719a.749.749 0 0 1 1.06 0Z"></path>
                                     </svg>
                                 </button>
                                 <div className="dropdown__wrapper">
@@ -130,7 +151,7 @@ export function Main() {
                                             {categories.map(category => (
                                                 <li key={category} onClick={() => setSelectedCategory(category)}>
                                                     <div className="item-title">
-                                                        <h3>{category === 'all' ? '所有类别' : category}</h3>
+                                                        <h3>{category === 'all' ? '所有类别' : category === 'recommended' ? '推荐课程' : category}</h3>
                                                     </div>
                                                 </li>
                                             ))}
@@ -138,7 +159,9 @@ export function Main() {
                                     </div>
                                 </div>
                             </li>
-                            <li><a onClick={() => history.push('/add-course')}>添加课程</a></li>
+                            {isAdmin && (
+                                <li><a onClick={() => history.push('/add-course')}>添加课程</a></li>
+                            )}
                         </ul>
                     </nav>
                 </div>
@@ -191,6 +214,7 @@ export function Main() {
                     </div>
                 )}
             </main>
+            <GroqChatWidget courses={courses} onRecommendation={handleRecommendation} />
         </div>
     );
 }

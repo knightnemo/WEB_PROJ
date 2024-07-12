@@ -57,10 +57,14 @@ export function AddCourse() {
     });
 
     useEffect(() => {
-        let isMounted = true;
-        fetchCourses(isMounted);
-        return () => { isMounted = false };
-    }, []);
+        if (!isAdmin) {
+            history.push('/');
+        } else {
+            let isMounted = true;
+            fetchCourses(isMounted);
+            return () => { isMounted = false };
+        }
+    }, [isAdmin, history]);
 
     const parseScalaList = (input: string): any[] => {
         // 移除 "List(" 前缀和结尾的 ")"
@@ -163,9 +167,11 @@ export function AddCourse() {
     };
 
     return (
-        <div className="add-course-container">
-            <h1 className="add-course-title">添加新课程</h1>
-            <form onSubmit={handleAddCourse} className="add-course-form">
+        <>
+            {isAdmin ? (
+                <div className="add-course-container">
+                    <h1 className="add-course-title">添加新课程</h1>
+                    <form onSubmit={handleAddCourse} className="add-course-form">
                 <div className="form-group">
                     <label htmlFor="title">课程标题</label>
                     <input
@@ -295,7 +301,11 @@ export function AddCourse() {
                         <FontAwesomeIcon icon={faTimes} /> 取消
                     </button>
                 </div>
-            </form>
-        </div>
+                    </form>
+                </div>
+            ) : (
+                <div>You do not have permission to access this page.</div>
+            )}
+        </>
     );
 }

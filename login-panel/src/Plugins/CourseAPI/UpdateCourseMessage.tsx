@@ -48,4 +48,23 @@ export class UpdateCourseMessage extends CourseMessage {
         this.prerequisites = prerequisites;
         this.learningObjectives = learningObjectives;
     }
+
+    toJSON() {
+        return {
+            id: this.id,
+            title: this.title,
+            instructor: this.instructor,
+            description: this.description,
+            rating: this.rating,
+            image_url: this.imageUrl,
+            resource_url: this.resourceUrl,
+            duration_minutes: this.durationMinutes,
+            difficulty_level: this.difficultyLevel,
+            category: this.category,
+            subcategory: this.subcategory,
+            language: this.language,
+            prerequisites: this.prerequisites,
+            learning_objectives: this.learningObjectives
+        };
+    }
 }
