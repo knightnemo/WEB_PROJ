@@ -57,6 +57,13 @@ export function Main() {
         return () => { isMounted = false };
     }, []);
 
+    const handleAuthAction = (action: 'login' | 'register') => {
+        history.push({
+            pathname: '/auth',
+            state: { action }
+        });
+    };
+
     const parseScalaList = (input: string): any[] => {
         // 移除 "List(" 前缀和结尾的 ")"
         const content = input.slice(5, -1).trim();
@@ -189,12 +196,10 @@ export function Main() {
                         </button>
                     ) : (
                         <>
-                            <a onClick={() => history.push('/auth?mode=login')} className="auth-button secondary">
-                                登录
-                            </a>
-                            <a onClick={() => history.push('/auth?mode=register')} className="auth-button primary">
-                                注册
-                            </a>
+                            <div className="auth-buttons">
+                                <button onClick={() => handleAuthAction('login')}>登录</button>
+                                <button onClick={() => handleAuthAction('register')}>注册</button>
+                            </div>
                         </>
                     )}
                 </div>

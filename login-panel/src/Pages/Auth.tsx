@@ -1,6 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
-import { useHistory } from 'react-router-dom';
 import { API } from 'Plugins/CommonUtils/API';
 import { LoginMessage } from 'Plugins/DoctorAPI/LoginMessage';
 import { RegisterMessage } from 'Plugins/DoctorAPI/RegisterMessage';
@@ -10,6 +8,8 @@ import { UserDeleteMessage } from 'Plugins/PatientAPI/UserDeleteMessage';
 import { AllUsersQueryMessage } from 'Plugins/PatientAPI/AllUsersQueryMessage';
 import { useUser } from './UserContext';
 import './Auth.css';
+import React, { useState, useEffect, useCallback } from 'react';
+import { useHistory, useLocation } from 'react-router-dom';
 
 export function Auth() {
     const history = useHistory();
@@ -24,6 +24,7 @@ export function Auth() {
     const [message, setMessage] = useState('');
     const [errors, setErrors] = useState({ username: '', password: '' });
     const [touched, setTouched] = useState({ username: false, password: false });
+    const location = useLocation<{ action: 'login' | 'register' }>();
 
     const resetState = useCallback(() => {
         setUsername('');
@@ -38,6 +39,12 @@ export function Auth() {
             resetState();
         };
     }, [resetState]);
+
+    useEffect(() => {
+        if (location.state?.action) {
+            setIsRegistering(location.state.action === 'register');
+        }
+    }, [location]);
 
     const sendPostRequest = async (apiMessage: API) => {
         setIsLoading(true);
