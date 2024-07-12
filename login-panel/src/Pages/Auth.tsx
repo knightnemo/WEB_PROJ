@@ -1,5 +1,8 @@
+<<<<<<< HEAD
 import React, { useState, useEffect, useCallback } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
+=======
+>>>>>>> 425bf416c53bd7470f13e7b8305e250a829acc6f
 import axios from 'axios';
 import { API } from 'Plugins/CommonUtils/API';
 import { LoginMessage } from 'Plugins/DoctorAPI/LoginMessage';
@@ -10,6 +13,8 @@ import { UserDeleteMessage } from 'Plugins/PatientAPI/UserDeleteMessage';
 import { AllUsersQueryMessage } from 'Plugins/PatientAPI/AllUsersQueryMessage';
 import { useUser } from './UserContext';
 import './Auth.css';
+import React, { useState, useEffect, useCallback } from 'react';
+import { useHistory, useLocation } from 'react-router-dom';
 
 export function Auth() {
     const history = useHistory();
@@ -45,6 +50,12 @@ export function Auth() {
             resetState();
         };
     }, [resetState]);
+
+    useEffect(() => {
+        if (location.state?.action) {
+            setIsRegistering(location.state.action === 'register');
+        }
+    }, [location]);
 
     const sendPostRequest = async (apiMessage: API) => {
         setIsLoading(true);
