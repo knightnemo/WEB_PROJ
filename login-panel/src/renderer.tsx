@@ -27,6 +27,7 @@ import { UserProfile } from 'Pages/UserProfile';
 import { ChangePassword } from 'Pages/ChangePassword'
 import { AddCourse } from 'Pages/AddCourse';
 import GenerateImage from 'Pages/GenerateImage'
+import NotificationsPage from 'Pages/NotificationsPage';
 const Layout = () => {
     return (
         <UserProvider>
@@ -39,6 +40,7 @@ const Layout = () => {
                 <Route path="/change-password" component={ChangePassword} />
                 <Route path="/add-course" component={AddCourse} />
                 <Route path="/generate-image" component={GenerateImage} />
+                <Route path="/notifications" component={NotificationsPage} />
             </Switch>
         </HashRouter>
         </UserProvider>

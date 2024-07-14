@@ -11,6 +11,7 @@ import GroqChatWidget from './GroqChatWidget';
 import NotificationComponent from './NotificationComponent';
 import { UserCourseMessage, UserCourseAction } from 'Plugins/CourseAPI/UserCourseMessage';
 import { getUserFavoriteCourses, getUserEnrolledCourses } from 'Plugins/CourseAPI/UserCourseInteractions';
+import ScrollingNotification from './ScrollingNotification';
 
 interface Course {
     id: string;
@@ -282,6 +283,7 @@ export function Main() {
                     )}
                 </div>
             </header>
+            <ScrollingNotification />
             <main className="main-content">
                 {isLoading ? (
                     <p>Loading courses...</p>

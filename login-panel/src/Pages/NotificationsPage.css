@@ -1,0 +1,30 @@
+.notifications-page {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.notifications-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.notification-item {
+    background-color: #fff9e6;
+    padding: 15px;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.notification-item h2 {
+    margin-top: 0;
+    color: #333;
+}
+
+.notification-date {
+    display: block;
+    font-size: 0.8em;
+    color: #666;
+    text-align: right;
+}
