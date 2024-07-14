@@ -18,6 +18,31 @@ object Init {
       _ <- initSchema(schemaName)
       _ <- writeDB(s"CREATE TABLE IF NOT EXISTS ${schemaName}.user_name (user_name TEXT, password TEXT)", List())
       _ <- writeDB(s"""
+        CREATE TABLE IF NOT EXISTS ${schemaName}.user_course (
+          user_name TEXT,
+          course_name TEXT,
+          enrollment_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          PRIMARY KEY (user_name, course_name)
+        )
+      """, List())
+      _ <- writeDB(s"""
+        CREATE TABLE IF NOT EXISTS ${schemaName}.course_ratings (
+          user_name TEXT,
+          course_name TEXT,
+          rating INT,
+          rating_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          PRIMARY KEY (user_name, course_name)
+        )
+      """, List())
+      _ <- writeDB(s"""
+        CREATE TABLE IF NOT EXISTS ${schemaName}.course_favorites (
+          user_name TEXT,
+          course_name TEXT,
+          favorite_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          PRIMARY KEY (user_name, course_name)
+        )
+      """, List())
+      _ <- writeDB(s"""
         CREATE TABLE IF NOT EXISTS ${schemaName}.courses (
           id TEXT PRIMARY KEY,
           title TEXT NOT NULL,
@@ -32,7 +57,7 @@ object Init {
           subcategory TEXT,
           language TEXT,
           prerequisites TEXT,
-          learning_objectives TEXT
+          interested_users TEXT
         )
       """, List()).attempt.flatMap {
         case Right(_) => IO.unit

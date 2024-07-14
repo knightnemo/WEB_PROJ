@@ -716,8 +716,6 @@ body {
     animation: fadeIn 0.3s ease-out;
 }
 
-<<<<<<< HEAD
-=======
 .action-buttons {
     display: flex;
     gap: 0.5rem;
@@ -807,7 +805,6 @@ body {
     animation: pulse 1s infinite;
 }
 
->>>>>>> 425bf416c53bd7470f13e7b8305e250a829acc6f
 .auth-buttons {
     display: flex;
     gap: 0.5rem;
@@ -845,4 +842,68 @@ body {
 
 .auth-buttons button:first-child:hover {
     background: #357abD;  /* 深蓝色用于悬停效果 */
+}
+
+/* Add these new styles for the notification feature */
+.notification-wrapper {
+    position: relative;
+    margin-right: 1rem;
+}
+
+.notification-icon {
+    cursor: pointer;
+    font-size: 1.5rem;
+    color: var(--link-gray);
+    transition: color 0.2s ease-in-out;
+}
+
+.notification-icon:hover {
+    color: var(--link-gray-hover);
+}
+
+.notification-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background-color: var(--primary);
+    color: white;
+    border-radius: 50%;
+    padding: 0.2rem 0.4rem;
+    font-size: 0.7rem;
+    font-weight: bold;
+}
+
+.notification-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    width: 300px;
+    background-color: var(--white);
+    border: 1px solid var(--gray-border);
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.notification-item {
+    padding: 1rem;
+    border-bottom: 1px solid var(--gray-border);
+    transition: background-color 0.2s ease-in-out;
+}
+
+.notification-item:last-child {
+    border-bottom: none;
+}
+
+.notification-item:hover {
+    background-color: var(--secondary-background);
+}
+
+/* Modify the existing .action-buttons class */
+.action-buttons {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
 }

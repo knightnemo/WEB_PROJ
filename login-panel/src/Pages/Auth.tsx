@@ -1,8 +1,3 @@
-<<<<<<< HEAD
-import React, { useState, useEffect, useCallback } from 'react';
-import { useHistory, useLocation } from 'react-router-dom';
-=======
->>>>>>> 425bf416c53bd7470f13e7b8305e250a829acc6f
 import axios from 'axios';
 import { API } from 'Plugins/CommonUtils/API';
 import { LoginMessage } from 'Plugins/DoctorAPI/LoginMessage';

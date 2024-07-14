@@ -4,9 +4,10 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faStar as faStarSolid } from '@fortawesome/free-solid-svg-icons';
 import { faStar as faStarRegular } from '@fortawesome/free-regular-svg-icons';
 import { useUser } from './UserContext';
-import { UpdateCourseMessage } from 'Plugins/CourseAPI/UpdateCourseMessage';
+import { UserCourseMessage, UserCourseAction } from 'Plugins/CourseAPI/UserCourseMessage';
 import axios from 'axios';
 import './CourseCard.css';
+import { getCourseRatingUsers, calculateAverageRating } from 'Plugins/CourseAPI/UserCourseInteractions';
 
 interface Course {
     id: string;
@@ -15,67 +16,81 @@ interface Course {
     description: string;
     rating: string;
     imageUrl?: string;
-    interestedUsers?: string;
+}
+
+interface UserInteraction {
+    isFavorite: boolean;
+    rating: number;
+    isEnrolled: boolean;
 }
 
 interface CourseCardProps {
     course: Course;
+    userInteraction?: UserInteraction;
 }
 
-export const CourseCard: React.FC<CourseCardProps> = ({ course }) => {
-    console.log('CourseCard initialized with course:', course);
+const formatDescription = (description: string): string => {
+    let formattedDesc1 = description;
+    if (description.length <= 70) {
+        formattedDesc1 = description.padEnd(70, ' ');
+    } else if (description.length > 80) {
+        formattedDesc1 = description.slice(0, 77) + '...';
+    }
+    let formattedDesc2 = '';
+    for (let i = 0; i < formattedDesc1.length; i++) {
+        if (i > 0 && i % 30 === 0) {
+            formattedDesc2 += '\n';
+        }
+        formattedDesc2 += formattedDesc1[i];
+    }
+    return formattedDesc2;
+};
+
+export const CourseCard: React.FC<CourseCardProps> = ({ course, userInteraction }) => {
     const history = useHistory();
     const { username } = useUser();
     const defaultImageUrl = "default_course_bg.jpeg";
-    const [isFavorite, setIsFavorite] = useState(false);
-    const [hasRated, setHasRated] = useState(false);
-    const [interestedUsers, setInterestedUsers] = useState<string[]>([]);
+    const [isFavorite, setIsFavorite] = useState(userInteraction?.isFavorite || false);
+    const [hasRated, setHasRated] = useState(userInteraction?.rating !== 0);
+    const [averageRating, setAverageRating] = useState<string>("0.0");
 
     useEffect(() => {
-        console.log('useEffect triggered. Username:', username, 'Course interestedUsers:', course.interestedUsers);
-        const users = course.interestedUsers ? course.interestedUsers.split(',').map(u => u.trim()) : [];
-        setInterestedUsers(users);
-        if (username) {
-            setIsFavorite(users.includes(username));
-            setHasRated(users.includes(username));
+        if (userInteraction) {
+            setIsFavorite(userInteraction.isFavorite);
+            setHasRated(userInteraction.rating !== 0);
         }
-    }, [username, course.interestedUsers]);
+        fetchAverageRating();
+    }, [userInteraction]);
+
+    const fetchAverageRating = async () => {
+        try {
+            const ratingUsers = await getCourseRatingUsers(course.id);
+            if (!Array.isArray(ratingUsers)) {
+                throw new Error('Unexpected response format');
+            }
+            const ratings = ratingUsers.map(item => {
+                if (typeof item !== 'object' || item === null || !('rating' in item) || typeof item.rating !== 'number') {
+                    throw new Error('Invalid rating data');
+                }
+                return item.rating;
+            });
+            const avgRating = calculateAverageRating(ratings);
+            setAverageRating(avgRating);
+        } catch (error) {
+            console.error('Error fetching ratings:', error);
+            setAverageRating("N/A");
+        }
+    };
 
     const toggleFavorite = async (e: React.MouseEvent) => {
         e.stopPropagation();
         if (!username) return;
 
-        console.log('toggleFavorite called. Current interestedUsers:', interestedUsers);
-
-        const updatedInterestedUsers = isFavorite
-            ? interestedUsers.filter(u => u !== username)
-            : [...new Set([...interestedUsers, username])];
-
-        console.log('Updated interestedUsers:', updatedInterestedUsers);
-
         try {
-            const updateCourseMessage = new UpdateCourseMessage(
-                course.id,
-                course.title,
-                course.instructor,
-                course.description,
-                course.rating,
-                course.imageUrl || undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                updatedInterestedUsers
-            );
-
-            await axios.post(updateCourseMessage.getURL(), JSON.stringify(updateCourseMessage.toJSON()), {
+            const favoriteMessage = new UserCourseMessage(username, course.id, UserCourseAction.FavoriteCourse);
+            await axios.post(favoriteMessage.getURL(), favoriteMessage.toJSON(), {
                 headers: { 'Content-Type': 'application/json' },
             });
-
-            setInterestedUsers(updatedInterestedUsers);
             setIsFavorite(!isFavorite);
         } catch (error) {
             console.error('Error updating course favorites:', error);
@@ -96,19 +111,19 @@ export const CourseCard: React.FC<CourseCardProps> = ({ course }) => {
             </figure>
             <div className="article-preview">
                 <h2>{course.title}</h2>
-                <p>{course.description}</p>
-                <div className="course-info">
-                    <span className="instructor">讲师: {course.instructor}</span>
-                    <span className="rating">★ {course.rating}</span>
-                    {username && (
-                        <>
-                        <span className="favorite" onClick={toggleFavorite}>
-                            <FontAwesomeIcon icon={isFavorite ? faStarSolid : faStarRegular} />
-                        </span>
-                            {hasRated && <span className="rated-badge">已评分</span>}
-                        </>
-                    )}
-                </div>
+                <pre>{formatDescription(course.description)}</pre>
+                    <div className="course-info">
+                        <span className="instructor">讲师: {course.instructor}</span>
+                        <span className="rating">★ {averageRating}</span>
+                        {username && (
+                            <>
+                            <span className="favorite" onClick={toggleFavorite}>
+                                <FontAwesomeIcon icon={isFavorite ? faStarSolid : faStarRegular} />
+                            </span>
+                                {hasRated && <span className="rated-badge">已评分</span>}
+                            </>
+                        )}
+                    </div>
             </div>
         </article>
     );

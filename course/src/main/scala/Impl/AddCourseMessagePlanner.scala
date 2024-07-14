@@ -33,7 +33,7 @@ case class AddCourseMessagePlanner(
       s"""INSERT INTO ${schemaName}.courses
          |(id, title, instructor, description, rating, image_url, resource_url,
          |duration_minutes, difficulty_level, category, subcategory,
-         |language, prerequisites, learning_objectives)
+         |language, prerequisites, interested_users)
          |VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""".stripMargin,
       List(
         SqlParameter("String", id),

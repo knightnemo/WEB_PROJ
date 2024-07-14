@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useLocation } from 'react-router-dom';
 import { useUser } from './UserContext';
 import { AllCoursesQueryMessage } from 'Plugins/CourseAPI/AllCoursesQueryMessage';
 import axios from 'axios';
@@ -8,6 +8,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faStar, faCodeBranch, faSearch, faRobot } from '@fortawesome/free-solid-svg-icons';
 import { CourseCard } from './CourseCard';
 import GroqChatWidget from './GroqChatWidget';
+import NotificationComponent from './NotificationComponent';
+import { UserCourseMessage, UserCourseAction } from 'Plugins/CourseAPI/UserCourseMessage';
+import { getUserFavoriteCourses, getUserEnrolledCourses } from 'Plugins/CourseAPI/UserCourseInteractions';
 
 interface Course {
     id: string;
@@ -26,16 +29,15 @@ interface Course {
     interested_users: string[];
 }
 
+interface UserInteraction {
+    isFavorite: boolean;
+    rating: number;
+    isEnrolled: boolean;
+}
+
 export function Main() {
     const handleGenerateImageClick = () => {
         history.push('/generate-image');
-    };
-
-    const handleAuthAction = (action: 'login' | 'register') => {
-        history.push({
-            pathname: '/auth',
-            state: { action }
-        });
     };
 
     const history = useHistory();
@@ -47,6 +49,10 @@ export function Main() {
     const [error, setError] = useState<string | null>(null);
     const [isGroqDialogOpen, setIsGroqDialogOpen] = useState(false);
     const [recommendedCourseIds, setRecommendedCourseIds] = useState<string[]>([]);
+    const [userInteractions, setUserInteractions] = useState<Record<string, UserInteraction>>({});
+    const location = useLocation();
+    const [favoriteCourses, setFavoriteCourses] = useState<Course[]>([]);
+    const [enrolledCourses, setEnrolledCourses] = useState<Course[]>([]);
 
     const handleRecommendation = (recommendedIds: string[]) => {
         setRecommendedCourseIds(recommendedIds);
@@ -68,6 +74,69 @@ export function Main() {
             pathname: '/auth',
             state: { action }
         });
+    };
+
+    useEffect(() => {
+        if (username && courses.length > 0) {
+            fetchUserInteractions();
+        }
+    }, [username, courses, location]); // 添加 location 作为依赖项
+
+    const fetchUserInteractions = async () => {
+        if (!username) return;
+
+        const newUserInteractions: Record<string, UserInteraction> = {};
+
+        for (const course of courses) {
+            try {
+                const userCourseMessage = new UserCourseMessage(username, course.id, UserCourseAction.GetInteraction);
+                console.log('username, course_id:', userCourseMessage);
+                const response = await axios.post(
+                    userCourseMessage.getURL(),
+                    userCourseMessage.toJSON(),
+                    {
+                        headers: { 'Content-Type': 'application/json' }
+                    }
+                );
+
+                newUserInteractions[course.id] = {
+                    isFavorite: response.data.isFavorite,
+                    rating: response.data.rating || 0,
+                    isEnrolled: response.data.isEnrolled
+                };
+            } catch (error) {
+                console.error(`Error fetching user interaction for course ${course.id}:`, error);
+                newUserInteractions[course.id] = {
+                    isFavorite: false,
+                    rating: 0,
+                    isEnrolled: false
+                };
+            }
+        }
+
+        setUserInteractions(newUserInteractions);
+    };
+
+    const fetchFavoriteCourses = async () => {
+        if (!username) return;
+        try {
+            const courses = await getUserFavoriteCourses(username);
+            setFavoriteCourses(courses);
+            setSelectedCategory('favorites');
+        } catch (error) {
+            console.error('Error fetching favorite courses:', error);
+        }
+    };
+
+    const fetchEnrolledCourses = async () => {
+        if (!username) return;
+        try {
+            const courses = await getUserEnrolledCourses(username);
+            setEnrolledCourses(courses);
+            setSelectedCategory('enrolled');
+        } catch (error) {
+            console.error('Error fetching enrolled courses:', error);
+        }
     };
 
     const parseScalaList = (input: string): any[] => {
@@ -164,6 +233,16 @@ export function Main() {
                                     </div>
                                 </div>
                             </li>
+                            {username && (
+                                <>
+                                    <li>
+                                        <button onClick={fetchFavoriteCourses}>我的收藏</button>
+                                    </li>
+                                    <li>
+                                        <button onClick={fetchEnrolledCourses}>我正在学</button>
+                                    </li>
+                                </>
+                            )}
                             {isAdmin && (
                                 <li><a onClick={() => history.push('/add-course')}>添加课程</a></li>
                             )}
@@ -181,6 +260,7 @@ export function Main() {
                             className="search-input"
                         />
                     </div>
+                    <NotificationComponent count={3} /> {/* Add this line */}
                     {username ? (
                         <button onClick={() => history.push(`/user/${username}`)} className="user-info-button">
                             <FontAwesomeIcon icon={faUser} className="user-icon" />
@@ -193,19 +273,12 @@ export function Main() {
                             </div>
                         </button>
                     ) : (
-<<<<<<< HEAD
-                        <div className="auth-buttons">
-                            <button onClick={() => handleAuthAction('login')}>登录</button>
-                            <button onClick={() => handleAuthAction('register')}>注册</button>
-                        </div>
-=======
                         <>
                             <div className="auth-buttons">
-                                <button onClick={() => handleAuthAction('login')}>登录</button>
+                            <button onClick={() => handleAuthAction('login')}>登录</button>
                                 <button onClick={() => handleAuthAction('register')}>注册</button>
                             </div>
                         </>
->>>>>>> 425bf416c53bd7470f13e7b8305e250a829acc6f
                     )}
                 </div>
             </header>
@@ -219,7 +292,33 @@ export function Main() {
                 ) : (
                     <div className="articles">
                         {filteredCourses.map((course) => (
-                            <CourseCard key={course.id} course={course} />
+                            <CourseCard
+                                key={course.id}
+                                course={course}
+                                userInteraction={userInteractions[course.id]}
+                            />
+                        ))}
+                    </div>
+                )}
+                {selectedCategory === 'favorites' && (
+                    <div className="articles">
+                        {favoriteCourses.map((course) => (
+                            <CourseCard
+                                key={course.id}
+                                course={course}
+                                userInteraction={userInteractions[course.id]}
+                            />
+                        ))}
+                    </div>
+                )}
+                {selectedCategory === 'enrolled' && (
+                    <div className="articles">
+                        {enrolledCourses.map((course) => (
+                            <CourseCard
+                                key={course.id}
+                                course={course}
+                                userInteraction={userInteractions[course.id]}
+                            />
                         ))}
                     </div>
                 )}

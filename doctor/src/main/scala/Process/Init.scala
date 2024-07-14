@@ -21,6 +21,7 @@ object Init {
       _ <- initSchema(schemaName)
       _ <- writeDB(s"CREATE TABLE IF NOT EXISTS ${schemaName}.user_name (user_name TEXT, password TEXT)", List())
       _ <- writeDB(s"CREATE TABLE IF NOT EXISTS ${schemaName}.doctor_rec (doctor_name TEXT, patient_name TEXT)", List())
+      _ <- writeDB(s"CREATE TABLE IF NOT EXISTS ${schemaName}.course_user (user_name TEXT, course TEXT)", List())
       _ <- writeDB(
         s"""
         CREATE TABLE IF NOT EXISTS ${schemaName}.doctors (

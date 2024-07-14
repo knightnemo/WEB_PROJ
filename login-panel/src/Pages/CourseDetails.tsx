@@ -4,13 +4,15 @@ import { useUser } from './UserContext';
 import { CourseQueryMessage } from 'Plugins/CourseAPI/CourseQueryMessage';
 import { UpdateCourseMessage } from 'Plugins/CourseAPI/UpdateCourseMessage';
 import { DeleteCourseMessage } from 'Plugins/CourseAPI/DeleteCourseMessage';
+import { UserCourseMessage, UserCourseAction } from 'Plugins/CourseAPI/UserCourseMessage';
 import axios from 'axios';
 import './CourseDetails.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { ImageUploader } from './ImageUploader';
-import COS from 'cos-js-sdk-v5';
 import { faStar as faStarRegular } from '@fortawesome/free-regular-svg-icons';
 import { faTimes, faStar as faStarSolid } from '@fortawesome/free-solid-svg-icons';
+import COS from 'cos-js-sdk-v5'
+import { ImageUploader } from './ImageUploader';
+import { getCourseRatingUsers, calculateAverageRating } from 'Plugins/CourseAPI/UserCourseInteractions';
 
 const DEFAULT_IMAGE_URL = 'default_course_bg.jpeg';
 
@@ -63,119 +65,124 @@ export function CourseDetails() {
     const [newImageFile, setNewImageFile] = useState<File | null>(null);
     const [userRating, setUserRating] = useState<number>(0);
     const [isFavorite, setIsFavorite] = useState(false);
+    const [userInteraction, setUserInteraction] = useState<{
+        isFavorite: boolean;
+        rating: number;
+        isEnrolled: boolean;
+    }>({ isFavorite: false, rating: 0, isEnrolled: false });
+    const [averageRating, setAverageRating] = useState<string>("0.0");
 
     useEffect(() => {
         fetchCourse();
-    }, [id]);
-
-    useEffect(() => {
-        if (username && course) {
-            const users = Array.isArray(course.interested_users)
-                ? course.interested_users
-                : course.interested_users.split(',').map(u => u.trim());
-            setIsFavorite(users.includes(username));
-            setUserRating(users.includes(username) ? parseInt(course.rating) : 0);
+        if (username) {
+            fetchUserInteraction();
         }
-    }, [username, course]);
+        fetchAverageRating();
+    }, [id, username]);
+
+    const fetchAverageRating = async () => {
+        try {
+            const ratingUsers = await getCourseRatingUsers(id);
+            if (!Array.isArray(ratingUsers)) {
+                throw new Error('Unexpected response format');
+            }
+            const ratings = ratingUsers.map(item => {
+                if (typeof item !== 'object' || item === null || !('rating' in item) || typeof item.rating !== 'number') {
+                    throw new Error('Invalid rating data');
+                }
+                return item.rating;
+            });
+            const avgRating = calculateAverageRating(ratings);
+            setAverageRating(avgRating);
+        } catch (error) {
+            console.error('Error fetching ratings:', error);
+            setAverageRating("N/A");
+        }
+    };
+
+    const fetchUserInteraction = async () => {
+        try {
+            const userCourseMessage = new UserCourseMessage(username, id, UserCourseAction.GetInteraction);
+            console.log('username, course_id:', userCourseMessage);
+            const response = await axios.post(
+                userCourseMessage.getURL(),
+                userCourseMessage.toJSON(),
+                {
+                    headers: { 'Content-Type': 'application/json' }
+                }
+            );
+            setUserInteraction({
+                isFavorite: response.data.isFavorite,
+                rating: response.data.rating || 0,
+                isEnrolled: response.data.isEnrolled
+            });
+            console.log('hahah', response.data);
+        } catch (error) {
+            console.error('Error fetching user interaction:', error);
+        }
+    };
 
     const handleRating = async (rating: number) => {
         if (!course || !username) return;
 
-        const currentUsers = Array.isArray(course.interested_users)
-            ? course.interested_users
-            : course.interested_users.split(',').map(u => u.trim());
-
-        if (currentUsers.includes(username) && userRating !== 0) {
-            alert("您已经评过分了，不能重复评分。");
-            return;
-        }
-
-        const currentRating = parseFloat(course.rating);
-        const totalUsers = currentUsers.length;
-        const newRating = userRating === 0
-            ? ((currentRating * totalUsers) + rating) / (totalUsers + 1)
-            : ((currentRating * totalUsers - userRating + rating) / totalUsers);
-
-        const updatedInterestedUsers = [...new Set([...currentUsers, username])];
-
-        console.log('Updated interested users after rating:', updatedInterestedUsers);
-        const prerequisites = Array.isArray(course.prerequisites)
-            ? course.prerequisites
-            : course.prerequisites.split(',').map(item => item.trim());
         try {
-            const updateCourseMessage = new UpdateCourseMessage(
-                course.id,
-                course.title,
-                course.instructor,
-                course.description,
-                newRating.toFixed(1),
-                course.imageUrl || undefined,
-                course.resourceUrl,
-                course.durationMinutes,
-                course.difficultyLevel,
-                course.category,
-                course.subcategory,
-                course.language,
-                prerequisites,
-                updatedInterestedUsers
-            );
+            let newRating = rating;
+            if (userInteraction.rating === rating) {
+                // 如果用户点击的是当前评分，则将评分设为 0（取消评分）
+                newRating = 0;
+            }
 
-            await axios.post(updateCourseMessage.getURL(), JSON.stringify(updateCourseMessage.toJSON()), {
+            const rateMessage = new UserCourseMessage(username, course.id, UserCourseAction.RateCourse, newRating);
+            await axios.post(rateMessage.getURL(), rateMessage.toJSON(), {
                 headers: { 'Content-Type': 'application/json' },
             });
 
-            setCourse({ ...course, rating: newRating.toFixed(1), interested_users: updatedInterestedUsers });
-            setUserRating(rating);
-            setIsFavorite(true);
+            setUserInteraction(prev => ({ ...prev, rating: newRating }));
+            fetchAverageRating(); // 重新获取并计算平均评分
         } catch (error) {
             console.error('Error updating course rating:', error);
         }
     };
 
+    // 更新评分显示逻辑
+    const renderRatingStars = () => {
+        return [1, 2, 3, 4, 5].map((star) => (
+            <FontAwesomeIcon
+                key={star}
+                icon={star <= (userInteraction.rating || 0) ? faStarSolid : faStarRegular}
+                onClick={() => handleRating(star)}
+                className={`rating-star ${userInteraction.rating ? '' : 'clickable'}`}
+            />
+        ));
+    };
+
     const toggleFavorite = async () => {
         if (!course || !username) return;
 
-        const currentUsers = Array.isArray(course.interested_users)
-            ? course.interested_users
-            : course.interested_users.split(',').map(u => u.trim());
-
-        console.log('CourseCard - Current users before toggling favorite:', currentUsers);
-
-        const updatedInterestedUsers = isFavorite
-            ? currentUsers.filter(u => u !== username)
-            : [...new Set([...currentUsers, username])];
-
-        console.log('CourseCard - Updated interested users after toggling favorite:', updatedInterestedUsers);
-
-        const prerequisites = Array.isArray(course.prerequisites)
-            ? course.prerequisites
-            : course.prerequisites.split(',').map(item => item.trim());
         try {
-            const updateCourseMessage = new UpdateCourseMessage(
-                course.id,
-                course.title,
-                course.instructor,
-                course.description,
-                course.rating,
-                course.imageUrl || undefined,
-                course.resourceUrl,
-                course.durationMinutes,
-                course.difficultyLevel,
-                course.category,
-                course.subcategory,
-                course.language,
-                prerequisites,
-                updatedInterestedUsers
-            );
-
-            await axios.post(updateCourseMessage.getURL(), JSON.stringify(updateCourseMessage.toJSON()), {
+            const favoriteMessage = new UserCourseMessage(username, course.id, UserCourseAction.FavoriteCourse);
+            await axios.post(favoriteMessage.getURL(), favoriteMessage.toJSON(), {
                 headers: { 'Content-Type': 'application/json' },
             });
 
-            setCourse({ ...course, interested_users: updatedInterestedUsers });
-            setIsFavorite(!isFavorite);
+            setUserInteraction(prev => ({ ...prev, isFavorite: !prev.isFavorite }));
         } catch (error) {
             console.error('Error updating course favorites:', error);
+        }
+    };
+
+    const enrollCourse = async () => {
+        if (!course || !username) return;
+
+        try {
+            const enrollMessage = new UserCourseMessage(username, course.id, UserCourseAction.EnrollCourse);
+            await axios.post(enrollMessage.getURL(), enrollMessage.toJSON(), {
+                headers: { 'Content-Type': 'application/json' },
+            });
+
+            setUserInteraction(prev => ({ ...prev, isEnrolled: true }));
+        } catch (error) {
+            console.error('Error enrolling in course:', error);
         }
     };
 
@@ -368,10 +375,10 @@ export function CourseDetails() {
                     <h1 className="course-title">{course.title}</h1>
                     <p className="instructor-name">讲师: {course.instructor}</p>
                     <div className="course-meta">
-                        <span className="rating">
-                            <span className="star">★</span>
-                            <span className="rating-value">{course.rating}</span>
-                        </span>
+                            <span className="rating">
+                                <span className="star">★</span>
+                                <span className="rating-value">{averageRating}</span>
+                            </span>
                         <span className="duration">{course.durationMinutes} 分钟</span>
                         <span className="difficulty-level">{course.difficultyLevel}</span>
                         <span className="category">{course.category}{course.subcategory ? ` - ${course.subcategory}` : ''}</span>
@@ -552,32 +559,31 @@ export function CourseDetails() {
                 </div>
 
                 <div className="course-sidebar">
-                    <a href={course.resourceUrl} target="_blank" rel="noopener noreferrer" className="enroll-button">
-                        开始学习
-                    </a>
-                    {isAdmin && (
-                        <div className="admin-actions">
-                            <button onClick={() => {
-                                setIsEditing(true)
-                                setEditedCourse({ ...course })
-                            }} className="edit-button">
-                                编辑课程
-                            </button>
-                            <button onClick={handleDeleteCourse} className="delete-button">删除课程</button>
-                        </div>
+                    {userInteraction.isEnrolled ? (
+                        <a href={course.resourceUrl} target="_blank" rel="noopener noreferrer" className="enroll-button">
+                            继续学习
+                        </a>
+                    ) : (
+                        <button onClick={enrollCourse} className="enroll-button">
+                            开始学习
+                        </button>
                     )}
                     {username && (
-                        <div className="rating-section">
-                            <h3>{userRating !== 0 ? '您的评分' : '为课程打分'}</h3>
-                            {[1, 2, 3, 4, 5].map((star) => (
-                                <FontAwesomeIcon
-                                    key={star}
-                                    icon={star <= userRating ? faStarSolid : faStarRegular}
-                                    onClick={() => handleRating(star)}
-                                    className={`rating-star ${userRating !== 0 ? 'disabled' : ''}`}
-                                />
-                            ))}
-                        </div>
+                        <>
+                            <div className="rating-section">
+                                <h3>{userInteraction.rating ? '您的评分' : '为课程打分'}</h3>
+                                {renderRatingStars()}
+                                {userInteraction.rating && (
+                                    <button onClick={() => handleRating(userInteraction.rating || 0)}
+                                            className="cancel-rating">
+                                        取消评分
+                                    </button>
+                                )}
+                            </div>
+                            <button onClick={toggleFavorite} className="favorite-button">
+                                {userInteraction.isFavorite ? '取消收藏' : '收藏课程'}
+                            </button>
+                        </>
                     )}
                 </div>
             </div>

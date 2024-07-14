@@ -26,21 +26,56 @@ object Routes:
       case "DeleteCourseMessage" =>
         IO(decode[DeleteCourseMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for DeleteCourseMessage")))
           .flatMap(m => m.fullPlan.map(_.asJson.toString))
+
       case "UpdateCourseMessage" =>
         IO(decode[UpdateCourseMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for UpdateCourseMessage")))
           .flatMap(m => m.fullPlan.map(_.asJson.toString))
+
       case "AllCoursesQueryMessage" =>
         IO(decode[AllCoursesQueryMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for AllCoursesQueryMessage")))
           .flatMap(m => m.fullPlan.map(_.asJson.toString))
+
+      case "UserCourseMessage" =>
+        IO(decode[UserCourseMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for UserCourseMessage")))
+          .flatMap(m => m.fullPlan.map(_.asJson.toString))
+
+      case "GetUserFavoriteCoursesMessage" =>
+        IO(decode[GetUserFavoriteCoursesPlanner](str).getOrElse(throw new Exception("Invalid JSON for GetUserFavoriteCoursesMessage")))
+          .flatMap(m => m.fullPlan.map(_.asJson.toString))
+
+      case "GetUserRatedCoursesMessage" =>
+        IO(decode[GetUserRatedCoursesPlanner](str).getOrElse(throw new Exception("Invalid JSON for GetUserRatedCoursesMessage")))
+          .flatMap(m => m.fullPlan.map(_.asJson.toString))
+
+      case "GetUserEnrolledCoursesMessage" =>
+        IO(decode[GetUserEnrolledCoursesPlanner](str).getOrElse(throw new Exception("Invalid JSON for GetUserEnrolledCoursesMessage")))
+          .flatMap(m => m.fullPlan.map(_.asJson.toString))
+
+      case "GetCourseEnrolledUsersMessage" =>
+        IO(decode[GetCourseEnrolledUsersPlanner](str).getOrElse(throw new Exception("Invalid JSON for GetCourseEnrolledUsersMessage")))
+          .flatMap(m => m.fullPlan.map(_.asJson.toString))
+
+      case "GetCourseRatingUsersMessage" =>
+        IO(decode[GetCourseRatingUsersPlanner](str).getOrElse(throw new Exception("Invalid JSON for GetCourseRatingUsersMessage")))
+          .flatMap(m => m.fullPlan.map(_.asJson.toString))
+
+      case "GetCourseFavoritedUsersMessage" =>
+        IO(decode[GetCourseFavoritedUsersPlanner](str).getOrElse(throw new Exception("Invalid JSON for GetCourseFavoritedUsersMessage")))
+          .flatMap(m => m.fullPlan.map(_.asJson.toString))
+        
       case _ =>
         IO.raiseError(new Exception(s"Unknown type: $messageType"))
     }
 
   val service: HttpRoutes[IO] = HttpRoutes.of[IO]:
     case req @ POST -> Root / "api" / name =>
-      println("request received")
-      req.as[String].flatMap{executePlan(name, _)}.flatMap(Ok(_))
-        .handleErrorWith{e =>
-          println(e)
+      println(s"Request received for $name")
+      req.as[String].flatMap { body =>
+          println(s"Request body: $body")
+          executePlan(name, body)
+        }.flatMap(Ok(_))
+        .handleErrorWith { e =>
+          println(s"Error processing request: ${e.getMessage}")
+          e.printStackTrace()
           BadRequest(e.getMessage)
         }
