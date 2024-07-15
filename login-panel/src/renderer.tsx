@@ -28,6 +28,10 @@ import { ChangePassword } from 'Pages/ChangePassword'
 import { AddCourse } from 'Pages/AddCourse';
 import GenerateImage from 'Pages/GenerateImage'
 import NotificationsPage from 'Pages/NotificationsPage';
+import AdminDashboard from 'Pages/AdminDashboard';
+import Modal from 'react-modal';
+
+Modal.setAppElement('#root');
 const Layout = () => {
     return (
         <UserProvider>
@@ -41,6 +45,7 @@ const Layout = () => {
                 <Route path="/add-course" component={AddCourse} />
                 <Route path="/generate-image" component={GenerateImage} />
                 <Route path="/notifications" component={NotificationsPage} />
+                <Route path="/admin-dashboard" component={AdminDashboard} />
             </Switch>
         </HashRouter>
         </UserProvider>

@@ -53,6 +53,14 @@ export function ChangePassword() {
         await sendPostRequest(apiMessage);
     };
 
+    const handleUserButtonClick = () => {
+        if (isAdmin) {
+            history.push('/admin-dashboard');
+        } else {
+            history.push(`/user/${username}`);
+        }
+    };
+
     return (
         <div className="change-password-container">
             <div className="change-password-card">
@@ -97,7 +105,7 @@ export function ChangePassword() {
                     </button>
                 </form>
                 <button
-                    onClick={() => history.push(`/user/${username}`)}
+                    onClick={handleUserButtonClick}
                     className="back-button"
                     disabled={isLoading}
                 >
