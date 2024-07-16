@@ -7,6 +7,6 @@ export class GetAllNotificationsMessage extends NotificationMessage {
 
     toJSON(): object {
         return {
-        }; // 或者返回任何需要的参数
+        };
     }
 }

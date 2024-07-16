@@ -7,7 +7,6 @@ import { CreateNotificationMessage } from 'Plugins/NotificationAPI/CreateNotific
 import { GetAllNotificationsMessage } from 'Plugins/NotificationAPI/GetAllNotificationsMessage';
 import { DeleteNotificationMessage } from 'Plugins/NotificationAPI/DeleteNotificationMessage';
 import { useHistory } from 'react-router-dom';
-import StaticNotification from './StaticNotification';
 
 
 interface Notification {
@@ -174,7 +173,6 @@ const NotificationsPage: React.FC = () => {
                     </form>
                 </div>
             )}
-            <StaticNotification notifications={notifications} />
             <div className="notifications-list">
                 {notifications.map(notification => (
                     <div key={notification.id} className="notification-item">
@@ -195,7 +193,8 @@ const NotificationsPage: React.FC = () => {
                 <button onClick={handleGoBack} className="back-button">返回</button>
             </div>
         </div>
-    );
+)
+    ;
 };
 
 export default NotificationsPage;

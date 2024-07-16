@@ -1,50 +1,63 @@
 import React, { useState, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faLink } from '@fortawesome/free-solid-svg-icons';
+import { faBell } from '@fortawesome/free-solid-svg-icons';
 import './ScrollingNotification.css';
+import axios from 'axios';
+import { GetUserNotificationsMessage } from 'Plugins/NotificationAPI/GetUserNotificationsMessage';
+import { useUser } from './UserContext';
 
 interface Notification {
-    id: number;
+    id: string;
+    title: string;
     content: string;
 }
 
 const ScrollingNotification: React.FC = () => {
     const [notifications, setNotifications] = useState<Notification[]>([]);
     const history = useHistory();
+    const { username } = useUser();
 
     useEffect(() => {
-        // 模拟从API获取通知
-        const fetchNotifications = async () => {
-            // 这里应该是一个实际的API调用
-            const mockNotifications = [
-                { id: 1, content: "Python进阶课程现已开放报名，限时优惠！" },
-                { id: 2, content: "本周六凌晨2-4点系统进行例行维护，请提前安排学习时间。" },
-                { id: 3, content: "Java基础课程已更新至2023版，包含最新特性讲解。" },
-            ];
-            setNotifications(mockNotifications);
-        };
-
         fetchNotifications();
-    }, []);
+    }, [username]);
+
+    const fetchNotifications = async () => {
+        try {
+            const message = new GetUserNotificationsMessage(username);
+            const response = await axios.post(message.getURL(), message.toJSON());
+
+            let parsedNotifications;
+            if (typeof response.data === 'string') {
+                const cleanedData = response.data.slice(5, -1).trim();
+                parsedNotifications = JSON.parse(`[${cleanedData}]`);
+            } else {
+                parsedNotifications = response.data;
+            }
+
+            setNotifications(parsedNotifications);
+        } catch (error) {
+            console.error('Failed to fetch notifications:', error);
+        }
+    };
 
     const handleViewDetails = () => {
-        // 跳转到通知页面
         history.push('/notifications');
     };
 
     return (
         <div className="scrolling-notification-container">
             <div className="scrolling-notification">
-                <div className="notification-icon">
-                    <FontAwesomeIcon icon={faLink} />
-                </div>
+                <FontAwesomeIcon icon={faBell} className="notification-icon" />
                 <div className="notification-content">
-                    {notifications.map((notification) => (
-                        <span key={notification.id} className="notification-item">
-                            {notification.content}
-                        </span>
-                    ))}
+                    <div className="scrolling-text">
+                        {notifications.map((notification) => (
+                            <div key={notification.id} className="notification-item">
+                                <div className="notification-title">{notification.title}</div>
+                                <div className="notification-body">{notification.content.substring(0, 50)}...</div>
+                            </div>
+                        ))}
+                    </div>
                 </div>
                 <button className="view-details-button" onClick={handleViewDetails}>
                     详情

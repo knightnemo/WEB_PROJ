@@ -121,3 +121,22 @@
     background-color: var(--gray);
     color: white;
 }
+
+.notifications-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.notification-item {
+    background-color: var(--table-background);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.notification-item, .notification-content {
+    white-space: normal;
+    overflow: visible;
+    animation: none;
+}
