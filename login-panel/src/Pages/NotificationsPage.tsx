@@ -6,7 +6,9 @@ import { GetUserNotificationsMessage } from 'Plugins/NotificationAPI/GetUserNoti
 import { CreateNotificationMessage } from 'Plugins/NotificationAPI/CreateNotificationMessage';
 import { GetAllNotificationsMessage } from 'Plugins/NotificationAPI/GetAllNotificationsMessage';
 import { DeleteNotificationMessage } from 'Plugins/NotificationAPI/DeleteNotificationMessage';
-import { useHistory} from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
+import StaticNotification from './StaticNotification';
+
 
 interface Notification {
     id: string;
@@ -14,7 +16,7 @@ interface Notification {
     content: string;
     publisher: string;
     publishTime: string;
-    recipients: string;
+    recipients: string[];
 }
 
 interface NewNotification {
@@ -58,8 +60,10 @@ const NotificationsPage: React.FC = () => {
             if (typeof response.data === 'string') {
                 // 移除 "List(" 前缀和结尾的 ")"
                 const cleanedData = response.data.slice(5, -1).trim();
-                console.log('cleanedData is now:',cleanedData);
-                parsedNotifications = JSON.parse(cleanedData);
+                console.log('cleanedData is now:', cleanedData);
+
+                // 将cleanedData包装在方括号中，使其成为有效的JSON数组
+                parsedNotifications = JSON.parse(`[${cleanedData}]`);
             } else {
                 parsedNotifications = response.data;
             }
@@ -74,6 +78,7 @@ const NotificationsPage: React.FC = () => {
                 }))
                 : [];
 
+            console.log('Formatted notifications:', formattedNotifications);
             setNotifications(formattedNotifications);
         } catch (error) {
             console.error('Failed to fetch notifications:', error);
@@ -81,7 +86,7 @@ const NotificationsPage: React.FC = () => {
             setNotifications([]);
         }
     };
-    console.log('Is admin:', isAdmin);
+
     const handlePublishNotification = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
@@ -95,18 +100,21 @@ const NotificationsPage: React.FC = () => {
             );
             const response = await axios.post(createMessage.getURL(), createMessage.toJSON());
             setMessage(response.data);
-            setNewNotification({id: '',
+            setNewNotification({
+                id: '',
                 title: '',
                 content: '',
                 publisher: '',
                 publishTime: '',
-                recipients: ''});
+                recipients: ''
+            });
             fetchNotifications();
         } catch (error) {
             console.error('Failed to publish notification:', error);
             setMessage('发布公告失败，请稍后重试');
         }
     };
+
     const handleDeleteNotification = async (id: string) => {
         try {
             const deleteMessage = new DeleteNotificationMessage(id);
@@ -129,6 +137,7 @@ const NotificationsPage: React.FC = () => {
     };
 
     return (
+
         <div className="notifications-page">
             <h1></h1>
             <h1></h1>
@@ -165,6 +174,7 @@ const NotificationsPage: React.FC = () => {
                     </form>
                 </div>
             )}
+            <StaticNotification notifications={notifications} />
             <div className="notifications-list">
                 {notifications.map(notification => (
                     <div key={notification.id} className="notification-item">
@@ -173,7 +183,7 @@ const NotificationsPage: React.FC = () => {
                         <div className="notification-meta">
                             <span>发布者: {notification.publisher}</span>
                             <span>时间: {notification.publishTime}</span>
-                            <span>接收者: {Array.isArray(notification.recipients) ? notification.recipients.join(', ') : notification.recipients}</span>
+                            <span>接收者: {notification.recipients.join(', ')}</span>
                         </div>
                         {isAdmin && (
                             <button onClick={() => handleDeleteNotification(notification.id)}>删除</button>
@@ -185,8 +195,7 @@ const NotificationsPage: React.FC = () => {
                 <button onClick={handleGoBack} className="back-button">返回</button>
             </div>
         </div>
-    )
-        ;
+    );
 };
 
 export default NotificationsPage;

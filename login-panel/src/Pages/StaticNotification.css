@@ -1,0 +1,27 @@
+/* StaticNotification.css */
+.static-notification-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin: 20px 0;
+}
+
+.static-notification-item {
+    background-color: #fff9e6;
+    padding: 15px;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.notification-icon {
+    margin-right: 15px;
+    color: #f0c14b;
+    font-size: 1.2em;
+}
+
+.notification-content {
+    flex: 1;
+}

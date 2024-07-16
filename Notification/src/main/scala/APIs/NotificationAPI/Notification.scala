@@ -10,7 +10,7 @@ case class Notification(
                          content: String,
                          publisher: String,
                          publishTime: String,
-                         recipients: List[String]
+                         recipients: String
                        )
 
 object Notification {

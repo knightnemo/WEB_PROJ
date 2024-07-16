@@ -13,8 +13,8 @@ case class CreateNotificationMessagePlanner(
                                              content: String,
                                              publisher: String,
                                              publishTime: String,
-                                             recipients: List[String],
-                                             override val planContext: PlanContext
+                                             recipients: String,
+                                             //override val planContext: PlanContext
                                            ) extends Planner[String]:
 
   override def plan(using PlanContext): IO[String] = {
@@ -28,7 +28,7 @@ case class CreateNotificationMessagePlanner(
         SqlParameter("String", content),
         SqlParameter("String", publisher),
         SqlParameter("String", publishTime),
-        SqlParameter("String", recipients.mkString(","))
+        SqlParameter("String", recipients)
       )
     ).attempt.flatMap {
       case Right(_) => IO.pure(s"Notification created successfully with ID: $id")
