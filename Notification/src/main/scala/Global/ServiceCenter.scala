@@ -13,7 +13,7 @@ object ServiceCenter {
   val patientServiceCode   = "A000003"
   val portalServiceCode    = "A000004"
   val courseServiceCode    = "A000005"  // 新添加的课程服务代码
-  val notificationServiceCode = "A000006"
+  val notificationServiceCode = "A000007"
 
   val fullNameMap: Map[String, String] = Map(
     dbManagerServiceCode ->  "数据库管理（DB_Manager）",
@@ -30,6 +30,6 @@ object ServiceCenter {
     "Patient" ->        "127.0.0.1:10003",
     "Portal" ->         "127.0.0.1:10004",
     "Course" ->         "127.0.0.1:10005",  // 注意：修正了IP地址格式
-    "Notification" -> "127.0.0.1:10006"
+    "Notification" -> "127.0.0.1:10007"
   )
 }

@@ -967,4 +967,39 @@ body {
     height: 100vh;
     font-size: 20px;
     color: #666;
+}.notification-bar {
+     display: flex;
+     align-items: center;
+     background-color: #fff9e6;
+     padding: 10px 20px;
+     margin: 10px auto;
+     max-width: 80%;
+     border-radius: 5px;
+     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+ }
+
+.notification-icon {
+    color: #f0c14b;
+    margin-right: 15px;
+}
+
+.notification-content {
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.notification-details {
+    background-color: #f0c14b;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 3px;
+    cursor: pointer;
+    margin-left: 15px;
+    white-space: nowrap;
+}
+
+.notification-details:hover {
+    background-color: #e3b73a;
 }
