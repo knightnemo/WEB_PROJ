@@ -16,6 +16,11 @@ body {
     line-height: 1.6;
     background-color: var(--background-color);
 }
+.comment-meta {
+    display: flex;
+    gap: 10px; /* 调整空格大小 */
+    align-items: center;
+}
 
 .course-details {
     max-width: 1200px;

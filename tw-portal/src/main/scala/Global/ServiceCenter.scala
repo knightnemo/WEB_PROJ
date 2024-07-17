@@ -14,13 +14,16 @@ object ServiceCenter {
   val portalServiceCode = "A000004"
   val courseServiceCode = "A000005" // 确保这行存在
   val notificationServiceCode = "A000007"
+  val commentServiceCode   = "A000006"
 
   val fullNameMap: Map[String, String] = Map(
     dbManagerServiceCode -> "数据库管理（DB_Manager）",
     doctorServiceCode -> "医生（Doctor）",
     patientServiceCode -> "病人（Patient）",
     portalServiceCode -> "门户（Portal）",
-    courseServiceCode -> "课程（Course）" // 确保这行存在
+    courseServiceCode -> "课程（Course）",
+    notificationServiceCode = "通知（Nitification）"
+    commentServiceCode   ->  "评论（Comment）" // 确保这行存在
   )
 
   val address: Map[String, String] = Map(
@@ -29,6 +32,7 @@ object ServiceCenter {
     "Patient" -> "127.0.0.1:10003",
     "Portal" -> "127.0.0.1:10004",
     "Course" -> "127.0.0.1:10005", // 确保这行存在，并且端口号正确
-    "Notification" -> "127.0.0.1:10007"
+    "Notification" -> "127.0.0.1:10007",
+    "Comment" ->    "127.0.0.1:10006"
   )
 }
