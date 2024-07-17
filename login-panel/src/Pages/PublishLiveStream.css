@@ -1,0 +1,88 @@
+.publish-live-stream {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.publish-live-stream h2 {
+    font-size: 24px;
+    color: #333;
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.publish-live-stream select,
+.publish-live-stream input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+.slot-selection {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-bottom: 1.5rem;
+}
+
+.slot-selection button {
+    padding: 10px;
+    border: 1px solid #ddd;
+    background-color: #f0f0f0;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+
+.slot-selection button:hover:not(:disabled) {
+    background-color: #e0e0e0;
+}
+
+.slot-selection button.selected {
+    background-color: #4a90e2;
+    color: white;
+    border-color: #4a90e2;
+}
+
+.slot-selection button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.publish-live-stream button {
+    width: 100%;
+    padding: 12px;
+    background-color: #4a90e2;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.publish-live-stream button:hover {
+    background-color: #357abD;
+}
+
+.error {
+    color: #d32f2f;
+    margin-bottom: 1rem;
+    font-size: 14px;
+}
+
+@media (max-width: 600px) {
+    .publish-live-stream {
+        padding: 1rem;
+    }
+
+    .slot-selection {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}

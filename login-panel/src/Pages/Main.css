@@ -1003,3 +1003,36 @@ body {
 .notification-details:hover {
     background-color: #e3b73a;
 }
+
+/* 在 .navigation > li > button 样式块后添加 */
+.navigation > li > button.live-stream-button {
+    background-color: #4a90e2;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    transition: all 0.3s ease;
+}
+
+.navigation > li > button.live-stream-button:hover {
+    background-color: #357abD;
+    transform: translateY(-2px);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+/* 如果需要为管理员和普通用户的按钮设置不同的样式，可以添加以下内容 */
+.navigation > li > button.admin-live-stream {
+    background-color: #28a745;
+}
+
+.navigation > li > button.admin-live-stream:hover {
+    background-color: #218838;
+}
+
+.navigation > li > button.user-live-stream {
+    background-color: #ffc107;
+    color: #212529;
+}
+
+.navigation > li > button.user-live-stream:hover {
+    background-color: #e0a800;
+}

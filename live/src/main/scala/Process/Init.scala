@@ -22,16 +22,11 @@ object Init {
         s"""
         CREATE TABLE IF NOT EXISTS ${schemaName}.live_streams (
           id VARCHAR(255) PRIMARY KEY,
-          name VARCHAR(255) UNIQUE NOT NULL,
-          capacity INT,
-          slot1 VARCHAR(255) DEFAULT '0',
-          slot2 VARCHAR(255) DEFAULT '0',
-          slot3 VARCHAR(255) DEFAULT '0',
-          slot4 VARCHAR(255) DEFAULT '0',
-          slot5 VARCHAR(255) DEFAULT '0',
-          slot6 VARCHAR(255) DEFAULT '0',
-          slot7 VARCHAR(255) DEFAULT '0',
-          slot8 VARCHAR(255) DEFAULT '0'
+          name VARCHAR(255) NOT NULL,
+          classroom VARCHAR(255) NOT NULL,
+          teacher VARCHAR(255) NOT NULL,
+          slot INT NOT NULL,
+          UNIQUE (classroom, slot)
         )
         """,
         List()

@@ -4,6 +4,7 @@ import { useUser } from './UserContext';
 import { AllCoursesQueryMessage } from 'Plugins/CourseAPI/AllCoursesQueryMessage';
 import axios from 'axios';
 import './Main.css';
+import PublishLiveStream from './PublishLiveStream';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faStar, faCodeBranch, faSearch, faRobot } from '@fortawesome/free-solid-svg-icons';
 import { CourseCard } from './CourseCard';
@@ -83,7 +84,7 @@ export function Main() {
         if (username && courses.length > 0) {
             fetchUserInteractions();
         }
-    }, [username, courses, location]); // 添加 location 作为依赖项
+    }, [username, courses, location]);
 
     const fetchUserInteractions = async () => {
         if (!username) return;
@@ -143,22 +144,14 @@ export function Main() {
     };
 
     const parseScalaList = (input: string): any[] => {
-        // 移除 "List(" 前缀和结尾的 ")"
         const content = input.slice(5, -1).trim();
-
-        // 如果内容为空，返回空数组
         if (content === '') {
             return [];
         }
-
-        // 使用正则表达式匹配每个 JSON 对象
         const jsonObjects = content.match(/\{[^{}]*\}/g);
-
         if (!jsonObjects) {
             throw new Error('No valid JSON objects found in the input string');
         }
-
-        // 解析每个 JSON 对象
         return jsonObjects.map(jsonStr => JSON.parse(jsonStr));
     };
 
@@ -205,133 +198,154 @@ export function Main() {
         }
     };
 
+    const handlePublishLiveStream = () => {
+        history.push('/publish-live-stream');
+    };
+
+    const handleEnrollLiveStream = () => {
+        history.push('/enroll-live-stream');
+    };
+
     return (
         <div className="app-container">
-                <header className="menu__wrapper">
-                    <div className="menu__bar">
-                        <a href="#" title="Home" aria-label="home" className="logo">
-                            <h1 className="logo-text">Course Sharing</h1>
-                        </a>
-                        <nav>
-                            <ul className="navigation">
-                                <li>
-                                    <button onClick={() => setSelectedCategory('all')}>
-                                        课程分类
-                                        <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16">
-                                            <path
-                                                d="M12.78 5.22a.749.749 0 0 1 0 1.06l-4.25 4.25a.749.749 0 0 1-1.06 0L3.22 6.28a.749.749 0 1 1 1.06-1.06L8 8.939l3.72-3.719a.749.749 0 0 1 1.06 0Z"></path>
-                                        </svg>
-                                    </button>
-                                    <div className="dropdown__wrapper">
-                                        <div className="dropdown">
-                                            <ul className="list-items-with-description">
-                                                {categories.map(category => (
-                                                    <li key={category} onClick={() => setSelectedCategory(category)}>
-                                                        <div className="item-title">
-                                                            <h3>{category === 'all' ? '所有类别' : category === 'recommended' ? '推荐课程' : category}</h3>
-                                                        </div>
-                                                    </li>
-                                                ))}
-                                            </ul>
-                                        </div>
+            <header className="menu__wrapper">
+                <div className="menu__bar">
+                    <a href="#" title="Home" aria-label="home" className="logo">
+                        <h1 className="logo-text">Course Sharing</h1>
+                    </a>
+                    <nav>
+                        <ul className="navigation">
+                            <li>
+                                <button onClick={() => setSelectedCategory('all')}>
+                                    课程分类
+                                    <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16">
+                                        <path
+                                            d="M12.78 5.22a.749.749 0 0 1 0 1.06l-4.25 4.25a.749.749 0 0 1-1.06 0L3.22 6.28a.749.749 0 1 1 1.06-1.06L8 8.939l3.72-3.719a.749.749 0 0 1 1.06 0Z"></path>
+                                    </svg>
+                                </button>
+                                <div className="dropdown__wrapper">
+                                    <div className="dropdown">
+                                        <ul className="list-items-with-description">
+                                            {categories.map(category => (
+                                                <li key={category} onClick={() => setSelectedCategory(category)}>
+                                                    <div className="item-title">
+                                                        <h3>{category === 'all' ? '所有类别' : category === 'recommended' ? '推荐课程' : category}</h3>
+                                                    </div>
+                                                </li>
+                                            ))}
+                                        </ul>
                                     </div>
-                                </li>
-                                {username && (
-                                    <>
-                                        <li>
-                                            <button onClick={fetchFavoriteCourses}>我的收藏</button>
-                                        </li>
-                                        <li>
-                                            <button onClick={fetchEnrolledCourses}>我正在学</button>
-                                        </li>
-                                    </>
-                                )}
-                                {isAdmin && (
-                                    <li><a onClick={() => history.push('/add-course')}>添加课程</a></li>
-                                )}
-                            </ul>
-                        </nav>
-                    </div>
-                    <div className="action-buttons">
-                        <div className="search-container">
-                            <FontAwesomeIcon icon={faSearch} className="search-icon" />
-                            <input
-                                type="text"
-                                placeholder="搜索课程..."
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                                className="search-input"
-                            />
-                        </div>
-                        <NotificationComponent count={3} /> {/* Add this line */}
-                        {username ? (
-                            <button onClick={handleUserButtonClick} className="user-info-button">
-                                <FontAwesomeIcon icon={faUser} className="user-icon" />
-                                <span className="user-name">{username}</span>
-                                <div className="user-stats">
-                                    <FontAwesomeIcon icon={faStar} className="icon" />
-                                    <span className="stat-count">52.3k</span>
-                                    <FontAwesomeIcon icon={faCodeBranch} className="icon" />
-                                    <span className="stat-count">6.4k</span>
                                 </div>
-                            </button>
+                            </li>
+                            {username && (
+                                <>
+                                    <li>
+                                        <button onClick={fetchFavoriteCourses}>我的收藏</button>
+                                    </li>
+                                    <li>
+                                        <button onClick={fetchEnrolledCourses}>我正在学</button>
+                                    </li>
+                                    {isAdmin ? (
+                                        <li>
+                                            <button onClick={handlePublishLiveStream} className="live-stream-button admin-live-stream">
+                                                发布小班辅导
+                                            </button>
+                                        </li>
+                                    ) : (
+                                        <li>
+                                            <button onClick={handleEnrollLiveStream} className="live-stream-button user-live-stream">
+                                                报名小班辅导
+                                            </button>
+                                        </li>
+                                    )}
+                                </>
+                            )}
+                            {isAdmin && (
+                                <li><a onClick={() => history.push('/add-course')}>添加课程</a></li>
+                            )}
+                        </ul>
+                    </nav>
+                </div>
+                <div className="action-buttons">
+                    <div className="search-container">
+                        <FontAwesomeIcon icon={faSearch} className="search-icon" />
+                        <input
+                            type="text"
+                            placeholder="搜索课程..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="search-input"
+                        />
+                    </div>
+                    <NotificationComponent count={3} />
+                    {username ? (
+                        <button onClick={handleUserButtonClick} className="user-info-button">
+                            <FontAwesomeIcon icon={faUser} className="user-icon" />
+                            <span className="user-name">{username}</span>
+                            <div className="user-stats">
+                                <FontAwesomeIcon icon={faStar} className="icon" />
+                                <span className="stat-count">52.3k</span>
+                                <FontAwesomeIcon icon={faCodeBranch} className="icon" />
+                                <span className="stat-count">6.4k</span>
+                            </div>
+                        </button>
+                    ) : (
+                        <div className="auth-buttons">
+                            <button onClick={() => handleAuthAction('login')}>登录</button>
+                            <button onClick={() => handleAuthAction('register')}>注册</button>
+                        </div>
+                    )}
+                </div>
+            </header>
+            <ScrollingNotification />
+            <main className="main-content">
+                {showAdminDashboard && isAdmin ? (
+                    <AdminDashboard />
+                ) : (
+                    <>
+                        {isLoading ? (
+                            <p>Loading courses...</p>
+                        ) : error ? (
+                            <p className="error-message">{error}</p>
+                        ) : filteredCourses.length === 0 ? (
+                            <p>No courses available. {isAdmin ? 'Try adding a new course!' : ''}</p>
                         ) : (
-                            <div className="auth-buttons">
-                                <button onClick={() => handleAuthAction('login')}>登录</button>
-                                <button onClick={() => handleAuthAction('register')}>注册</button>
+                            <div className="articles">
+                                {filteredCourses.map((course) => (
+                                    <CourseCard
+                                        key={course.id}
+                                        course={course}
+                                        userInteraction={userInteractions[course.id]}
+                                    />
+                                ))}
                             </div>
                         )}
-                    </div>
-                </header>
-                <ScrollingNotification />
-                <main className="main-content">
-                    {showAdminDashboard && isAdmin ? (
-                        <AdminDashboard />
-                    ) : (
-                        <>
-                            {isLoading ? (
-                                <p>Loading courses...</p>
-                            ) : error ? (
-                                <p className="error-message">{error}</p>
-                            ) : filteredCourses.length === 0 ? (
-                                <p>No courses available. {isAdmin ? 'Try adding a new course!' : ''}</p>
-                            ) : (
-                                <div className="articles">
-                                    {filteredCourses.map((course) => (
-                                        <CourseCard
-                                            key={course.id}
-                                            course={course}
-                                            userInteraction={userInteractions[course.id]}
-                                        />
-                                    ))}
-                                </div>
-                            )}
-                            {selectedCategory === 'favorites' && (
-                                <div className="articles">
-                                    {favoriteCourses.map((course) => (
-                                        <CourseCard
-                                            key={course.id}
-                                            course={course}
-                                            userInteraction={userInteractions[course.id]}
-                                        />
-                                    ))}
-                                </div>
-                            )}
-                            {selectedCategory === 'enrolled' && (
-                                <div className="articles">
-                                    {enrolledCourses.map((course) => (
-                                        <CourseCard
-                                            key={course.id}
-                                            course={course}
-                                            userInteraction={userInteractions[course.id]}
-                                        />
-                                    ))}
-                                </div>
-                            )}
-                        </>
-                    )}
-                </main>
-                <GroqChatWidget courses={courses} onRecommendation={handleRecommendation} />
-                </div>
-            );
-        }
+                        {selectedCategory === 'favorites' && (
+                            <div className="articles">
+                                {favoriteCourses.map((course) => (
+                                    <CourseCard
+                                        key={course.id}
+                                        course={course}
+                                        userInteraction={userInteractions[course.id]}
+                                    />
+                                ))}
+                            </div>
+                        )}
+                        {selectedCategory === 'enrolled' && (
+                            <div className="articles">
+                                {enrolledCourses.map((course) => (
+                                    <CourseCard
+                                        key={course.id}
+                                        course={course}
+                                        userInteraction={userInteractions[course.id]}
+                                    />
+                                ))}
+                            </div>
+                        )}
+                    </>
+                )}
+            </main>
+            <GroqChatWidget courses={courses} onRecommendation={handleRecommendation} />
+        </div>
+    );
+}

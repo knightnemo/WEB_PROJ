@@ -18,24 +18,18 @@ case class CreateLiveStreamMessagePlanner(
 
   override def plan(using PlanContext): IO[String] = {
     val id = UUID.randomUUID().toString
-    val CreateLiveStreamMessage(name, capacity, slot1, slot2, slot3, slot4, slot5, slot6, slot7, slot8) = message
+    val CreateLiveStreamMessage(name, classroom, teacher, slot) = message
 
     val writeMessage = WriteDBMessage(
       s"""INSERT INTO ${schemaName}.live_streams
-         |(id, name, capacity, slot1, slot2, slot3, slot4, slot5, slot6, slot7, slot8)
-         |VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""".stripMargin,
+         |(id, name, classroom, teacher, slot)
+         |VALUES (?, ?, ?, ?, ?)""".stripMargin,
       List(
         SqlParameter("String", id),
         SqlParameter("String", name),
-        SqlParameter("Int", capacity.toString),
-        SqlParameter("String", slot1),
-        SqlParameter("String", slot2),
-        SqlParameter("String", slot3),
-        SqlParameter("String", slot4),
-        SqlParameter("String", slot5),
-        SqlParameter("String", slot6),
-        SqlParameter("String", slot7),
-        SqlParameter("String", slot8)
+        SqlParameter("String", classroom),
+        SqlParameter("String", teacher),
+        SqlParameter("Int", slot.toString)
       )
     )
 

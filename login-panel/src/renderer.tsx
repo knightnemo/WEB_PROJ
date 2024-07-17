@@ -29,6 +29,7 @@ import { AddCourse } from 'Pages/AddCourse';
 import GenerateImage from 'Pages/GenerateImage'
 import NotificationsPage from 'Pages/NotificationsPage';
 import AdminDashboard from 'Pages/AdminDashboard';
+import PublishLiveStream from 'Pages/PublishLiveStream';
 import Modal from 'react-modal';
 
 Modal.setAppElement('#root');
@@ -46,6 +47,7 @@ const Layout = () => {
                 <Route path="/generate-image" component={GenerateImage} />
                 <Route path="/notifications" component={NotificationsPage} />
                 <Route path="/admin-dashboard" component={AdminDashboard} />
+                <Route path="/publish-live-stream" component={PublishLiveStream} />
             </Switch>
         </HashRouter>
         </UserProvider>

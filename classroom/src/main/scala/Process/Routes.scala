@@ -28,6 +28,9 @@ object Routes:
       case "CheckClassroomAvailabilityMessage" =>
         IO(decode[CheckClassroomAvailabilityMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for CheckClassroomAvailabilityMessage")))
           .flatMap(_.fullPlan.map(_.asJson.toString))
+      case "AllClassroomsQueryMessage" =>
+        IO(decode[ AllClassroomsQueryMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for CheckClassroomAvailabilityMessage")))
+          .flatMap(_.fullPlan.map(_.asJson.toString))
       case _ =>
         IO.raiseError(new Exception(s"Unknown type: $messageType"))
     }
