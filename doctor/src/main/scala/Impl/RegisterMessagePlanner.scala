@@ -27,8 +27,8 @@ case class RegisterMessagePlanner(userName: String, password: String, bio: Optio
           _ <- writeDB(
             s"""
             INSERT INTO ${schemaName}.doctors 
-            (user_name, bio, followers, following, review_count) 
-            VALUES (?, ?, 0, 0, 0)
+            (user_name, bio, followers, following, review_count, slot1, slot2, slot3, slot4, slot5, slot6, slot7, slot8)
+            VALUES (?, ?, 0, 0, 0, '0', '0', '0', '0', '0', '0', '0', '0')
             """,
             List(
               SqlParameter("String", userName),

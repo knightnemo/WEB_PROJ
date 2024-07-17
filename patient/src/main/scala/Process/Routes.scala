@@ -38,6 +38,12 @@ object Routes:
       case "PatientChangePasswordMessage" =>
         IO(decode[PatientChangePasswordMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for PatientChangePasswordMessage")))
           .flatMap(_.fullPlan.map(_.asJson.toString))
+      case "CheckPatientSlotAvailabilityMessage" =>
+        IO(decode[CheckPatientSlotAvailabilityMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for CheckPatientSlotAvailabilityMessage")))
+          .flatMap(_.fullPlan.map(_.asJson.toString))
+      case "OccupyPatientSlotMessage" =>
+        IO(decode[OccupyPatientSlotMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for OccupyPatientSlotMessage")))
+          .flatMap(_.fullPlan.map(_.asJson.toString))
       case _ =>
         IO.raiseError(new Exception(s"Unknown type: $messageType"))
     }

@@ -25,6 +25,7 @@ export function Auth() {
     const [errors, setErrors] = useState({ username: '', password: '' });
     const [touched, setTouched] = useState({ username: false, password: false });
     const location = useLocation<{ action: 'login' | 'register' }>();
+    const [bio, setBio] = useState('');
 
     const resetState = useCallback(() => {
         setUsername('');
@@ -182,9 +183,13 @@ export function Auth() {
 
         let apiMessage: API;
         if (isAdmin) {
-            apiMessage = isRegistering ? new RegisterMessage(username, password) : new LoginMessage(username, password);
+            apiMessage = isRegistering
+                ? new RegisterMessage(username, password, bio)  // 注意这里添加了 bio
+                : new LoginMessage(username, password);
         } else {
-            apiMessage = isRegistering ? new PatientRegisterMessage(username, password) : new PatientLoginMessage(username, password);
+            apiMessage = isRegistering
+                ? new PatientRegisterMessage(username, password)
+                : new PatientLoginMessage(username, password);
         }
         await sendPostRequest(apiMessage);
     };
@@ -234,7 +239,8 @@ export function Auth() {
                                     className={touched.username && errors.username ? 'error' : ''}
                                     disabled={isLoading}
                                 />
-                                {touched.username && errors.username && <span className="error-message">{errors.username}</span>}
+                                {touched.username && errors.username &&
+                                    <span className="error-message">{errors.username}</span>}
                             </div>
                             <div className="form-group">
                                 <label htmlFor="password">密码</label>
@@ -247,7 +253,8 @@ export function Auth() {
                                     className={touched.password && errors.password ? 'error' : ''}
                                     disabled={isLoading}
                                 />
-                                {touched.password && errors.password && <span className="error-message">{errors.password}</span>}
+                                {touched.password && errors.password &&
+                                    <span className="error-message">{errors.password}</span>}
                             </div>
                             <div className="checkbox-group">
                                 <input
@@ -257,8 +264,19 @@ export function Auth() {
                                     onChange={(e) => setIsAdmin(e.target.checked)}
                                     disabled={isLoading}
                                 />
-                                <label htmlFor="isAdmin">管理员账户</label>
+                                <label htmlFor="isAdmin">医生账户</label>
                             </div>
+                            {isRegistering && isAdmin && (
+                                <div className="form-group">
+                                    <label htmlFor="bio">个人简介</label>
+                                    <textarea
+                                        id="bio"
+                                        value={bio}
+                                        onChange={(e) => setBio(e.target.value)}
+                                        disabled={isLoading}
+                                    />
+                                </div>
+                            )}
                             <button type="submit" className="submit-button" disabled={isLoading}>
                                 {isLoading ? '处理中...' : (isRegistering ? '注册' : '登录')}
                             </button>
@@ -274,18 +292,19 @@ export function Auth() {
                         <h2 className="auth-title">欢迎, {username}!</h2>
                         {isAdmin && (
                             <div className="user-management">
-        <span className="caption-container">
-            <span className="table-title">
-                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                    <circle cx="9" cy="7" r="4"></circle>
-                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                </svg>
-                用户列表
-            </span>
-            <span className="table-row-count">({users.length} 用户)</span>
-        </span>
+                            <span className="caption-container">
+                                <span className="table-title">
+                                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none"
+                                         xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                        <circle cx="9" cy="7" r="4"></circle>
+                                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                                    </svg>
+                                    用户列表
+                                </span>
+                                <span className="table-row-count">({users.length} 用户)</span>
+                            </span>
                                 <div className="table-wrapper">
                                     <table>
                                         <thead>
