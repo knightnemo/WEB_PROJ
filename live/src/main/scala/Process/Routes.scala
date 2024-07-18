@@ -28,6 +28,12 @@ object Routes:
       case "CheckLiveStreamAvailabilityMessage" =>
         IO(decode[CheckLiveStreamAvailabilityMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for CheckLiveStreamAvailabilityMessage")))
           .flatMap(_.fullPlan.map(_.asJson.toString))
+      case "GetAllLiveStreamsMessage" =>
+        IO(decode[GetAllLiveStreamsMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for GetAllLiveStreamsMessage")))
+          .flatMap(_.fullPlan.map(_.asJson.noSpaces))
+      case "UpdateLiveStreamCapacityMessage" =>
+        IO(decode[UpdateLiveStreamCapacityMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for UpdateLiveStreamCapacityMessage")))
+          .flatMap(_.fullPlan.map(_.asJson.toString))
       case _ =>
         IO.raiseError(new Exception(s"Unknown type: $messageType"))
     }

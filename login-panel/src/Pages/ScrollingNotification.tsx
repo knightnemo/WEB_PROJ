@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useHistory } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBell } from '@fortawesome/free-solid-svg-icons';
@@ -14,13 +14,38 @@ interface Notification {
 }
 
 const ScrollingNotification: React.FC = () => {
+
     const [notifications, setNotifications] = useState<Notification[]>([]);
     const history = useHistory();
+    const handleBack = () => {
+        history.goBack(); // 添加这个函数
+    };
     const { username } = useUser();
+    const scrollingTextRef = useRef<HTMLDivElement>(null);
+    const [scrollPosition, setScrollPosition] = useState(0);
 
     useEffect(() => {
         fetchNotifications();
     }, [username]);
+
+    useEffect(() => {
+        const scrollingText = scrollingTextRef.current;
+        if (scrollingText && notifications.length > 0) {
+            const scroll = () => {
+                setScrollPosition((prevPosition) => {
+                    const maxScroll = scrollingText.scrollWidth / 2;
+                    if (prevPosition >= maxScroll) {
+                        return 0;
+                    }
+                    return prevPosition + 1;
+                });
+            };
+
+            const animationId = setInterval(scroll, 30); // 调整此值以改变滚动速度
+
+            return () => clearInterval(animationId);
+        }
+    }, [notifications]);
 
     const fetchNotifications = async () => {
         try {
@@ -49,14 +74,20 @@ const ScrollingNotification: React.FC = () => {
         <div className="scrolling-notification-container">
             <div className="scrolling-notification">
                 <FontAwesomeIcon icon={faBell} className="notification-icon" />
-                <div className="notification-content">
-                    <div className="scrolling-text">
-                        {notifications.map((notification) => (
-                            <div key={notification.id} className="notification-item">
-                                <div className="notification-title">{notification.title}</div>
-                                <div className="notification-body">{notification.content.substring(0, 50)}...</div>
-                            </div>
-                        ))}
+                <div className="notification-content-wrapper">
+                    <div className="notification-content">
+                        <div
+                            className="scrolling-text"
+                            ref={scrollingTextRef}
+                            style={{ transform: `translateX(-${scrollPosition}px)` }}
+                        >
+                            {notifications.concat(notifications).map((notification, index) => (
+                                <div key={`${notification.id}-${index}`} className="notification-item">
+                                    <div className="notification-title">{notification.title}</div>
+                                    <div className="notification-body">{notification.content.substring(0, 50)}...</div>
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 </div>
                 <button className="view-details-button" onClick={handleViewDetails}>

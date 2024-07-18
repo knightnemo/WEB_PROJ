@@ -12,14 +12,6 @@ interface UserInfo {
     followers: number;
     following: number;
     reviewCount: number;
-    slot1: string;
-    slot2: string;
-    slot3: string;
-    slot4: string;
-    slot5: string;
-    slot6: string;
-    slot7: string;
-    slot8: string;
 }
 
 interface Review {
@@ -75,17 +67,9 @@ export function UserProfile() {
                     setUserInfo({
                         username: typeof userData === 'string' ? userData : username,
                         bio: typeof userData === 'string' ? generateRandomBio() : (userData.bio || generateRandomBio()),
-                        followers: typeof userData === 'string' ? Math.floor(Math.random() * 1000) : (userData.followers || Math.floor(Math.random() * 1000)),
-                        following: typeof userData === 'string' ? Math.floor(Math.random() * 500) : (userData.following || Math.floor(Math.random() * 500)),
-                        reviewCount: typeof userData === 'string' ? Math.floor(Math.random() * 50) : (userData.reviewCount || Math.floor(Math.random() * 50)),
-                        slot1: typeof userData === 'string' ? '0' : (userData.slot1 || '0'),
-                        slot2: typeof userData === 'string' ? '0' : (userData.slot2 || '0'),
-                        slot3: typeof userData === 'string' ? '0' : (userData.slot3 || '0'),
-                        slot4: typeof userData === 'string' ? '0' : (userData.slot4 || '0'),
-                        slot5: typeof userData === 'string' ? '0' : (userData.slot5 || '0'),
-                        slot6: typeof userData === 'string' ? '0' : (userData.slot6 || '0'),
-                        slot7: typeof userData === 'string' ? '0' : (userData.slot7 || '0'),
-                        slot8: typeof userData === 'string' ? '0' : (userData.slot8 || '0'),
+                        followers: typeof userData === 'string' ? Math.floor(7) : (userData.followers || Math.floor(7)),
+                        following: typeof userData === 'string' ? Math.floor(6) : (userData.following || Math.floor(5)),
+                        reviewCount: typeof userData === 'string' ? Math.floor(3) : (userData.reviewCount || Math.floor(3))
                     });
                 } else {
                     throw new Error('User not found');
@@ -100,17 +84,9 @@ export function UserProfile() {
             setUserInfo({
                 username: username,
                 bio: generateRandomBio(),
-                followers: Math.floor(Math.random() * 1000),
-                following: Math.floor(Math.random() * 500),
-                reviewCount: Math.floor(Math.random() * 50),
-                slot1: '0',
-                slot2: '0',
-                slot3: '0',
-                slot4: '0',
-                slot5: '0',
-                slot6: '0',
-                slot7: '0',
-                slot8: '0',
+                followers: Math.floor(7),
+                following: Math.floor(5),
+                reviewCount: Math.floor(5)
             });
         } finally {
             setIsLoading(false);

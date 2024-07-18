@@ -1,0 +1,91 @@
+.enroll-live-stream {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+}
+
+.enroll-live-stream h2 {
+    color: #333;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.error {
+    color: #ff0000;
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.live-stream-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+.live-stream-item {
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 15px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.live-stream-item h3 {
+    color: #2c3e50;
+    margin-top: 0;
+}
+
+.live-stream-item p {
+    margin: 5px 0;
+    color: #34495e;
+}
+
+.live-stream-item button {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.live-stream-item button:hover {
+    background-color: #2980b9;
+}
+
+.live-stream-item button:disabled {
+    background-color: #bdc3c7;
+    cursor: not-allowed;
+}
+
+/* 在文件末尾添加以下内容 */
+
+.back-button {
+    display: inline-block;
+    margin-top: 1rem;
+    padding: 10px 20px;
+    background-color: #f0f0f0;
+    color: #333;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.back-button:hover {
+    background-color: #e0e0e0;
+}
+
+.button-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1rem;
+}
+
+.button-container button {
+    width: auto;
+}

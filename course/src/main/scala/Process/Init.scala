@@ -63,5 +63,13 @@ object Init {
         case Right(_) => IO.unit
         case Left(e) => IO(println(s"Note: Unable to add new columns. They may already exist. Error: ${e.getMessage}"))
       }
+      _ <- writeDB(s"""
+        CREATE TABLE IF NOT EXISTS ${schemaName}.course_changes (
+          id SERIAL PRIMARY KEY,
+          course_id TEXT NOT NULL,
+          change_type TEXT NOT NULL,
+          FOREIGN KEY (course_id) REFERENCES ${schemaName}.courses(id) ON DELETE CASCADE
+        )
+      """, List())
     } yield ()
 }

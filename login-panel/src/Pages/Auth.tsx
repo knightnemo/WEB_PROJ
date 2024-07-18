@@ -264,7 +264,7 @@ export function Auth() {
                                     onChange={(e) => setIsAdmin(e.target.checked)}
                                     disabled={isLoading}
                                 />
-                                <label htmlFor="isAdmin">医生账户</label>
+                                <label htmlFor="isAdmin">管理员账户</label>
                             </div>
                             {isRegistering && isAdmin && (
                                 <div className="form-group">

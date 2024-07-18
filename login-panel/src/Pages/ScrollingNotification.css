@@ -3,15 +3,15 @@
     max-width: 1200px;
     margin: 20px auto;
     padding: 10px 20px;
-    background-color: #fff9e6; /* 淡黄色背景 */
+    background-color: rgba(255, 249, 230, 0.8);
     border-radius: 20px;
     box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    backdrop-filter: blur(5px);
 }
 
 .scrolling-notification {
     display: flex;
     align-items: center;
-    overflow: hidden;
 }
 
 .notification-icon {
@@ -21,27 +21,33 @@
     flex-shrink: 0;
 }
 
-.notification-content {
+.notification-content-wrapper {
     flex: 1;
+    margin: 0 15px;
     overflow: hidden;
-    white-space: nowrap;
+    background-color: rgba(255, 255, 255, 0.5);
+    border-radius: 10px;
+    padding: 10px;
+}
+
+.notification-content {
+    overflow: hidden;
+    width: 100%;
 }
 
 .scrolling-text {
-    display: inline-block;
-    white-space: nowrap;
-    animation: scroll 30s linear infinite;
+    display: flex;
+    width: max-content;
 }
 
 .notification-item {
-    display: inline-block;
+    flex-shrink: 0;
     background-color: white;
     border-radius: 8px;
     padding: 10px 15px;
     margin-right: 15px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     width: 300px;
-    vertical-align: top;
 }
 
 .notification-title {
@@ -67,27 +73,106 @@
     border-radius: 15px;
     cursor: pointer;
     font-size: 0.9em;
-    transition: background-color 0.3s;
+    transition: background-color 0.3s, transform 0.3s;
     flex-shrink: 0;
-    margin-left: 15px;
 }
 
 .view-details-button:hover {
     background-color: #e3b73a;
+    transform: translateY(-2px);
 }
 
-@keyframes scroll {
-    0% {
-        transform: translate(0, 0);
-    }
-    100% {
-        transform: translate(-100%, 0);
-    }
+.notification-item.course-change {
+    background-color: #f0f8ff;
+    border-left: 3px solid #4169e1;
 }
 
-/* 确保动画在足够长的距离内滚动 */
-.scrolling-text::after {
-    content: "";
-    display: inline-block;
-    width: 100px;
+.scrolling-notification-container {
+    width: 80%;
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 10px 20px;
+    background-color: rgba(255, 249, 230, 0.8);
+    border-radius: 20px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    backdrop-filter: blur(5px);
+}
+
+.scrolling-notification {
+    display: flex;
+    align-items: center;
+}
+
+.notification-icon {
+    color: #f0c14b;
+    font-size: 1.2em;
+    margin-right: 15px;
+    flex-shrink: 0;
+}
+
+.notification-content-wrapper {
+    flex: 1;
+    margin: 0 15px;
+    overflow: hidden;
+    background-color: rgba(255, 255, 255, 0.5);
+    border-radius: 10px;
+    padding: 10px;
+}
+
+.notification-content {
+    overflow: hidden;
+    width: 100%;
+}
+
+.scrolling-text {
+    display: flex;
+    width: max-content;
+    transition: transform 0.1s linear;
+}
+
+.notification-item {
+    flex-shrink: 0;
+    background-color: white;
+    border-radius: 8px;
+    padding: 10px 15px;
+    margin-right: 15px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    width: 300px;
+}
+
+.notification-title {
+    font-weight: bold;
+    margin-bottom: 5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.notification-body {
+    font-size: 0.9em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.view-details-button {
+    background-color: #f0c14b;
+    color: #000;
+    border: none;
+    padding: 5px 15px;
+    border-radius: 15px;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: background-color 0.3s, transform 0.3s;
+    flex-shrink: 0;
+}
+
+.view-details-button:hover {
+    background-color: #e3b73a;
+    transform: translateY(-2px);
+}
+
+.notification-item.course-change {
+    background-color: #f0f8ff;
+    border-left: 3px solid #4169e1;
 }

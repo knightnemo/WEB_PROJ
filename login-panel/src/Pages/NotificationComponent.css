@@ -1,0 +1,142 @@
+.notification-wrapper {
+    position: relative;
+}
+
+.notification-icon-wrapper {
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    transition: background-color 0.3s ease;
+}
+
+.notification-icon-wrapper:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.notification-icon {
+    font-size: 1.5rem;
+    color: #4a4a4a;
+}
+
+.notification-badge {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background-color: #ff3860;
+    color: white;
+    border-radius: 50%;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+    font-weight: bold;
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.notification-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    width: 300px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    overflow: hidden;
+    animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.notification-header {
+    background-color: #f5f5f5;
+    color: #4a4a4a;
+    padding: 12px 16px;
+    margin: 0;
+    font-size: 1rem;
+    font-weight: bold;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.notification-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.notification-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    border-bottom: 1px solid #e0e0e0;
+    transition: background-color 0.3s ease;
+}
+
+.notification-item:hover {
+    background-color: #f9f9f9;
+}
+
+.notification-type-icon {
+    font-size: 1.25rem;
+    margin-right: 12px;
+}
+
+.notification-type-icon.update {
+    color: #3273dc;
+}
+
+.notification-type-icon.delete {
+    color: #ff3860;
+}
+
+.notification-content {
+    flex: 1;
+    font-size: 0.9rem;
+    color: #4a4a4a;
+}
+
+.no-notifications {
+    padding: 16px;
+    text-align: center;
+    color: #7a7a7a;
+    font-style: italic;
+}
+
+/* 添加滚动条样式 */
+.notification-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.notification-list::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.notification-list::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 3px;
+}
+
+.notification-list::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}

@@ -7,7 +7,6 @@
     --primary-hover: #555555;
     --link-gray: #666666;
     --link-gray-hover: #171717;
-    --gray: #E1E1E1;
     --gray-border: #E6E6E6;
     --white: #FCFCFC;
     --navbar-height: 64px;
@@ -799,6 +798,305 @@ body {
     100% {
         transform: scale(1);
     }
+}
+
+.user-info-button:hover .icon {
+    animation: pulse 1s infinite;
+}
+
+.auth-buttons {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    flex-wrap: nowrap;
+}
+
+.auth-buttons button {
+    text-decoration: none;
+    font-size: 0.875rem;
+    white-space: nowrap;
+    padding: 0.5rem 1rem;  /* 统一内边距 */
+    transition: all 0.2s ease-in-out;
+    line-height: 1.25rem;
+    cursor: pointer;
+    border: none;
+    border-radius: 0.375rem;
+    font-weight: 600;  /* 增加字体粗细 */
+}
+
+.auth-buttons button:last-child {
+    background: none;
+    color: #4a90e2;  /* 使用蓝色 */
+    border: 1px solid #4a90e2;  /* 蓝色边框 */
+}
+
+.auth-buttons button:last-child:hover {
+    background: rgba(74, 144, 226, 0.1);  /* 淡蓝色背景 */
+}
+
+.auth-buttons button:first-child {
+    color: var(--white);
+    background: #4a90e2;  /* 蓝色背景 */
+}
+
+.auth-buttons button:first-child:hover {
+    background: #357abD;  /* 深蓝色用于悬停效果 */
+}
+
+/* Add these new styles for the notification feature */
+.notification-wrapper {
+    position: relative;
+    margin-right: 1rem;
+}
+
+.notification-icon {
+    cursor: pointer;
+    font-size: 1.5rem;
+    color: var(--link-gray);
+    transition: color 0.2s ease-in-out;
+}
+
+.notification-icon:hover {
+    color: var(--link-gray-hover);
+}
+
+.notification-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background-color: var(--primary);
+    color: white;
+    border-radius: 50%;
+    padding: 0.2rem 0.4rem;
+    font-size: 0.7rem;
+    font-weight: bold;
+}
+
+.notification-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    width: 300px;
+    background-color: var(--white);
+    border: 1px solid var(--gray-border);
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.notification-item {
+    padding: 1rem;
+    border-bottom: 1px solid var(--gray-border);
+    transition: background-color 0.2s ease-in-out;
+}
+
+.notification-item:last-child {
+    border-bottom: none;
+}
+
+.notification-item:hover {
+    background-color: var(--secondary-background);
+}
+
+/* Modify the existing .action-buttons class */
+.action-buttons {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+/* 现有的样式保持不变 */
+
+.admin-dashboard {
+    padding: 20px;
+    background-color: #f5f5f5;
+}
+
+.admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.admin-nav {
+    display: flex;
+    gap: 10px;
+}
+
+.admin-nav button {
+    padding: 8px 16px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.admin-nav button:hover {
+    background-color: #0056b3;
+}
+
+.chart-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.chart-container {
+    background-color: white;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.chart-container h2 {
+    margin-bottom: 15px;
+    font-size: 18px;
+    color: #333;
+}
+
+.loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    font-size: 20px;
+    color: #666;
+}
+
+.pagination button:hover {
+    background-color: #4a90e2;
+    color: white;
+}
+
+.pagination button.active {
+    background-color: #4a90e2;
+    color: white;
+}
+
+/* 添加 .course-content 样式 */
+.course-content {
+    flex-grow: 1;
+}
+
+/* 修改 .articles 样式 */
+.articles {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+/* 修改现有的 .app-container 样式 */
+.app-container {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    padding-top: var(--navbar-height);
+}
+
+/* 修改 .articles 样式 */
+.articles {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+@media (min-width: 768px) {
+    .articles {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+/* 修改 .pagination 样式 */
+.pagination {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    position: absolute;
+    bottom: 0px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 5px;
+}
+
+.pagination button {
+    padding: 0.5rem 1rem;
+    border: 1px solid #4a90e2;
+    background-color: white;
+    color: #4a90e2;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-radius: 4px;
+}
+
+.main-content {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    max-width: 1200px;
+    width: 100%;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    position: relative;
+    padding-bottom: 60px; /* 为分页按钮留出空间 */
+}
+
+/* 修改 .articles 样式 */
+.articles {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+@media (min-width: 768px) {
+    .articles {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+.notification-bar {
+     display: flex;
+     align-items: center;
+     background-color: #fff9e6;
+     padding: 10px 20px;
+     margin: 10px auto;
+     max-width: 80%;
+     border-radius: 5px;
+     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+ }
+
+.notification-icon {
+    color: #f0c14b;
+    margin-right: 15px;
+}
+
+.notification-content {
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.notification-details {
+    background-color: #f0c14b;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 3px;
+    cursor: pointer;
+    margin-left: 15px;
+    white-space: nowrap;
+}
+
+.notification-details:hover {
+    background-color: #e3b73a;
 }
 
 .user-info-button:hover .icon {

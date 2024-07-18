@@ -5,6 +5,7 @@ import { AllCoursesQueryMessage } from 'Plugins/CourseAPI/AllCoursesQueryMessage
 import axios from 'axios';
 import './Main.css';
 import PublishLiveStream from './PublishLiveStream';
+import EnrollLiveStream from './EnrollLiveStream';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faStar, faCodeBranch, faSearch, faRobot } from '@fortawesome/free-solid-svg-icons';
 import { CourseCard } from './CourseCard';
@@ -39,10 +40,6 @@ interface UserInteraction {
 }
 
 export function Main() {
-    const handleGenerateImageClick = () => {
-        history.push('/generate-image');
-    };
-
     const history = useHistory();
     const { username, isAdmin } = useUser();
     const [courses, setCourses] = useState<Course[]>([]);
@@ -57,6 +54,14 @@ export function Main() {
     const [favoriteCourses, setFavoriteCourses] = useState<Course[]>([]);
     const [enrolledCourses, setEnrolledCourses] = useState<Course[]>([]);
     const [showAdminDashboard, setShowAdminDashboard] = useState(false);
+    const [currentPage, setCurrentPage] = useState(1);
+    const coursesPerPage = 6;
+
+    const handleGenerateImageClick = () => {
+        history.push('/generate-image');
+    };
+
+    const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
     const handleRecommendation = (recommendedIds: string[]) => {
         setRecommendedCourseIds(recommendedIds);
@@ -125,6 +130,7 @@ export function Main() {
         if (!username) return;
         try {
             const courses = await getUserFavoriteCourses(username);
+            console.log('Fetched favorite courses:', courses);
             setFavoriteCourses(courses);
             setSelectedCategory('favorites');
         } catch (error) {
@@ -181,6 +187,12 @@ export function Main() {
     };
 
     const filteredCourses = courses.filter(course => {
+        if (selectedCategory === 'favorites') {
+            return favoriteCourses;
+        }
+        if (selectedCategory === 'enrolled') {
+            return enrolledCourses;
+        }
         if (selectedCategory === 'recommended') {
             return recommendedCourseIds.includes(course.id);
         }
@@ -205,6 +217,11 @@ export function Main() {
     const handleEnrollLiveStream = () => {
         history.push('/enroll-live-stream');
     };
+
+    const indexOfLastCourse = currentPage * coursesPerPage;
+    const indexOfFirstCourse = indexOfLastCourse - coursesPerPage;
+    const currentCourses = filteredCourses.slice(indexOfFirstCourse, indexOfLastCourse);
+    const totalPages = Math.ceil(filteredCourses.length / coursesPerPage);
 
     return (
         <div className="app-container">
@@ -302,7 +319,7 @@ export function Main() {
                 {showAdminDashboard && isAdmin ? (
                     <AdminDashboard />
                 ) : (
-                    <>
+                    <div className="course-content">
                         {isLoading ? (
                             <p>Loading courses...</p>
                         ) : error ? (
@@ -310,42 +327,59 @@ export function Main() {
                         ) : filteredCourses.length === 0 ? (
                             <p>No courses available. {isAdmin ? 'Try adding a new course!' : ''}</p>
                         ) : (
-                            <div className="articles">
-                                {filteredCourses.map((course) => (
-                                    <CourseCard
-                                        key={course.id}
-                                        course={course}
-                                        userInteraction={userInteractions[course.id]}
-                                    />
-                                ))}
-                            </div>
+                            <>
+                                {selectedCategory !== 'favorites' && selectedCategory !== 'enrolled' && (
+                                    <div className="articles">
+                                        {currentCourses.map((course) => (
+                                            <CourseCard
+                                                key={course.id}
+                                                course={course}
+                                                userInteraction={userInteractions[course.id]}
+                                            />
+                                        ))}
+                                    </div>
+                                )}
+                                {selectedCategory === 'favorites' && (
+                                    <div className="articles">
+                                        {favoriteCourses.map((course) => (
+                                            <CourseCard
+                                                key={course.id}
+                                                course={course}
+                                                userInteraction={userInteractions[course.id]}
+                                            />
+                                        ))}
+                                    </div>
+                                )}
+                                {selectedCategory === 'enrolled' && (
+                                    <div className="articles">
+                                        {enrolledCourses.map((course) => (
+                                            <CourseCard
+                                                key={course.id}
+                                                course={course}
+                                                userInteraction={userInteractions[course.id]}
+                                            />
+                                        ))}
+                                    </div>
+                                )}
+                            </>
                         )}
-                        {selectedCategory === 'favorites' && (
-                            <div className="articles">
-                                {favoriteCourses.map((course) => (
-                                    <CourseCard
-                                        key={course.id}
-                                        course={course}
-                                        userInteraction={userInteractions[course.id]}
-                                    />
-                                ))}
-                            </div>
-                        )}
-                        {selectedCategory === 'enrolled' && (
-                            <div className="articles">
-                                {enrolledCourses.map((course) => (
-                                    <CourseCard
-                                        key={course.id}
-                                        course={course}
-                                        userInteraction={userInteractions[course.id]}
-                                    />
-                                ))}
-                            </div>
-                        )}
-                    </>
+                    </div>
+                )}
+                {selectedCategory !== 'favorites' && selectedCategory !== 'enrolled' && filteredCourses.length > coursesPerPage && (
+                    <div className="pagination">
+                        {Array.from({ length: totalPages }, (_, i) => (
+                            <button
+                                key={i}
+                                onClick={() => paginate(i + 1)}
+                                className={currentPage === i + 1 ? 'active' : ''}
+                            >
+                                {i + 1}
+                            </button>
+                        ))}
+                    </div>
                 )}
             </main>
-            <GroqChatWidget courses={courses} onRecommendation={handleRecommendation} />
+            <GroqChatWidget courses={courses} onRecommendation={handleRecommendation}></GroqChatWidget>
         </div>
     );
 }

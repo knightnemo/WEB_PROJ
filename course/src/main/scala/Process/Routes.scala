@@ -9,6 +9,7 @@ import io.circe.syntax.*
 import org.http4s.*
 import org.http4s.client.Client
 import org.http4s.dsl.io.*
+import APIs.CourseAPI.CourseChangesMessages._
 
 object Routes:
   private def executePlan(messageType: String, str: String): IO[String] =
@@ -63,6 +64,14 @@ object Routes:
         IO(decode[GetCourseFavoritedUsersPlanner](str).getOrElse(throw new Exception("Invalid JSON for GetCourseFavoritedUsersMessage")))
           .flatMap(m => m.fullPlan.map(_.asJson.toString))
         
+      case "RecordCourseChangeMessage" =>
+        IO(decode[RecordCourseChangeMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for RecordCourseChangeMessage")))
+          .flatMap(m => m.fullPlan.map(_.asJson.toString))
+
+      case "GetUserCourseChangesMessage" =>
+        IO(decode[GetUserCourseChangesMessagePlanner](str).getOrElse(throw new Exception("Invalid JSON for GetUserCourseChangesMessage")))
+          .flatMap(m => m.fullPlan.map(_.asJson.toString))
+
       case _ =>
         IO.raiseError(new Exception(s"Unknown type: $messageType"))
     }

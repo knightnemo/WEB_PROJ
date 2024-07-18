@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faStar as faStarSolid } from '@fortawesome/free-solid-svg-icons';
+import { faStar as faStarSolid, faCheckCircle } from '@fortawesome/free-solid-svg-icons';
 import { faStar as faStarRegular } from '@fortawesome/free-regular-svg-icons';
 import { useUser } from './UserContext';
 import { UserCourseMessage, UserCourseAction } from 'Plugins/CourseAPI/UserCourseMessage';
@@ -112,18 +112,27 @@ export const CourseCard: React.FC<CourseCardProps> = ({ course, userInteraction 
             <div className="article-preview">
                 <h2>{course.title}</h2>
                 <pre>{formatDescription(course.description)}</pre>
-                    <div className="course-info">
-                        <span className="instructor">讲师: {course.instructor}</span>
-                        <span className="rating">★ {averageRating}</span>
+                <div className="course-info">
+                    <span className="instructor">讲师: {course.instructor}</span>
+                    <div className="rating-favorite-container">
+                        <span className="rating">
+                            <FontAwesomeIcon icon={faStarSolid} className="star-icon" />
+                            {averageRating}
+                        </span>
                         {username && (
                             <>
-                            <span className="favorite" onClick={toggleFavorite}>
-                                <FontAwesomeIcon icon={isFavorite ? faStarSolid : faStarRegular} />
-                            </span>
-                                {hasRated && <span className="rated-badge">已评分</span>}
+                                <span className={`favorite ${isFavorite ? 'is-favorite' : ''}`} onClick={toggleFavorite}>
+                                    <FontAwesomeIcon icon={isFavorite ? faStarSolid : faStarRegular} />
+                                </span>
+                                {hasRated && (
+                                    <span className="rated-badge">
+                                        <FontAwesomeIcon icon={faCheckCircle} /> 已评分
+                                    </span>
+                                )}
                             </>
                         )}
                     </div>
+                </div>
             </div>
         </article>
     );

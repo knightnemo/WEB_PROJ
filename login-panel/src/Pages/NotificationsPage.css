@@ -1,142 +1,418 @@
+:root {
+    --primary-color: #3a6ea5;
+    --secondary-color: #6b9ac4;
+    --background-color: #f4f7fa;
+    --card-background: #ffffff;
+    --text-color: #333333;
+    --light-text-color: #666666;
+    --border-color: #e0e0e0;
+    --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --transition: all 0.3s ease;
+}
+
 .notifications-page {
-    max-width: 800px;
-    margin: 0 auto;
+    max-width: 900px;
+    margin: 2rem auto;
     padding: 2rem;
+    background-color: var(--background-color);
+    border-radius: 10px;
+    box-shadow: var(--shadow);
 }
 
 .notifications-page h1 {
-    font-size: 1.75rem;
-    color: var(--blue);
-    margin-bottom: 1.5rem;
+    font-size: 2rem;
+    color: var(--primary-color);
+    margin-bottom: 2rem;
+    text-align: center;
 }
 
 .message {
-    background-color: var(--gray-background);
-    color: var(--primary);
-    padding: 0.75rem;
-    border-radius: 0.5rem;
-    margin-bottom: 1rem;
+    background-color: var(--secondary-color);
+    color: white;
+    padding: 1rem;
+    border-radius: 5px;
+    margin-bottom: 1.5rem;
+    text-align: center;
 }
 
 .publish-notification {
-    background-color: var(--table-background);
-    border-radius: 1rem;
+    background-color: var(--card-background);
+    border-radius: 8px;
     padding: 1.5rem;
     margin-bottom: 2rem;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow);
 }
 
 .publish-notification h2 {
-    font-size: 1.25rem;
+    font-size: 1.5rem;
+    color: var(--primary-color);
     margin-bottom: 1rem;
 }
 
 .publish-notification form {
-    display: flex;
-    flex-direction: column;
+    display: grid;
     gap: 1rem;
 }
 
 .publish-notification input,
-.publish-notification textarea,
-.publish-notification select {
+.publish-notification textarea {
+    width: 100%;
     padding: 0.75rem;
-    border: 2px solid var(--gray-background);
-    border-radius: 0.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
     font-size: 1rem;
+    transition: var(--transition);
+}
+
+.publish-notification input:focus,
+.publish-notification textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(58, 110, 165, 0.2);
 }
 
 .publish-notification textarea {
     min-height: 100px;
+    resize: vertical;
 }
 
-.publish-notification select {
-    height: 150px;
-}
-
-.publish-notification button {
-    background-color: var(--blue);
+.publish-notification button,
+.back-button {
+    background-color: var(--primary-color);
     color: white;
-    padding: 0.75rem;
+    padding: 0.75rem 1.5rem;
     border: none;
-    border-radius: 0.5rem;
+    border-radius: 4px;
     font-size: 1rem;
     font-weight: 600;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    transition: var(--transition);
 }
 
-.publish-notification button:hover {
-    background-color: #2563eb;
+.publish-notification button:hover,
+.back-button:hover {
+    background-color: var(--secondary-color);
 }
 
 .notifications-list {
-    display: flex;
-    flex-direction: column;
+    display: grid;
     gap: 1.5rem;
 }
 
 .notification-item {
-    background-color: var(--table-background);
-    border-radius: 1rem;
+    background-color: var(--card-background);
+    border-radius: 8px;
     padding: 1.5rem;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow);
+    transition: var(--transition);
+}
+
+.notification-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }
 
 .notification-item h2 {
     font-size: 1.25rem;
+    color: var(--primary-color);
     margin-bottom: 0.5rem;
-    color: var(--primary);
 }
 
 .notification-item p {
+    color: var(--text-color);
     margin-bottom: 1rem;
-    color: var(--gray);
+    line-height: 1.6;
 }
 
 .notification-meta {
     display: flex;
     justify-content: space-between;
     font-size: 0.875rem;
-    color: var(--gray);
+    color: var(--light-text-color);
+    border-top: 1px solid var(--border-color);
+    padding-top: 1rem;
+    margin-top: 1rem;
 }
 
-.pagination {
-    display: flex;
-    justify-content: center;
-    gap: 0.5rem;
+.delete-button {
+    background-color: #e74c3c;
+    color: white;
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.delete-button:hover {
+    background-color: #c0392b;
+}
+
+.back-button-container {
+    text-align: center;
     margin-top: 2rem;
 }
-
-.pagination button {
-    background-color: var(--gray-background);
-    border: none;
-    padding: 0.5rem 1rem;
-    border-radius: 0.25rem;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
+:root {
+    --primary-color: #3a6ea5;
+    --secondary-color: #6b9ac4;
+    --accent-color: #f2a365;
+    --background-color: #f9f9f9;
+    --text-color: #333333;
+    --light-text-color: #666666;
+    --white: #ffffff;
+    --shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
-.pagination button:hover {
-    background-color: var(--gray);
-    color: white;
+.notifications-page {
+    max-width: 1000px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background-color: var(--white);
+    border-radius: 20px;
+    box-shadow: var(--shadow);
+}
+
+.notifications-page h1 {
+    font-size: 2.5rem;
+    color: var(--primary-color);
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.message {
+    background-color: var(--accent-color);
+    color: var(--white);
+    padding: 1rem;
+    border-radius: 10px;
+    margin-bottom: 1.5rem;
+    text-align: center;
 }
 
 .notifications-list {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
+    display: grid;
+    gap: 2rem;
 }
 
 .notification-item {
-    background-color: var(--table-background);
-    border-radius: 1rem;
-    padding: 1.5rem;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    background-color: var(--white);
+    border-radius: 15px;
+    padding: 2rem;
+    box-shadow: var(--shadow);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.notification-item, .notification-content {
-    white-space: normal;
-    overflow: visible;
-    animation: none;
+.notification-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+.notification-item h2 {
+    font-size: 1.5rem;
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+}
+
+.notification-item p {
+    margin-bottom: 1.5rem;
+    color: var(--text-color);
+    line-height: 1.6;
+}
+
+.notification-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    font-size: 0.9rem;
+    color: var(--light-text-color);
+    margin-bottom: 1rem;
+}
+
+.notification-meta span {
+    background-color: var(--background-color);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+}
+
+.delete-button {
+    background-color: #e74c3c;
+    color: var(--white);
+    border: none;
+    padding: 0.7rem 1.2rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    font-size: 0.9rem;
+}
+
+.delete-button:hover {
+    background-color: #c0392b;
+    transform: translateY(-2px);
+}
+
+.back-button-container {
+    text-align: center;
+    margin-top: 2rem;
+}
+
+.back-button {
+    background-color: var(--secondary-color);
+    color: var(--white);
+    border: none;
+    padding: 1rem 2rem;
+    border-radius: 10px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.back-button:hover {
+    background-color: var(--primary-color);
+    transform: translateY(-2px);
+}
+.notifications-page {
+    max-width: 1200px; /* 进一步增加最大宽度 */
+    margin: 3rem auto;
+    padding: 2.5rem;
+    background-color: #f8f9fa;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.notification-item {
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 1.8rem 2.5rem; /* 增加左右内边距 */
+    margin-bottom: 1.5rem;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.notification-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.notification-item h2 {
+    font-size: 1.5rem;
+    color: #2c3e50;
+    margin-bottom: 1rem;
+    letter-spacing: 0.5px; /* 增加标题字间距 */
+}
+
+.notification-item p {
+    color: #34495e;
+    line-height: 1.8; /* 增加行高 */
+    margin-bottom: 1.2rem;
+    letter-spacing: 0.3px; /* 增加正文字间距 */
+}
+
+.notification-meta {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    font-size: 0.95rem;
+    color: #7f8c8d;
+    margin-top: auto; /* 将元数据推到底部 */
+}
+
+.notification-meta span {
+    background-color: #ecf0f1;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    margin-bottom: 0.5rem;
+    margin-right: 0.5rem; /* 添加右侧间距 */
+}
+
+.delete-button {
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    padding: 0.6rem 1.2rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 1rem;
+    align-self: flex-end; /* 将按钮对齐到右侧 */
+}
+
+.delete-button:hover {
+    background-color: #c0392b;
+}
+
+.notifications-page {
+    max-width: 1200px;
+    margin: 3rem auto;
+    padding: 2.5rem;
+    background-color: #f8f9fa;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.notification-item {
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+}
+
+.notification-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.notification-content {
+    flex-grow: 1;
+    padding-right: 1.5rem;
+}
+
+.notification-item h2 {
+    font-size: 1.3rem;
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+    letter-spacing: 0.5px;
+}
+
+.notification-item p {
+    color: #34495e;
+    line-height: 1.6;
+    margin-bottom: 0.8rem;
+    letter-spacing: 0.3px;
+}
+
+.notification-meta {
+    display: flex;
+    flex-wrap: wrap;
+    font-size: 0.85rem;
+    color: #7f8c8d;
+}
+
+.notification-meta span {
+    background-color: #ecf0f1;
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    margin-right: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.delete-button {
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    padding: 0.6rem 1.2rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    align-self: flex-start;
+    white-space: nowrap;
+}
+
+.delete-button:hover {
+    background-color: #c0392b;
 }
