@@ -18,20 +18,22 @@ case class CreateLiveStreamMessagePlanner(
 
   override def plan(using PlanContext): IO[String] = {
     val id = UUID.randomUUID().toString
-    val CreateLiveStreamMessage(name, classroom, teacher, slot) = message
+    val CreateLiveStreamMessage(name, classroom, teacher, slot, capacity) = message
 
     val writeMessage = WriteDBMessage(
       s"""INSERT INTO ${schemaName}.live_streams
-         |(id, name, classroom, teacher, slot)
-         |VALUES (?, ?, ?, ?, ?)""".stripMargin,
+         |(id, name, classroom, teacher, slot, capacity)
+         |VALUES (?, ?, ?, ?, ?, ?)""".stripMargin,
       List(
         SqlParameter("String", id),
         SqlParameter("String", name),
         SqlParameter("String", classroom),
         SqlParameter("String", teacher),
-        SqlParameter("Int", slot.toString)
+        SqlParameter("Int", slot.toString),
+        SqlParameter("Int", capacity.toString)  // 新增字段
       )
     )
+
 
     writeMessage.asJson.as[WriteDBMessage].fold(
       error => IO.raiseError(new Exception(s"Failed to encode WriteDBMessage: ${error.getMessage}")),

@@ -14,6 +14,7 @@ interface LiveStream {
     classroom: string;
     teacher: string;
     slot: number;
+    capacity: number;
 }
 
 const EnrollLiveStream: React.FC = () => {
@@ -22,9 +23,6 @@ const EnrollLiveStream: React.FC = () => {
     const [liveStreams, setLiveStreams] = useState<LiveStream[]>([]);
     const [error, setError] = useState<string>('');
 
-    const handleBack = () => {
-        history.goBack();
-    };
     useEffect(() => {
         fetchLiveStreams();
     }, []);
@@ -62,9 +60,25 @@ const EnrollLiveStream: React.FC = () => {
         }
     };
 
+    const updateLiveStreamCapacity = async (liveStreamId: string, slotNumber: number, userName: string): Promise<boolean> => {
+        try {
+            const message = new UpdateLiveStreamCapacityMessage(liveStreamId, slotNumber, userName);
+            const response = await axios.post(message.getURL(), { message });
+            return response.data === "Live stream capacity updated successfully";
+        } catch (error) {
+            console.error('更新直播容量失败:', error);
+            return false;
+        }
+    };
+
     const handleEnroll = async (liveStream: LiveStream) => {
         setError('');
         try {
+            if (liveStream.capacity <= 0) {
+                setError('该课程已满员');
+                return;
+            }
+
             const isAvailable = await checkSlotAvailability(liveStream.slot);
             if (!isAvailable) {
                 setError('您已经在该时段报名了其他课程');
@@ -77,12 +91,30 @@ const EnrollLiveStream: React.FC = () => {
                 return;
             }
 
+            const updated = await updateLiveStreamCapacity(liveStream.id, liveStream.slot, username);
+            if (!updated) {
+                setError('更新课程容量失败');
+                return;
+            }
+
+            // 更新本地状态，减少课程容量
+            setLiveStreams(prevStreams =>
+                prevStreams.map(stream =>
+                    stream.id === liveStream.id
+                        ? { ...stream, capacity: stream.capacity - 1 }
+                        : stream
+                )
+            );
+
             alert('报名成功');
-            fetchLiveStreams();
         } catch (error) {
             console.error('报名直播课程时出错:', error);
             setError('报名直播课程失败');
         }
+    };
+
+    const handleBack = () => {
+        history.goBack();
     };
 
     return (
@@ -96,13 +128,17 @@ const EnrollLiveStream: React.FC = () => {
                         <p>教师: {liveStream.teacher}</p>
                         <p>教室: {liveStream.classroom}</p>
                         <p>时段: {liveStream.slot}</p>
-                        <button onClick={() => handleEnroll(liveStream)}>
-                            报名
+                        <p>剩余容量: {liveStream.capacity}</p>
+                        <button
+                            onClick={() => handleEnroll(liveStream)}
+                            disabled={liveStream.capacity <= 0}
+                        >
+                            {liveStream.capacity > 0 ? '报名' : '已满员'}
                         </button>
-                        <button onClick={handleBack} className="back-button">返回</button>
                     </li>
                 ))}
             </ul>
+            <button onClick={handleBack} className="back-button">返回</button>
         </div>
     );
 };

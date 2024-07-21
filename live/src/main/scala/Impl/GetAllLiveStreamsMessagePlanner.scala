@@ -17,7 +17,7 @@ case class GetAllLiveStreamsMessagePlanner(
   override def plan(using PlanContext): IO[List[LiveStreamInfo]] = {
     val readMessage = ReadDBRowsMessage(
       s"""
-         |SELECT id, name, classroom, teacher, slot
+         |SELECT id, name, classroom, teacher, slot, capacity
          |FROM ${schemaName}.live_streams
       """.stripMargin,
       List()
@@ -35,7 +35,8 @@ case class GetAllLiveStreamsMessagePlanner(
                 classroom <- row.hcursor.get[String]("classroom")
                 teacher <- row.hcursor.get[String]("teacher")
                 slot <- row.hcursor.get[Int]("slot")
-              } yield LiveStreamInfo(id, name, classroom, teacher, slot)
+                capacity <- row.hcursor.get[Int]("capacity")
+              } yield LiveStreamInfo(id, name, classroom, teacher, slot, capacity)
             }
           )
         case Left(error) =>

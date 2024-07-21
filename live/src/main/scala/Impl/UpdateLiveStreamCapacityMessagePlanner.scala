@@ -20,9 +20,9 @@ case class UpdateLiveStreamCapacityMessagePlanner(
     val writeMessage = WriteDBMessage(
       s"""
          |UPDATE ${schemaName}.live_streams
-         |SET enrolled_count = enrolled_count + 1
-         |WHERE id = ? AND capacity > enrolled_count
-      """.stripMargin,
+         |SET capacity = capacity - 1
+         |WHERE id = ? AND capacity > 0
+        """.stripMargin,
       List(SqlParameter("String", liveStreamId))
     )
 

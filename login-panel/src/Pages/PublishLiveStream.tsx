@@ -97,7 +97,8 @@ const PublishLiveStream: React.FC = () => {
                 liveStreamName,
                 selectedClassroom.name,
                 username,
-                selectedSlot
+                selectedSlot,
+                selectedClassroom.capacity  // 添加容量参数
             );
             console.log('发送 CreateLiveStreamMessage:', JSON.stringify({ message }));
             const response = await axios.post(message.getURL(), { message }, {

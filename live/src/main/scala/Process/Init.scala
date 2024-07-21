@@ -26,6 +26,7 @@ object Init {
           classroom VARCHAR(255) NOT NULL,
           teacher VARCHAR(255) NOT NULL,
           slot INT NOT NULL,
+          capacity INT NOT NULL,
           UNIQUE (classroom, slot)
         )
         """,

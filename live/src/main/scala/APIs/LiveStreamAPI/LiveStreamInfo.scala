@@ -8,7 +8,8 @@ case class LiveStreamInfo(
                            name: String,
                            classroom: String,
                            teacher: String,
-                           slot: Int
+                           slot: Int,
+                           capacity: Int  // 新增字段
                          )
 
 object LiveStreamInfo {
