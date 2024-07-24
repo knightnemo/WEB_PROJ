@@ -13,8 +13,8 @@ import { ImageUploader } from './ImageUploader';
 const DEFAULT_EMPTY_IMAGE_URL = 'default_course_bg.jpeg';
 
 const cos = new COS({
-    SecretId: 'AKIDKQZErVAvmedkp2Kl8UzT6wwNoKoDkO93',
-    SecretKey: 'BMdQG9AFWtUbnChCkEo7Ng9gK4tkpvCb',
+    SecretId: '',
+    SecretKey: '',
 });
 
 interface Course {

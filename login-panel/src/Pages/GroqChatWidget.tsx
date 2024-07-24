@@ -13,7 +13,7 @@ interface Course {
 }
 ///knightnemo:这里又是真的api_key,咱们的proj简直是网络安全反面典范
 const groq = new Groq({
-    apiKey: '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',
+    apiKey: '',
     dangerouslyAllowBrowser: true
 });
 ///

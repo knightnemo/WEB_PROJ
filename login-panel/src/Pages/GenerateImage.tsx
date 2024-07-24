@@ -5,7 +5,7 @@ import { RequestRedirect } from 'node-fetch';
 import './GenerateImage.css';
 import { useParams, useHistory, Link } from 'react-router-dom';
 
-const SD_API_KEY ='4qO7aG6gRP5ZQhGNB7HxBRFOwVw39qRq5nHLh8mJiQROlwZzFdHRN9pUvUK6';
+const SD_API_KEY ='';
 
 const GenerateImage = () => {
     const [prompt, setPrompt] = useState('');
